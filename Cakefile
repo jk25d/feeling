@@ -8,7 +8,7 @@
 # * docs  - generates annotated documentation using docco
 # * clean - clean generated .js files
 files = [
-  'lib'
+  'js'
   'src'
 ]
 
