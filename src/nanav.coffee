@@ -1,4 +1,4 @@
-$ ->
+### $ ->
   class Item extends Backbone.Model
     defaults:
       part1: 'Hello'
@@ -40,4 +40,33 @@ $ ->
     events: 'click button': 'addItem'
 
   list_view = new ListView
+###
 
+$ ->
+  class Wine extends Backbone.Model
+  
+  class Winelist extends Backbone.Collection
+
+  class WineView extends Backbone.View
+
+  class WinelistView extends Backbone.View
+    el: 'body'
+    initialize: ->
+      @render()
+    render: ->
+      @$el.append '<ul><li>first</li></ul>'
+      @
+    
+  class HeaderView extends Backbone.View
+    template: _.template($('#tpl-header').html())
+    initialize: ->
+      @render()
+    render: ->
+      @$el.html @template()
+      @
+
+  class RRouter extends Backbone.Router
+    initialize: ->
+      $('#header').html(new HeaderView().render().el)
+    
+  new RRouter    
