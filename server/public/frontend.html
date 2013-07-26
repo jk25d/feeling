@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Frontend - Backbone.js integration with API</title>
+  </head>
+  <body>
+    <section id="api">
+      <h1>Nouns...</h1>
+      <p>
+        /feelings<br>
+        /feelings/:id
+      </p>
+    </section>
+    <section id="container">
+      <h1>Feeling List</h1>
+      <p>
+        To render the feeling list use the route '#list' following the url for this page
+      </p>
+    </section> <!-- /container -->
+ 
+    <script type="text/template" id="product-template">
+        <p>{{feelName}}</p>
+        <p>{{comment}}</p>
+    </script>
+ 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.1/underscore-min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.0/backbone-min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.3.0/mustache.min.js"></script>
+    <script>
+        PX = window.PX || {};
+ 
+        // model
+        PX.Feeling = Backbone.Model.extend({
+            defaults: {
+                feelName: null,
+                comment: null
+            }
+        });
+ 
+        // collection
+        (function () {
+            var FeelingList;
+ 
+            FeelingList = Backbone.Collection.extend({
+                model: PX.Feeling,
+                url: '/api/feelings',
+                initialize: function () {
+                    this.fetch({
+                        success: this.fetchSuccess,
+                        error: this.fetchError
+                    });
+                    this.deferred = new $.Deferred();
+                },
+                deferred: Function.constructor.prototype,
+                fetchSuccess: function (collection, response) {
+                    collection.deferred.resolve();
+                },
+                fetchError: function (collection, response) {
+                    throw new Error("Products fetch did get collection from API");
+                }
+            });
+ 
+            PX.feelings = new FeelingList();
+            FeelingList = null;
+        }());
+ 
+ 
+        PX.FeelingView = Backbone.View.extend({
+            tagName: "li",
+            className: "feeling",
+            initialize: function (options) {
+                this.template = $('#feeling-template').html();
+            },
+            render: function () {
+                var markup = Mustache.to_html(this.template, this.model.toJSON());
+                this.$el.html(markup).attr('id',this.model.get('_id'));
+                return this;
+            }
+        });
+ 
+        PX.FeelingListView = Backbone.View.extend({
+            tagName: "ul",
+            className: "feelings",
+            // initialize: function (options) {
+            //     this.container = options.container;
+            // },
+            render: function () {
+                var i, len = this.collection.length;
+                for (i=0; i < len; i++) {
+                    this.renderItem(this.collection.models[i]);
+                };
+                $(this.container).find(this.className).remove();
+                this.$el.appendTo(this.options.container);
+                return this;
+            },
+            renderItem: function (model) {
+                var item = new PX.FeelingView({
+                    "model": model
+                });
+                item.render().$el.appendTo(this.$el);
+            }
+        });
+ 
+        // application
+        PX.App = Backbone.Router.extend({
+            routes: {
+                "/": "listFeelings",
+                "list": "listFeelings"
+            },
+            //initialize: function (options) {},
+            listFeelings: function () {
+                var FeelingList = new PX.FeelingListView({
+                    "container": $('#container'),
+                    "collection": PX.feelings
+                });
+                PX.feelings.deferred.done(function () {
+                    FeelingList.render();
+                });
+            }
+        });
+ 
+        // bootstrap
+        PX.app = new PX.App();
+        Backbone.history.start();
+ 
+    </script>
+ 
+  </body>
+</html>

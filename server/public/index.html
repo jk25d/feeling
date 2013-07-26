@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>API index</title>
+  </head>
+  <body>
+    <section>
+      <h1>Nouns...</h1>
+      <p>
+        /products<br>
+        /products/:id
+      </p>
+    </section>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+<script>
+jQuery.get("/api/feelings/", function (data, textStatus, jqXHR) {
+    console.log("Get resposne:");
+    console.dir(data);
+    console.log(textStatus);
+    console.dir(jqXHR);
+});
+
+jQuery.post("/api/feelings", {
+  "feelId": "0007",
+  "userId": "jerryjung",
+  "feelName": "happy",
+  "feelColor": "#ffffff",
+  "comment": "I'm happy today!!",
+  "isPublic": "N"
+}, function (data, textStatus, jqXHR) {
+    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
+});
+
+jQuery.get("/api/feelings/51f1ff325cfe1ccb2b000001", function(data, textStatus, jqXHR) { 
+    console.log("Post resposne:"); 
+    console.dir(data); 
+    console.log(textStatus); 
+    console.dir(jqXHR); 
+});
+ 
+
+</script>
+  </body>
+</html>
