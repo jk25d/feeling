@@ -67,3 +67,18 @@ http://pixlr.com/editor/
 
 ## css grad tool
 http://www.colorzilla.com/gradient-editor/
+
+
+Windows Development Setting
+---------------------------
+
+  install node.js for windows
+  
+  set HTTP_PROXY=http://userid:pass@localhost:port  # if use proxy
+  npm config set registry "http://registry.npmjs.org/"  # ssl off
+
+  npm install -g coffee-script
+  npm install which  # for windows
+
+  cake build
+
