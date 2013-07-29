@@ -4,7 +4,7 @@ var application_root = __dirname,
     mongoose = require('mongoose');
 
 
-var app = express.createServer();
+var app = express();
 mongoose.connect('mongodb://localhost/test');
 
 var Schema = mongoose.Schema;  
@@ -39,8 +39,9 @@ app.configure(function () {
 
 
 app.get('/api', function (req, res) {
-  res.send('Ecomm API is running');
+  res.send('Feeling API is running');
 });
+
 
 app.get('/api/feelings', function (req, res){
   return FeelingModel.find(function (err, feelings) {
