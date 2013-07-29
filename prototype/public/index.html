@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NANAV</title>
+  <link rel="stylesheet" href="css/bootstrap-responsive.css" media='screen'>
+  <link rel="stylesheet" href="css/nanav.css">
+  <script src="js/jquery-1.10.2.min.js"></script>
+  <script src="js/bootstrap-2.3.2.js"></script>
+  <script src="js/json2.js"></script>
+  <script src="js/underscore-1.5.1.js"></script>
+  <script src="js/backbone-1.0.0.min.js"></script>
+</head>
+
+<body>
+
+<div id="header">
+  <div id='logo'>NANAV</div>
+  <div id='menu'>
+    <a href='#'>NEW</a>
+    <span> · </span>
+    <a href='#'>MY FEELINGS</a><br/>
+    <a href='#'>PEOPLE FEELINGS</a><br/>
+    <a href='#'>LOGOUT</a>
+  </div>
+</div>
+
+<div id="content">
+</div>
+
+<!-- Templates -->
+<script type="text/template" id="tpl-ask-feeling">
+  <div class='subtitle'>WHAT IS YOUR <h1>FEELING</h1> NOW ?</div>
+    <div id='wordcloud' class='btn-group' data-toggle='buttons-radio'>
+      <button type='button' class='word'>외롭다</button>
+      <button type='button' class='word'>마음아프다</button>
+      <button type='button' class='word'>쓸쓸하다</button>
+      <button type='button' class='word'>기쁘다</button><br/>
+
+      <button type='button' class='word'>기운차다</button>
+      <button type='button' class='word'>기운이없다</button>
+      <button type='button' class='word'>우울하다</button>
+      <button type='button' class='word'>만족스럽다</button><br/>
+
+      <button type='button' class='word'>걱정된다</button>
+      <button type='button' class='word'>삶이힘들다</button>
+      <button type='button' class='word'>초조하다</button>
+      <button type='button' class='word'>허전하다</button><br/>
+
+      <button type='button' class='word'>무섭다</button>
+      <button type='button' class='word'>두렵다</button>
+      <button type='button' class='word'>열등감느낀다</button>
+      <button type='button' class='word'>의욕이없다</button><br/>
+
+      <button type='button' class='word'>사랑스럽다</button>
+      <button type='button' class='word'>소중하다</button>
+      <button type='button' class='word'>설레다</button>
+      <button type='button' class='word'>즐겁다</button>
+    </div>
+
+    <div class='textarea-wrap'>
+      <textarea maxlength='140' class='rd6'></textarea>
+    </div>
+    <div class='btnarea'>
+      <a href='#' class='btn-cl'>확인</a>
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="tpl-wine-list-item">
+	<a href='#wines/<%= id %>'><%= name %></a>
+</script>
+
+<script type="text/template" id="tpl-wine-details">
+    <div class="form-left-col">
+        <label>Id:</label>
+        <input type="text" id="wineId" name="id" value="<%= id %>" disabled />
+        <label>Name:</label>
+        <input type="text" id="name" name="name" value="<%= name %>" required/>
+        <label>Grapes:</label>
+        <input type="text" id="grapes" name="grapes" value="<%= grapes %>"/>
+        <label>Country:</label>
+        <input type="text" id="country" name="country" value="<%= country %>"/>
+        <label>Region:</label>
+        <input type="text" id="region" name="region"  value="<%= region %>"/>
+        <label>Year:</label>
+        <input type="text" id="year" name="year"  value="<%= year %>"/>
+    </div>
+    <div class="form-right-col">
+        <label>Notes:</label>
+        <textarea id="description" name="description"><%= description %></textarea>
+    </div>
+</script>
+
+</body>
+</html>
+
