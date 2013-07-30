@@ -14,7 +14,7 @@
 
 /* common */
 div {overflow:hidden;}
-h1,h2,h3,h4,h5,h6 {margin:0;}
+h1,h2,h3,h4,h5,h6 {margin:0;display:inline;}
 h1 {font-size:63px;}
 h2 {font-size:36px;}
 h3 {font-size:16px;}
@@ -70,15 +70,37 @@ textarea {
   -khtml-border-radius: 6px;
   border-radius: 6px;
 }
+.word{
+  color:#ffffff;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: button;
+  *overflow: visible;
+  cursor: pointer;
+}
+.word::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+.word:hover {
+  color:#00ccff;
+}
+.word.active,
+.word:active {
+  font-size:30px;
+  font-weight:bold;
+  color:#00ccff;
+}
 
 /* */
 #header { margin:10px 0; }
 #logo { float:left;font-size:16px;color:#868686; }
-#menu { float:right;text-align:right;font-size:9px;line-height:12px; }
+#menu { float:right;text-align:right;font-size:9px;line-height:12px;}
 
+.content {margin:0 auto;max-width:480px;}
 .subtitle {text-align:center;font-size:36px;margin-top:34px;line-height:50px;}
 .subtitle h1 {font-size:66px;color:#0099ff}
-#wordcloud {width:300px;margin:0 auto;margin-top:22px;text-align:center;font-size:14px;line-height:28px;}
+#wordcloud {margin:0 auto;margin-top:22px;text-align:center;font-size:14px;line-height:28px;}
 .word.active {color:#0099ff;}
 .textarea-wrap {margin-top:40px;text-align:center;}
 .textarea-wrap textarea {width:280px;height:80px;}
