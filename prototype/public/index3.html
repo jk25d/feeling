@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NANAV</title>
+  <link rel="stylesheet" href="css/bootstrap-responsive.css" media='screen'>
+  <link rel="stylesheet" href="css/nanav.css">
+  <script src="js/jquery-1.10.2.min.js"></script>
+  <script src="js/bootstrap-2.3.2.js"></script>
+  <script src="js/json2.js"></script>
+  <script src="js/underscore-1.5.1.js"></script>
+  <script src="js/backbone-1.0.0.min.js"></script>
+  <script src="js/nanav.js"></script>
+</head>
+
+<body>
+
+<div id="header">
+  <div id='logo'>NANAV</div>
+  <div id='menu'>
+    <a href='#logout'>LOGOUT</a>
+    <span> · </span>
+    <a href='#thoughts/new'>NEW THOUGHT</a>
+    <span> · </span>
+    <a href='#thoughts'>MY THOUGHTS</a><br/>
+    <a href='#allthoughts'>RECEIVED THOUGHTS</a><br/>
+    <a href='#allfeelings'>ALL FEELINGS</a><br/>
+  </div>
+</div>
+
+<div class='subtitle'></div>
+
+<div id="content">
+</div>
+
+<!-- TEMPLATES -->
+<script type="text/template" id="tpl-thought">
+  <li>
+    <ul>
+      <li><%= user %></li>
+      <li><%= word %></li>
+      <li><%= feeltxt %></li>
+      <li><%= thought %></li>
+      <li><%= time %></li>
+    </ul>
+  </li>
+</script>
+
+<script type="text/template" id="tpl-feeling">
+  <li>
+    <ul>
+      <li><%= user %></li>
+      <li><%= word %></li>
+      <li><%= feeltxt %></li>
+      <li><%= time %></li>
+    </ul>
+  </li>
+</script>
+
+<script type="text/template" id="tpl-newthought">
+  <div class='textarea-wrap'>
+    <input id='feeltxt' type='text'></input>
+    <textarea id='thought' maxlength='140' class='rd6'></textarea>
+  </div>
+  <div class='btnarea'>
+    <a id='save-btn' class='btn-cl'>확인</a>
+  </div>
+</script>
+
+<script type="text/template" id="tpl-login">
+  <input id='userid' type='text'></input>
+  <a id='login-btn' class='btn-cl'>LOGIN</a>
+</script>
+
+</body>
+</html>
+
