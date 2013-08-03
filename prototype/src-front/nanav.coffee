@@ -1,79 +1,69 @@
 $ ->
 
-  WORDMAP =
-    w0: '외롭다'
-    w1: '마음아프다'
-    w2: '쓸쓸하다'
-    w3: '기쁘다'
-    w4: '기운차다'
-    w5: '기운이없다'
-    w6: '우울하다'
-    w7: '만족스럽다'
-    w8: '걱정된다'
-    w9: '삶이힘들다'
-    w10: '초조하다'
-    w11: '허전하다'
-    w12: '무섭다'
-    w13: '두렵다'
-    w14: '열등감느낀다'
-    w15: '의욕이없다'
-    w16: '사랑스럽다'
-    w17: '소중하다'
-    w18: '설레다'
-    w19: '즐겁다'
+  WORDS =
+    w0:  {w: '외롭다',      c: '#00ccff'}
+    w1:  {w: '마음아프다',  c: '#3399ff'}
+    w2:  {w: '쓸쓸하다',    c: '#9966ff'}
+    w3:  {w: '기쁘다',      c: '#ff00ff'}
+    w4:  {w: '기운차다',    c: '#ff3399'}
+    w5:  {w: '기운이없다',  c: '#ff0066'}
+    w6:  {w: '우울하다',    c: '#ff6600'}
+    w7:  {w: '만족스럽다',  c: '#ff9933'}
+    w8:  {w: '걱정된다',    c: '#ffcc00'}
+    w9:  {w: '삶이힘들다',  c: '#33cc33'}
+    w10: {w: '초조하다',    c: '#00cc66'}
+    w11: {w: '허전하다',    c: '#009999'}
+    w12: {w: '무섭다',      c: '#336699'}
+    w13: {w: '두렵다',      c: '#cc00ff'}
+    w14: {w: '열등감느낀다',c: '#660033'}
+    w15: {w: '의욕이없다',  c: '#993333'}
+    w16: {w: '사랑스럽다',  c: '#df0000'}
+    w17: {w: '소중하다',    c: '#993300'}
+    w18: {w: '설레다',      c: '#996600'}
+    w19: {w: '즐겁다',      c: '#666633'}
     
 
-  # MODELS
-
-  class Thought extends Backbone.Model
-    url: '../api/thoughts'
-
-  class Thoughts extends Backbone.Collection
-    model: Thought
-    url: '../api/thoughts'
-  
-  class AllThoughts extends Backbone.Collection
-    model: Thought
-    url: '../api/allthoughts'
+  #### MODELS ####
 
   class Word extends Backbone.Model
-    url: '../api/words'
+    url: '../api/daily_words'
 
   class Feeling extends Backbone.Model
-    url: '../api/allfeelings'
+    url: '../api/feelings'
+
+  class Comment extends Backbone.Model
+    url: '../api/comments'
+
+  class FloatFeeling extends Backbone.Model
+    url: '../api/float_feelings'
   
+  class FloatFeelingComment extends Backbone.Model
+    url: "../api/float_feelings/#{id}/comment"
+
   class Feelings extends Backbone.Collection
     model: Feeling
-    url: '../api/allfeelings'
+    url: ../api/feelings'
+
+  class Comments extends Backbone.Collection
+    model: Comment
+    url: ../api/comments'
+
+  class FloatFeelings extends Backbone.Collection
+    model: FloatFeeling
+    url: ../api/float_feelings'
 
 
-  # VIEWS
 
-  class ThoughtsView extends Backbone.View
-    tagName: 'ul'
-    initialize: ->
-      @model.bind 'reset', @render, @
-    render: (event) ->
-      $('.subtitle').html "MY THOUGHTS"
-      for thought in @model.models
-        @$el.append new ThoughtView(model: thought).render().el
-      @
-
-  class ThoughtView extends Backbone.View
-    tagName: 'li'
-    template: _.template $('#tpl-thought').html()
-    render: (event) ->
-      @model.set 'word', WORDMAP[@model.get('word')]
-      @$el.html @template(@model.toJSON())
-      @
+  #### VIEWS ####
 
   class WordView extends Backbone.View
     tagName: 'button'
     render: (event) ->
       @$el.addClass 'btn'
       @$el.addClass 'word'
-      @$el.attr 'id', @model
-      @$el.html WORDMAP[@model]
+      @$el.attr 'id', @model.id
+      @$el.css 'color', @model.c
+      @$el.html @model.w
       @
 
   class WordsView extends Backbone.View
@@ -86,33 +76,34 @@ $ ->
         @$el.append new WordView(model: word).render().el
       @
 
-  class NewThoughtView extends Backbone.View
+  class NewFeelingView extends Backbone.View
     tagName: 'div'
-    template: _.template $('#tpl-newthought').html()
+    template: _.template $('#tpl-new-feeling').html()
     events:
       'click #save-btn': 'save'
+      'click .word': 'toggle'
     initialize: ->
       @model.bind 'reset', @render, @
     render: (event) ->
-      $('.subtitle').html "NEW THOUGHT"
+      $('.subtitle').html "NEW FEELING"
+      @words = Object.keys(WORDS).map (k) -> WORDS[k].id = k
+      $('.words').html new WordsView.render(model: @words).el
       @$el.append @template() 
       @
+    toggle: ->
+      t = $('#wordcloud').children('.active').attr('id')
+      $('#content').val t
     save: ->
-      console.log $('#wordcloud').children()
-      console.log $('#wordcloud').children('.active').attr('id')
       @model.set
-        word: $('#wordcloud').children('.active').attr('id')
-        feeltxt: $('#feeltxt').val()
-        thought: $('#thought').val()
-      console.log @model
-      unless @model.get('word') && @model.get('feeltxt') && @model.get('thought')
+        word_id: $('#wordcloud').children('.active').attr('id')
+        content: $('#content').val()
+      unless @model.get('word_id') && @model.get('feeltxt')
         alert 'fill all inputs'
         return
-      console.log 'before save'
-      @model.save success: (data) -> 
-        window.location.replace '#thoughts'
+      @model.save {}, success: (data) -> 
+        window.location.replace '#feelings'
 
-  class AllThoughtsView extends Backbone.View
+  class FeelingsView extends Backbone.View
     tagName: 'ul'
     initialize: ->
       @model.bind 'reset', @render, @
@@ -159,7 +150,7 @@ $ ->
           window.location.replace '#'
 
 
-  # ROUTER
+  #### ROUTER ####
 
   $.ajaxSetup
     statusCode:
@@ -168,13 +159,13 @@ $ ->
 
   class AppRouter extends Backbone.Router
     routes:
-      "": "thoughts"
+      "": "feelings"
       "login": "login"
-      "logout": "login"
-      "thoughts": "thoughts"
-      "thoughts/new": "newthought"
-      "allthoughts": "allthoughts"
-      "allfeelings": "allfeelings"
+      "logout": "logout"
+      "feelings": "feelings"
+      "feelings/new": "new_feelings"
+      "feelings/:id": "show_feelings"
+      "float_feelings": "float_feelings"
 
     login: ->
       $('#content').html(new LoginView({}).render().el)
@@ -186,27 +177,29 @@ $ ->
         success: (data) ->
           window.location.replace '/#login'
 
-    thoughts: ->
-      console.log 'thoughts'
-      @thoughts = new Thoughts
-      @thoughts.fetch success: (model, res) ->
-        $('#content').html(new ThoughtsView(model: model).render().el)
+    new_feelings: ->
+      $('#content').html new WordsView(model: Object.keys(WORDS)).render().el
+      @feeling = new Feeling
+      $('#content').html new NewFeelingView(model: @feeling).render().el
 
-    newthought: ->
-      $('#content').html(new WordsView(model: Object.keys(WORDMAP)).render().el)
-      @thought = new Thought
-      @thought.fetch success: (model, res) ->
-        $('#content').append(new NewThoughtView(model: model).render().el)
-
-    allthoughts: ->
-      @thoughts = new AllThoughts
-      @thoughts.fetch success: (model, res) ->
-        $('#content').html(new AllThoughtsView(model: model).render().el)
-    
-    allfeelings: ->
+    feelings: ->
       @feelings = new Feelings
-      @feelings.fetch success: (model, res) ->
-        $('#content').html(new AllFeelingsView(model: model).render().el)
+      @feelings.fetch 
+        data: {mon: 8, n: 3}
+        success: (model, res) ->
+          $('#content').html new FeelingsView(model: model).render().el
+
+    show_feelings: (id) ->
+      @feeling = new Feeling
+      @feeling.fetch 
+        data: {id: id} 
+        success: (model, res) ->
+          $('#content').html new FeelingDetailView(model: model).render().el
+    
+    float_feelings: ->
+      @float_feelings = new FloatFeelings
+      @float_feelings.fetch success: (model, res) ->
+        $('#content').html new FloatFeelingsView(model: model).render().el
 
   new AppRouter
   Backbone.history.start()

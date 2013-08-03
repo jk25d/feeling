@@ -21,11 +21,10 @@
   <div id='menu'>
     <a href='#logout'>LOGOUT</a>
     <span> · </span>
-    <a href='#thoughts/new'>NEW THOUGHT</a>
+    <a href='#feelings/new'>NEW FEELINGS</a>
     <span> · </span>
-    <a href='#thoughts'>MY THOUGHTS</a><br/>
-    <a href='#allthoughts'>RECEIVED THOUGHTS</a><br/>
-    <a href='#allfeelings'>ALL FEELINGS</a><br/>
+    <a href='#feelings'>MY FEELINGS</a><br/>
+    <a href='#float_feelings'>RECEIVED FEELINGS</a><br/>
   </div>
 </div>
 
@@ -58,10 +57,11 @@
   </li>
 </script>
 
-<script type="text/template" id="tpl-newthought">
+<script type="text/template" id="tpl-new-feeling">
+  <div class='words'></div>
   <div class='textarea-wrap'>
-    <input id='feeltxt' type='text'></input>
-    <textarea id='thought' maxlength='140' class='rd6'></textarea>
+    <input id='word_id' type='text'></input>
+    <textarea id='content' maxlength='140' class='rd6'></textarea>
   </div>
   <div class='btnarea'>
     <a id='save-btn' class='btn-cl'>확인</a>
@@ -69,7 +69,7 @@
 </script>
 
 <script type="text/template" id="tpl-login">
-  <input id='userid' type='text'></input>
+  <input id='user_id' type='text'></input>
   <a id='login-btn' class='btn-cl'>LOGIN</a>
 </script>
 
