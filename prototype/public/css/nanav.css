@@ -21,10 +21,10 @@ h3 {font-size:16px;}
 h4 {font-size:14px;}
 h5 {font-size:9px;}
 p {font-size:12px;}
-a:link {color:#ffffff;text-decoration:none;}
-a:visited {color:#ffffff;text-decoration:none;}
-a:active {color:#0099ff;text-decoration:none;}
-a:hover {color:#00ccff;text-decoration:none;}
+a:link {text-decoration:none;}
+a:visited {text-decoration:none;}
+a:active {text-decoration:none;}
+a:hover {text-decoration:none;}
 body {
   background-color:#3a3a3a;
   color:#ffffff;
@@ -71,7 +71,6 @@ textarea {
   border-radius: 6px;
 }
 .word{
-  color:#ffffff;
   background: transparent;
   border: 0;
   -webkit-appearance: button;
@@ -83,13 +82,12 @@ textarea {
   border: 0;
 }
 .word:hover {
-  color:#00ccff;
+  font-weight:bold;
 }
 .word.active,
 .word:active {
   font-size:30px;
   font-weight:bold;
-  color:#00ccff;
 }
 
 /* */
