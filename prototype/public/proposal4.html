@@ -1,0 +1,264 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NANAV</title>
+  <link rel="stylesheet" href="css/bootstrap-snippets.css" media='screen'>
+  <link rel="stylesheet" href="css/bootstrap-responsive.css" media='screen'>
+  <link rel="stylesheet" href="css/nanav.css" media='screen'>
+  <script src="js/jquery-1.10.2.min.js"></script>
+  <script src="js/bootstrap-2.3.2.js"></script>
+  <script src="js/json2.js"></script>
+  <script src="js/underscore-1.5.1.js"></script>
+  <script src="js/backbone-1.0.0.min.js"></script>
+  <script src="js/coffee-script.js"></script>
+  <style>
+    body {background-color:#ffffff;color:#aaaaaa;}
+    textarea {background-color:#ffffff;color:#aaaaaa;}
+    #_content {margin:0 auto;max-width:480px;text-align:center;}
+    ul {list-style:none;padding-left:0;}
+    li {margin:10px 0 20px 0;}
+    .expandable li .expandme {display:none;}
+    .expandable .active .expandme {display:block;}
+    .toggle li {display:none;}
+    .toggle .active {display:block;}
+	  .word {width:130px;height:130px;margin:8px;border:1px solid #dddddd;display:inline-block;}
+    .box {width:180px;height:180px;margin:8px;border:1px solid #dddddd;display:inline-block;padding:10px;}
+    .c0 {color:#00ccff;}
+    .c1 {color:#9966ff;}
+    .c2 {color:#ff0066;}
+    .c3 {color:#ff6600;}
+    .c4 {color:#ffcc00;}
+    .c5 {color:#336699;}
+    .c6 {color:#660033;}
+    .c7 {color:#df0000;}
+    .c8 {color:#996600;}
+    .c9 {color:#666633;}
+    .s0 {font-size:10px;}
+    .s1 {font-size:12px;}
+    .s2 {font-size:14px;}
+    .s3 {font-size:16px;}
+    .s4 {font-size:18px;}
+    .s5 {font-size:20px;}
+    .s6 {font-size:22px;}
+    .s7 {font-size:24px;}
+  </style>
+  <script type='text/coffeescript'>
+    $ ->
+      class TestRouter extends Backbone.Router
+        routes:
+          "": "home"
+          "login": "login"
+          "feelings/new": "feelings_new"
+          "feelings": "feelings"
+          "feelings/show": "feelings_show"
+          "floats": "floats"
+          "comments/:id/toggle": "comments_id_toggle"
+          "comments": "comments"
+          "feelings/:id/show": "feelings_id_show"
+          "toggle/:id": "toggle"
+        home: ->
+          $('#_content').html _.template $('#tpl_feelings_new').html()
+        login: ->
+          $('#_content').html _.template $('#tpl_login').html()
+        feelings_new: ->
+          $('#_content').html _.template $('#tpl_feelings_new').html()
+        feelings: ->
+          $('#_content').html _.template $('#tpl_feelings').html()
+        feelings_show: (event) ->
+          $('#_content').html _.template $('#tpl_feelings_show').html()
+        floats: ->
+          $('#_content').html _.template $('#tpl_floats').html()
+        comments: ->
+          $('#_content').html _.template $('#tpl_comments').html()
+        feelings_id_show: (id) ->
+          $('.expandable > li').removeClass 'active'
+          $("##{id}").addClass 'active'
+        toggle: (id) ->
+          console.log id
+          $("##{id}").children().toggleClass 'active'
+      new TestRouter
+      Backbone.history.start()
+  </script>
+</head>
+
+<body>
+
+<div id="_header">
+  <div id='logo'>NANAV</div>
+  <div id='menu'>
+    <a href='#login'>LOGOUT</a>
+    <span> · </span>
+    <a href='#feelings/new'>NEW FEELINGS</a>
+    <span> · </span>
+    <a href='#feelings'>MY FEELINGS</a><br/>
+    <a href='#floats'>RECEIVED FEELINGS</a><br/>
+  </div>
+</div>
+
+<div id='_wrap'>
+  <div id='_title'></div>
+  <div id='_content'></div>
+</div>
+
+<!-- TEMPLATES -->
+<script type='text/template' id='tpl_login'>
+  <div id='login_holder'>
+    <div>ID</div>
+    <input type='text'></input>
+    <div>Password</div>
+    <input type='text'></input>
+    <div><a href='#feelings/new'>LOGIN</a></div>
+  </div>
+</script>
+
+<script type='text/template' id='tpl_feelings_new'>
+  <div id='feelings_new_holder'>
+    <div><h2>지금 당신의 기분은?</h2></div>
+    <div class='btn-group' data-toggle='buttons-radio'>
+      <button type='button' class='btn word c0 s5'>외롭다</button>
+      <button type='button' class='btn word c2 s2'>마음아프다</button>
+      <button type='button' class='btn word c4 s3'>쓸쓸하다</button>
+      <button type='button' class='btn word c6 s5'>기쁘다</button>
+
+      <button type='button' class='btn word c8 s2'>기운차다</button>
+      <button type='button' class='btn word c3 s3'>기운이없다</button>
+      <button type='button' class='btn word c1 s5'>우울하다</button>
+      <button type='button' class='btn word c5 s2'>만족스럽다</button>
+
+      <button type='button' class='btn word c7 s2'>걱정된다</button>
+      <button type='button' class='btn word c9 s3'>삶이힘들다</button>
+      <button type='button' class='btn word c3 s2'>초조하다</button>
+      <button type='button' class='btn word c8 s1'>허전하다</button>
+
+      <button type='button' class='btn word c2 s0'>무섭다</button>
+      <button type='button' class='btn word c1 s1'>두렵다</button>
+      <button type='button' class='btn word c5 s6'>열등감느낀다</button>
+      <button type='button' class='btn word c4 s3'>의욕이없다</button>
+
+      <button type='button' class='btn word c6 s3'>사랑스럽다</button>
+      <button type='button' class='btn word c0 s4'>소중하다</button>
+      <button type='button' class='btn word c7 s4'>설레다</button>
+      <button type='button' class='btn word c9 s5'>즐겁다</button>
+    </div>
+    <div><textarea></textarea></div>
+    <div><a href="#myModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a></div>
+    <div id="myModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Modal header</h3>
+      </div>
+      <div class="modal-body">
+        <p>One fine body…</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn">Close</a>
+        <a href="#" class="btn btn-primary">Save changes</a>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type='text/template' id='tpl_feelings'>
+  <div id='feelings_holder'>
+    <div style='text-align:left;'>
+      <div class='box'>
+        <div style='text-align:center;'>
+          <a href='#feelings/new' class='c0 s2'>+</a>
+        </div>
+      </div>
+      <div class='box'>
+        <div style='height:80%'>
+          <a href='#feelings/f0/show' class='c0 s2'>영화 돈만 버렸음</a>
+        </div>
+        <div class='s0'>한심하다 6시간전 답글1</div>
+      </div>
+      <div class='box'>
+        <div style='height:80%'>
+          <a href='#feelings/f1/show' class='c9 s1'>배고파 죽겠는데 밥은 언제머그러가나 ㅠ.ㅠ</a>      
+        </div>
+        <div class='s0'>한심하다 6시간전 답글1</div>
+      </div>
+      <div class='box'>
+        <div style='height:80%'>
+          <a href='#feelings/f2/show' class='c2 s4'>오늘은 소개팅 하는날</a>
+        </div>
+        <div class='s0'>한심하다 6시간전 답글1</div>
+      </div>
+      <div class='box'>
+        <div style='text-align:center'>
+          <a href='#feelings/f0/show' class='c0 s2'>more</a>
+        </div>
+      </div>
+    </div>
+
+    <div style='border-bottom:1px solid #999999'></div>
+
+    <div style='text-align:left;'>
+      <div class='box'>
+        <div style='height:80%'>
+          <a href='#feelings/f2/show' class='c2 s4'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</a>
+        </div>
+        <div class='s0'>6시간전 한심하다님 답글하기 포워드</div>
+      </div>
+      <div class='box'>
+        <div style='height:80%'>
+          <a href='#feelings/f2/show' class='c2 s4'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</a>
+        </div>
+        <div class='s0'>6시간전 한심하다님 답글하기 포워드</div>
+      </div>
+      <div class='box'>
+        <div style='height:80%'>
+          <a href='#feelings/f2/show' class='c2 s4'>설국열차 내 인생 최고의 영화임</a>
+        </div>
+        <div class='s0'>6시간전 한심하다님 답글하기 포워드</div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type='text/template' id='tpl_floats'>
+  <div id='floats_holder'>
+    <div><h2>당신에게 온 3개의 메시지</h2></div>
+    <a href='#toggle/float0'>
+      <ul class='toggle' id='float0'>
+        <li class='c0 active'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</li>
+        <li class='c0'>6시간전 한심하다님 답글하기 포워드</li>
+      </ul>
+    </a>
+    <a href='#toggle/float1'>
+      <ul class='toggle' id='float1'>
+        <li class='c8 active'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</li>
+        <li class='c0'>6시간전 즐겁다님 답글하기 포워드</li>
+      </ul>
+    </a>
+    <a href='#toggle/float2'>
+      <ul class='toggle' id='float2'>
+        <li class='c4 active'>설국열차 내 인생 최고의 영화임</li>
+        <li class='c0'>6시간전 설렌다님 답글하기 포워드</li>
+      </ul>
+    </a>
+    <div><a href='#comments'>&gt;</a></div>
+  </div>
+</script>
+<script type='text/template' id='tpl_comments'>
+  <div id='comments_holder'>
+    <div><h2>그동안 내가 보낸 답변들</h2></div>
+    <a href='#toggle/flc1'>
+      <ul class='toggle' id='flc1'>
+        <li class='active'>기운을 내세요 <span class='c0'>@한심하다 셤망침</span></li>
+        <li>11/11/11 11:11 @mmmy****</li>
+      </ul>
+    <a href='#toggle/flc2'>
+      <ul class='toggle' id='flc2'>
+        <li class='active'>혼자가 아니에요 <span class='c9'>@외로워요 바람이 차갑네요</span></li>
+        <li>11/11/11 11:11 @mmmy****</li>
+      </ul>
+    <div><a href='#floats'>&lt;</a></div>
+  </div>
+</script>
+
+</body>
+</html>
+
