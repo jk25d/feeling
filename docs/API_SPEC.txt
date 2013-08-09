@@ -1,0 +1,129 @@
+﻿
+
+
+
+Feeling Words - index
+========================================================= 
+GET /feelings/words
+  [ {feel: '', count: ''}, {} ]
+
+
+
+MyFeelings - new
+=========================================================
+POST /feelings/my
+ - feel
+ - desc			// 상세내용
+ - isPublic
+
+MyFeelings - index
+========================================================= 
+GET /feelings/my
+(입력 파라메터: skip, count(가져올갯수))
+ - id
+ - feel
+ - desc
+ - hearts
+   [ {user_id: ''} ]
+ - timestamp   
+ - comments
+   [ { id
+       user
+       timestamp
+       feel    // 이 코멘트를 단 사람의 당시 느낌
+     }
+   ]
+
+MyFeelings - index (24시간이내)
+========================================================= 
+GET /feelings/my/latest
+ - id
+ - feel
+ - desc
+ - hearts
+   [ {user_id: ''} ]
+ - timestamp   
+ - comments
+   [ { id
+       user
+       timestamp
+       feel    // 이 코멘트를 단 사람의 당시 느낌
+     }
+   ]
+
+MyFeelings - show
+========================================================= 
+GET /feelings/my/:feel_id
+ - id
+ - feel
+ - desc
+ - hearts
+   [ {user_id: ''} ]
+ - timestamp   
+ - comments
+   [ { id
+       user
+       timestamp
+       feel    // 이 코멘트를 단 사람의 당시 느낌
+     }
+   ]
+
+
+MyFeelings/Comments - destroy
+========================================================= 
+DELETE /feelings/my/:feel_id/comments/:comment_id
+
+      
+
+OthersFeelings - index (내 보관함에 있는것만)
+========================================================= 
+GET /feelings/others
+ - id
+ - feel
+ - desc
+ - user_id 		// 느낌을 쓴 유저 id
+ - timestamp
+
+OthersFeelings - show
+========================================================= 
+GET /feelings/others/:id
+ - id
+ - feel
+ - desc
+ - user_id 		// 느낌을 쓴 유저 id
+ - timestamp
+
+
+OthersFeelings - update
+========================================================= 
+PUT /feelings/others/:feel_id
+ - action
+   'send' or 'forward'
+
+
+OthersFeelings/Comments - new
+========================================================= 
+POST /feelings/others/:feel_id/comments
+ - desc
+
+HeartFeelings - index 내가 공감한 느낌 리스트(heart누른거)
+=========================================================
+(입력 파라메터: skip, count(가져올갯수))
+GET /feelings/hearts
+
+ - id
+ - feel
+ - user_id 		// 느낌을 쓴 유저 id
+ - timestamp
+ - comment              // 공감도하고 코멘트도 달았다면 내꺼만 보여줌..
+     - timestamp
+     - feel             // 당시 나의 느낌
+
+
+ 
+ 
+
+
+ 
+ 
+ 
