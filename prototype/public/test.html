@@ -1,13 +1,21 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<style>
-
-</style>
+  <meta charset="utf-8">
+  <title>next demo</title>
+  <style>
+ 
+  span { color:blue; font-weight:bold; }
+  button { width:100px; }
+  	</style>
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 </head>
 <body>
-  <ul>
-    <li>a</li>
-    <li style='display:block;'>b</li>
-  </ul>
+  <div><button disabled="disabled">First</button> - <span></span></div>
+  <div><button>Second</button> - <span></span></div>
+ 
+  <div><button disabled="disabled">Third</button> - <span></span></div>
+<script>$("button[disabled]").next().text("this button is disabled");</script>
+ 
 </body>
 </html>
