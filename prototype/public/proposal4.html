@@ -4,26 +4,28 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NANAV</title>
-  <link rel="stylesheet" href="css/bootstrap-snippets.css" media='screen'>
-  <link rel="stylesheet" href="css/bootstrap-responsive.css" media='screen'>
-  <link rel="stylesheet" href="css/nanav.css" media='screen'>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.css" media='screen'>
+  <style>
+    body {background-color:#dddddd;padding-top:60px;padding-bottom:40px;}
+  </style>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" media='screen'>
+  <!--link rel="stylesheet" href="css/nanav4.css" media='screen'-->
   <script src="js/jquery-1.10.2.min.js"></script>
-  <script src="js/bootstrap-2.3.2.js"></script>
+  <script src="bootstrap/js/bootstrap.js"></script>
   <script src="js/json2.js"></script>
   <script src="js/underscore-1.5.1.js"></script>
   <script src="js/backbone-1.0.0.min.js"></script>
   <script src="js/coffee-script.js"></script>
   <style>
-    body {background-color:#ffffff;color:#aaaaaa;}
+    body {background-color:#dddddd;}
     textarea {background-color:#ffffff;color:#aaaaaa;}
     #_content {margin:0 auto;max-width:1200px;text-align:center;}
     ul {list-style:none;padding-left:0;}
-    li {margin:10px 0 20px 0;}
+    div {overflow:hidden;box-sizing:border-box;}
     .expandable li .expandme {display:none;}
     .expandable .active .expandme {display:block;}
     .toggle li {display:none;}
     .toggle .active {display:block;}
-	  .word {width:130px;height:130px;margin:8px;border:1px solid #dddddd;float:left;}
     .box {width:180px;height:180px;margin:8px;border:1px solid #dddddd;float:left;padding:10px;}
     .c0 {color:#00ccff;}
     .c1 {color:#9966ff;}
@@ -42,7 +44,27 @@
     .s4 {font-size:18px;}
     .s5 {font-size:20px;}
     .s6 {font-size:22px;}
-    .s7 {font-size:24px;}
+    .s7 {font-size:32px;}
+    .word{
+      background: transparent;
+      border: 0;
+      -webkit-appearance: button;
+      *overflow: visible;
+      cursor: pointer;
+      line-height:40px;
+    }
+    .rd6 {
+      -moz-border-radius: 6px;
+      -webkit-border-radius: 6px;
+      -khtml-border-radius: 6px;
+      border-radius: 6px;
+    }
+    .rd50 {
+      -moz-border-radius: 50%;
+      -webkit-border-radius: 50%;
+      -khtml-border-radius: 50%;
+      border-radius: 50%;
+    }
   </style>
   <script type='text/coffeescript'>
     $ ->
@@ -85,19 +107,31 @@
 
 <body>
 
-<div id="_header">
-  <div id='logo'>NANAV</div>
-  <div id='menu'>
-    <a href='#login'>LOGOUT</a>
-    <span> · </span>
-    <a href='#feelings/new'>NEW FEELINGS</a>
-    <span> · </span>
-    <a href='#feelings'>MY FEELINGS</a><br/>
-    <a href='#floats'>RECEIVED FEELINGS</a><br/>
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class='navbar-inner'>
+    <div class='container'>
+      <button type='button' class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
+        <span class='icon-bar'></span>
+        <span class='icon-bar'></span>
+        <span class='icon-bar'></span>
+      </button>
+
+      <a class='brand' href='#'>FEELING SHARE</a>
+      <div class='nav-collapse collapse'>
+        <ul class='nav'>
+          <li class='active'><a href='#login'>LOGOUT</a></li>
+          <li><a href='#feelings'>MY FEELINGS</a></li>
+          <li><a href='#feelings/new'>NEW FEELING</a></li>
+          <li><a href='#floats'>TODAY FEELINGS</a></li>
+        </ul>
+      </div> <!-- /.nav-collapse -->
+    </div>
   </div>
 </div>
 
-<div id='_content'></div>
+<div id='_content' class='container'>
+  <div class='row'></div>
+</div>
 
 <!-- TEMPLATES -->
 <script type='text/template' id='tpl_login'>
@@ -111,53 +145,108 @@
 </script>
 
 <script type='text/template' id='tpl_feelings_new'>
-  <div id='feelings_new_holder'>
-    <div><h2>지금 당신의 기분은?</h2></div>
-    <div class='btn-group' data-toggle='buttons-radio'>
-      <button type='button' class='btn word c0 s5'>외롭다</button>
-      <button type='button' class='btn word c2 s2'>마음아프다</button>
-      <button type='button' class='btn word c4 s3'>쓸쓸하다</button>
-      <button type='button' class='btn word c6 s5'>기쁘다</button>
+  <div id='feeling_map' class='span5' style='background-color:#eeeeee;padding:10px;'>
+    <div class='rd6' style='background-color:#ffffff;border:1px solid #eaeaea;'>
+      <div class='s1' style='line-height:20px;text-align:left;margin-top:20px;margin-left:20px;'>최근 느낌들</div>
+      <div class='btn-group' data-toggle='buttons-radio' style='text-align:left;margin-top:10px;padding:10px;border-top:1px solid #dddddd;border-bottom:1px solid #dddddd;white-space:normal;width:100%;'>
+        <button type='button' class='word c0 s7'>외롭다</button>
+        <button type='button' class='word c2'>마음아프다</button>
+        <button type='button' class='word c4'>쓸쓸하다</button>
+        <button type='button' class='word c6 s0'>기쁘다</button>
 
-      <button type='button' class='btn word c8 s2'>기운차다</button>
-      <button type='button' class='btn word c3 s3'>기운이없다</button>
-      <button type='button' class='btn word c1 s5'>우울하다</button>
-      <button type='button' class='btn word c5 s2'>만족스럽다</button>
+        <button type='button' class='word c8'>기운차다</button>
+        <button type='button' class='word c3 s0'>기운이없다</button>
+        <button type='button' class='word c1 s0'>우울하다</button>
+        <button type='button' class='word c5'>만족스럽다</button>
 
-      <button type='button' class='btn word c7 s2'>걱정된다</button>
-      <button type='button' class='btn word c9 s3'>삶이힘들다</button>
-      <button type='button' class='btn word c3 s2'>초조하다</button>
-      <button type='button' class='btn word c8 s1'>허전하다</button>
+        <button type='button' class='word c7'>걱정된다</button>
+        <button type='button' class='word c9'>삶이힘들다</button>
+        <button type='button' class='word c3 s0'>초조하다</button>
+        <button type='button' class='word c8 s7'>허전하다</button>
 
-      <button type='button' class='btn word c2 s0'>무섭다</button>
-      <button type='button' class='btn word c1 s1'>두렵다</button>
-      <button type='button' class='btn word c5 s6'>열등감느낀다</button>
-      <button type='button' class='btn word c4 s3'>의욕이없다</button>
+        <button type='button' class='word c2'>무섭다</button>
+        <button type='button' class='word c1'>두렵다</button>
+        <button type='button' class='word c5 s0'>열등감느낀다</button>
+        <button type='button' class='word c4'>의욕이없다</button>
 
-      <button type='button' class='btn word c6 s3'>사랑스럽다</button>
-      <button type='button' class='btn word c0 s4'>소중하다</button>
-      <button type='button' class='btn word c7 s4'>설레다</button>
-      <button type='button' class='btn word c9 s5'>즐겁다</button>
+        <button type='button' class='word c6'>사랑스럽다</button>
+        <button type='button' class='word c0 s7'>소중하다</button>
+        <button type='button' class='word c7 s0'>설레다</button>
+        <button type='button' class='word c9'>즐겁다</button>
+      </div>
+
+      <div class='s1' style='line-height:20px;text-align:left;margin-top:20px;margin-left:20px;'>나와 비슷한 성향의 사람들의 최근 느낌</div>
+      <div class='btn-group' data-toggle='buttons-radio' style='text-align:left;margin-top:10px;padding:10px;border-top:1px solid #dddddd;border-bottom:1px solid #dddddd;white-space:normal;width:100%;'>
+        <button type='button' class='word c0 s7'>외롭다</button>
+        <button type='button' class='word c2'>마음아프다</button>
+        <button type='button' class='word c4'>쓸쓸하다</button>
+        <button type='button' class='word c6 s0'>기쁘다</button>
+
+        <button type='button' class='word c8'>기운차다</button>
+        <button type='button' class='word c3 s0'>기운이없다</button>
+        <button type='button' class='word c1 s0'>우울하다</button>
+      </div>
+
+      <div class='s1' style='line-height:20px;text-align:left;margin-top:20px;margin-left:20px;'>
+        <span class='s1' style='float:left'>나의 최근 느낌</span>
+        <span class='s0' style='float:right'>more</span>
+      </div>
+      <div style='border-top:1px solid #dddddd;padding:10px;margin-top:10px;'>
+        <div style='background-color:#339999;color:#ffffff;height:60px;width:60px;float:left;text-align:center;line-height:60px;margin-right:10px;' class='s1 rd50'>한심하다</div>
+        <span style='float:left'>6시간전</span>
+      </div>
     </div>
-    <div><textarea></textarea></div>
-    <div><a href="#myModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a></div>
-    <div id="myModal" class="modal hide fade">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Modal header</h3>
+  </div>
+
+  <div class='span6'>
+    <div id='feeling_logs' style='background-color:#eeeeee;padding:10px;'>
+
+      <div class='rd6' style='background-color:#ffffff;border:1px solid #eaeaea;text-align:left;'>
+        <div style='line-height:20px;'>
+          <span style='float:right' class='s0'>Refresh</span>
+        </div>
+
+        <div style='border-top:1px solid #dddddd;padding:10px;margin-top:10px;'>
+          <div class='s0' style='line-height:20px;'>
+            <span style='float:right'>6시간전</span>
+          </div>
+          <div style='border:1px solid #aaaaaa;height:60px;width:100px;float:left;padding:10px;margin-right:10px;' class='c2'>한심하다</div>
+          <p>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</p>
+          <div class='s0' style='line-height:20px;clear:left;'>
+            <span style='float:right'>댓글 1</span>
+          </div>
+        </div>
+
+        <div style='border-top:1px solid #dddddd;padding:10px;margin-top:10px;'>
+          <div class='s0' style='line-height:20px;'>
+            <span style='float:right'>8시간전</span>
+          </div>
+          <div style='border:1px solid #aaaaaa;height:60px;width:100px;float:left;padding:10px;margin-right:10px;' class='c5'>기쁘다</div>
+          <p>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</p>
+          <div class='s0' style='line-height:20px;clear:left;'>
+            <span style='float:right;margin-left:10px;'>포워드</span>
+            <span style='float:right'>공감</span>
+          </div>
+        </div>
+
+        <div style='border-top:1px solid #dddddd;padding:10px;margin-top:10px;'>
+          <div class='s0' style='line-height:20px;'>
+            <span style='float:right'>10시간전</span>
+          </div>
+          <div style='border:1px solid #aaaaaa;height:60px;width:100px;float:left;padding:10px;margin-right:10px;' class='c7'>외롭다</div>
+          <p>설국열차 내 인생 최고의 영화임</p>
+          <div class='s0' style='line-height:20px;clear:left;'>
+            <span style='float:right;margin-left:10px;'>포워드</span>
+            <span style='float:right'>공감</span>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-        <p>One fine body…</p>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn">Close</a>
-        <a href="#" class="btn btn-primary">Save changes</a>
-      </div>
+
     </div>
   </div>
 </script>
 
-<script type='text/template' id='tpl_feelings'>
+<script type='text/template' id='tpl_floats'>
   <div id='feelings_holder'>
     <div style='text-align:left;'>
       <div class='box'>
@@ -166,79 +255,75 @@
         </div>
       </div>
       <div class='box'>
-        <div style='height:80%'>
+        <div style='height:30px'>
+          <span class='c0'>한심하다</span>
+        </div>
+        <div style='height:130px'>
           <a href='#feelings/f0/show' class='c0 s2'>영화 돈만 버렸음</a>
         </div>
-        <div class='s0'>한심하다 6시간전 답글1</div>
-      </div>
-      <div class='box'>
-        <div style='height:80%'>
-          <a href='#feelings/f1/show' class='c9 s1'>배고파 죽겠는데 밥은 언제머그러가나 ㅠ.ㅠ</a>      
-        </div>
-        <div class='s0'>한심하다 6시간전 답글1</div>
-      </div>
-      <div class='box'>
-        <div style='height:80%'>
-          <a href='#feelings/f2/show' class='c2 s4'>오늘은 소개팅 하는날</a>
-        </div>
-        <div class='s0'>한심하다 6시간전 답글1</div>
-      </div>
-      <div class='box'>
-        <div style='text-align:center;'>
-          <a href='#feelings/f0/show' class='c0 s2'>more</a>
+        <div class='s0' style='line-height:20px;'>
+          <span>6시간전</span>
+          <span style='float:right'>댓글 <strong class='s2'>1</strong></span>
         </div>
       </div>
-    </div>
-
-    <div style='border-bottom:1px solid #999999'></div>
-
-    <div style='text-align:left;'>
       <div class='box'>
-        <div style='height:80%'>
-          <a href='#feelings/f2/show' class='c2 s4'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</a>
+        <div style='height:30px'>
+          <span class='c2'>한심하다님</span>
+          <span class='s0' style='float:right;'>urid****</span>
         </div>
-        <div class='s0'>6시간전 한심하다님 답글하기 포워드</div>
+        <div style='height:130px'>
+          <a href='#feelings/f2/show' class='c2 s2'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</a>
+        </div>
+        <div class='s0'>
+          <span>6시간전</span>
+          <span style='float:right;margin-left:10px;'>포워드</span>
+          <span style='float:right'>공감</span>
+        </div>
       </div>
       <div class='box'>
-        <div style='height:80%'>
-          <a href='#feelings/f2/show' class='c2 s4'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</a>
+        <div style='height:30px'>
+          <span class='c2'>한심하다님</span>
+          <span class='s0' style='float:right;'>urid****</span>
         </div>
-        <div class='s0'>6시간전 한심하다님 답글하기 포워드</div>
+        <div style='height:130px'>
+          <a href='#feelings/f2/show' class='c2 s2'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</a>
+        </div>
+        <div class='s0'>
+          <span>6시간전</span>
+          <span style='float:right;margin-left:10px;'>포워드</span>
+          <span style='float:right'>공감</span>
+        </div>
       </div>
       <div class='box'>
-        <div style='height:80%'>
-          <a href='#feelings/f2/show' class='c2 s4'>설국열차 내 인생 최고의 영화임</a>
+        <div style='height:30px'>
+          <span class='c2'>한심하다님</span>
+          <span class='s0' style='float:right;'>urid****</span>
         </div>
-        <div class='s0'>6시간전 한심하다님 답글하기 포워드</div>
+        <div style='height:130px'>
+          <a href='#feelings/f2/show' class='c2 s2'>설국열차 내 인생 최고의 영화임</a>
+        </div>
+        <div class='s0'>
+          <span>6시간전</span>
+          <span style='float:right;margin-left:10px;'>포워드</span>
+          <span style='float:right'>공감</span>
+        </div>
+      </div>
+      <div class='box'>
+        <div style='height:30px'>
+          <span class='c9'>한심하다</span>
+        </div>
+        <div style='height:130px'>
+          <a href='#feelings/f1/show' class='c9 s2'>배고파 죽겠는데 밥은 언제머그러가나 ㅠ.ㅠ</a>      
+        </div>
+        <div class='s0' style='line-height:20px;'>
+          <span>6시간전</span>
+          <span style='float:right'>댓글 <strong class='s2'>1</strong></span>
+        </div>
       </div>
     </div>
   </div>
 </script>
 
-<script type='text/template' id='tpl_floats'>
-  <div id='floats_holder'>
-    <div><h2>당신에게 온 3개의 메시지</h2></div>
-    <a href='#toggle/float0'>
-      <ul class='toggle' id='float0'>
-        <li class='c0 active'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</li>
-        <li class='c0'>6시간전 한심하다님 답글하기 포워드</li>
-      </ul>
-    </a>
-    <a href='#toggle/float1'>
-      <ul class='toggle' id='float1'>
-        <li class='c8 active'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</li>
-        <li class='c0'>6시간전 즐겁다님 답글하기 포워드</li>
-      </ul>
-    </a>
-    <a href='#toggle/float2'>
-      <ul class='toggle' id='float2'>
-        <li class='c4 active'>설국열차 내 인생 최고의 영화임</li>
-        <li class='c0'>6시간전 설렌다님 답글하기 포워드</li>
-      </ul>
-    </a>
-    <div><a href='#comments'>&gt;</a></div>
-  </div>
-</script>
 <script type='text/template' id='tpl_comments'>
   <div id='comments_holder'>
     <div><h2>그동안 내가 보낸 답변들</h2></div>
