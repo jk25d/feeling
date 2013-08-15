@@ -6,21 +6,23 @@
   <title>NANAV</title>
   <link rel="stylesheet" href="bootstrap/css/bootstrap.css" media='screen'>
   <style>
-    body {background-color:#5a635d;padding-top:40px;padding-bottom:40px;}
+    body {background-color:#5a635d;padding-top:40px;padding-bottom:40px;font-size:12px;}
   </style>
-  <link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" media='screen'>
+  <!--link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" media='screen'-->
   <!--link rel="stylesheet" href="css/nanav4.css" media='screen'-->
   <script src="js/jquery-1.10.2.min.js"></script>
+  <script src="js/jquery.wookmark.js"></script>
   <script src="bootstrap/js/bootstrap.js"></script>
   <script src="js/json2.js"></script>
   <script src="js/underscore-1.5.1.js"></script>
   <script src="js/backbone-1.0.0.min.js"></script>
   <script src="js/coffee-script.js"></script>
   <style>
+    small {font-size:11px;}
     a {color:#536e5c}
     textarea {background-color:#f9f9f9;color:#aaaaaa;}
-    #_content {margin:0 auto;max-width:1200px;}
-    ul {list-style:none;padding-left:0;}
+    #_content {margin:0 auto;max-width:960px;}
+    ul {list-style:none;margin:0;padding:0;}
     div {overflow:hidden;box-sizing:border-box;}
     .expandable li .expandme {display:none;}
     .expandable .active .expandme {display:block;}
@@ -68,7 +70,10 @@
       -khtml-border-radius: 50%;
       border-radius: 50%;
     }
-    .wordcloud li {display:inline-block}
+    .wordcloud>li {display:inline-block}
+    #tiles {position:relative;margin-top:14px;}
+    #tiles>li {width:225px;overflow:hidden;}
+    .dropdown-menu {background-color:#333333;z-index:2000;height:100px;}
   </style>
   <script type='text/coffeescript'>
     $ ->
@@ -106,6 +111,13 @@
           $("##{id}").children().toggleClass 'active'
       new TestRouter
       Backbone.history.start()
+
+      $('#tiles > li').wookmark
+        autoResize: true
+        container: $('#tiles')
+        offset: 10
+        itemWidth: 225
+
   </script>
 </head>
 
@@ -132,8 +144,7 @@
   </div>
 </div>
 
-<div id='_content' class='container' style='background-color:#87908a;padding-bottom:20px'>
-  <div class='row'></div>
+<div id='_content' style='background-color:#87908a;'>
 </div>
 
 <!-- TEMPLATES -->
@@ -148,8 +159,9 @@
 </script>
 
 <script type='text/template' id='tpl_feelings_new'>
-  <div class='span5'>
-  <div class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;margin-top:20px;'>
+<ul id='tiles'>
+  <li>
+  <div class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
     <div style='padding:10px;'>
       <a href='#'><h3 style='color:#333333'>myidmyid</h3></a>
     </div>
@@ -190,10 +202,9 @@
         <a class='btn' href='#' style='float:right;'>작성하기</a>
       </div>
     </div>
-
   </div>
 
-  <div id='feeling_map' class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;margin-top:20px;'>
+  <div class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;margin-top:7px;'>
     <div style='border-bottom:1px solid #dddddd;padding:10px;'>
       <h3>공유중인 느낌</h3>
       <a href='#' style='float:right;'><h5>Refresh</h5></a>
@@ -203,7 +214,7 @@
       <small style='margin-right:10px'>최근 올라온 느낌들</small>
       <a href='#'><small>구독하기</small></a>
     </div>
-    <ul class='wordcloud' style='margin:0px;padding:20px;border-top:1px solid #dddddd;border-bottom:1px solid #dddddd;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;'>
+    <ul class='wordcloud' style='margin:0px;padding:10px;border-top:1px solid #dddddd;border-bottom:1px solid #dddddd;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;'>
       <li class='c0 s2' style='margin-right:5px'>#외롭다</li>
       <li class='c2' style='margin-right:5px'>#마음아프다</li>
       <li class='c4' style='margin-right:5px'>#쓸쓸하다</li>
@@ -224,17 +235,15 @@
       <small style='margin-right:10px'>나와 비슷한 성향의 사람들</small>
       <a href='#'><small>구독하기</small></a>
     </div>
-    <ul class='wordcloud' style='margin:0px;padding:20px;border-top:1px solid #dddddd;border-bottom:1px solid #dddddd;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;'>
+    <ul class='wordcloud' style='margin:0px;padding:10px;border-top:1px solid #dddddd;border-bottom:1px solid #dddddd;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;'>
       <li class='c0 s2' style='margin-right:5px'>#외롭다</li>
       <li class='c2' style='margin-right:5px'>#마음아프다</li>
       <li class='c4' style='margin-right:5px'>#쓸쓸하다</li>
     </ul>
   </div>
-  </div>
+  </li>
 
-  <div id='feeling_logs' class='span6 rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;margin-top:20px;'>
-    <div style='padding:10px;'><h3 style='color:#333333'>새 느낌</h3></div>
-
+  <li class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
     <div style='border-top:1px solid #dddddd;padding:10px;cursor:pointer;'>
       <div style='line-height:20px;'>
         <div class='c2' style='margin-right:10px;float:left;width:80px;'>#한심하다</div>
@@ -247,7 +256,9 @@
         <small style='float:right'>댓글 1</small>
       </div>
     </div>
+  </li>
 
+  <li class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
     <div style='border-top:1px solid #dddddd;padding:10px;'>
       <div style='line-height:20px;'>
         <div class='c4' style='margin-right:10px;float:left;width:80px;'>#기운이없다</div>
@@ -257,14 +268,14 @@
       <div style='padding:10px'>일이 너무 힘들다..</div>
     </div>
     <div style='margin-top:5px;background-color:#edf0ee'>
-      <div style='border-top:1px solid #e2e2e2;padding:10px 5px 10px 40px;'>
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <span style='margin-right:10px'>별거도 아닌거 갖고..</span>
         <h6 style='margin-right:10px'>user****</h6>
         <h6 style='margin-right:10px'>7시간전</h6>
         <a href='#'><small>삭제</small></a>
       </div>
 
-      <div style='border-top:1px solid #e2e2e2;padding:10px 5px 10px 40px;'>
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <small style='margin-right:10px'><strong>#공감해요</strong></small>
         <span style='margin-right:10px'>부러워요 님좀 짱인듯</span>
         <h6 style='margin-right:10px'>user****</h6>
@@ -272,7 +283,7 @@
         <small>좋아요</small>
       </div>
 
-      <div style='border-top:1px solid #e2e2e2;padding:10px 5px 10px 40px;'>
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <small style='margin-right:10px'><strong>#공감해요</strong></small>
         <h6 style='margin-right:10px'>user****</h6>
         <h6 style='margin-right:10px'>7시간전</h6>
@@ -280,7 +291,9 @@
         <a href='#'><small>삭제</small></a>
       </div>
     </div>
+  </li>
 
+  <li class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
     <div style='border-top:1px solid #dddddd;padding:10px;'>
       <div style='line-height:20px;'>
         <div class='c6' style='margin-right:10px;float:left;width:80px;'>#기쁘다</div>
@@ -293,7 +306,9 @@
         <a href='#' style='float:right'><small>공감</small></a>
       </div>
     </div>
+  </li>
 
+  <li class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
     <div style='border-top:1px solid #dddddd;padding:10px;'>
       <div style='line-height:20px;'>
         <div class='c7' style='margin-right:10px;float:left;width:80px;'>#외롭다</div>
@@ -307,7 +322,7 @@
       </div>
     </div>
     <div style='margin-top:5px;background-color:#edf0ee'>
-      <div style='border-top:1px solid #e2e2e2;padding:10px 5px 10px 40px;'>
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <div>
           <input type="text" placeholder="남기고 싶은말" style='float:right;width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
         </div>
@@ -317,7 +332,9 @@
         </div>
       </div>
     </div>
+  </li>
 
+  <li class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
     <div style='border-top:1px solid #dddddd;padding:10px;'>
       <div style='line-height:20px;'>
         <div class='c6' style='margin-right:10px;float:left;width:80px;'>#기쁘다</div>
@@ -327,17 +344,16 @@
       <div style='padding:10px'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</div>
     </div>
     <div style='margin-top:5px;background-color:#edf0ee'>
-      <div style='border-top:1px solid #e2e2e2;padding:10px 5px 10px 40px;'>
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <small style='margin-right:10px'><strong>#공감해요</strong></small>
         <span style='margin-right:10px'>힘내세요</span>
         <h5 style='margin-right:10px'><strong>myidmyid</strong></h5>
         <h6 style='margin-right:10px'>7시간전</h6>
       </div>
     </div>
+  </li>
 
-
-    <div style='background-color:#d2dbd5;text-align:center;margin-bottom:10px;padding:5px 0 5px 0;cursor:pointer'>more</div>
-  </div>
+</ul>
 </script>
 
 <script type='text/template' id='tpl_floats'>

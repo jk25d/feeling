@@ -86,3 +86,16 @@ $.ajaxSetup({
     }
 });
 
+--------
+
+tile layout
+
+http://www.wookmark.com/jquery-plugin         # MIT, 1.4.2, 15k(6k)
+https://github.com/xlune/jQuery-vGrid-Plugin	# MIT, 0.1.11, 9.7k, has delay if reduce size
+http://yconst.com/web/freetile/		            # MIT, 0.3.1, 30k(12k)
+https://github.com/thinkpixellab/tilesjs      # MIT, , 21k
+http://masonry.desandro.com/		              # MIT, 3.1.1, 70k(24k)
+
+http://www.inwebson.com/demo/blocksit-js/  # no responsive?
+http://isotope.metafizzy.co/		# commercial license
+http://jsonenglish.com/projects/flex/         # no dynamic alignment
