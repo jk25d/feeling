@@ -1,0 +1,456 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NANAV</title>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.css" media='screen'>
+  <style>
+    body {background-color:#5a635d;padding-top:40px;padding-bottom:40px;}
+  </style>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" media='screen'>
+  <link rel="stylesheet" href="css/proposal7.css" media='screen'>
+  <script src="js/jquery-1.10.2.min.js"></script>
+  <script src="bootstrap/js/bootstrap.js"></script>
+  <script src="js/json2.js"></script>
+  <script src="js/underscore-1.5.1.js"></script>
+  <script src="js/backbone-1.0.0.min.js"></script>
+  <script src="js/coffee-script.js"></script>
+  <style>
+  </style>
+  <script type='text/coffeescript'>
+    $ ->
+      class TestRouter extends Backbone.Router
+        routes:
+          "": "home"
+          "login": "login"
+          "feelings/new": "feelings_new"
+          "feelings": "feelings"
+          "feelings/show": "feelings_show"
+          "floats": "floats"
+          "comments/:id/toggle": "comments_id_toggle"
+          "comments": "comments"
+          "feelings/:id/show": "feelings_id_show"
+          "toggle/:id": "toggle"
+        home: ->
+          $('#_content').html _.template $('#tpl_feelings_new').html()
+        login: ->
+          $('#_content').html _.template $('#tpl_login').html()
+        feelings_new: ->
+          $('#_content').html _.template $('#tpl_feelings_new').html()
+        feelings: ->
+          $('#_content').html _.template $('#tpl_feelings').html()
+        feelings_show: (event) ->
+          $('#_content').html _.template $('#tpl_feelings_show').html()
+        floats: ->
+          $('#_content').html _.template $('#tpl_floats').html()
+        comments: ->
+          $('#_content').html _.template $('#tpl_comments').html()
+        feelings_id_show: (id) ->
+          $('.expandable > li').removeClass 'active'
+          $("##{id}").addClass 'active'
+        toggle: (id) ->
+          console.log id
+          $("##{id}").children().toggleClass 'active'
+      new TestRouter
+      Backbone.history.start()
+  </script>
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class='navbar-inner'>
+    <div class='container'>
+      <button type='button' class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
+        <span class='icon-bar'></span>
+        <span class='icon-bar'></span>
+        <span class='icon-bar'></span>
+      </button>
+
+      <a class='brand' href='#'>FEELING SHARE</a>
+      <div class='nav-collapse collapse'>
+        <ul class='nav'>
+          <li class='active'><a href='#login'>LOGOUT</a></li>
+          <li><a href='#feelings'>MY FEELINGS</a></li>
+          <li><a href='#floats'>TODAY FEELINGS</a></li>
+        </ul>
+      </div> <!-- /.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div id='_content'>
+</div>
+
+<!-- TEMPLATES -->
+<script type='text/template' id='tpl_login'>
+  <div id='login_holder'>
+    <div>ID</div>
+    <input type='text'></input>
+    <div>Password</div>
+    <input type='text'></input>
+    <div><a href='#feelings/new'>LOGIN</a></div>
+  </div>
+</script>
+
+<script type='text/template' id='tpl_feelings_new'>
+  <div class='rd6 _tab'>
+    <div class='title'>
+      <a href='#'><h3 style='color:#333333'>myidmyid</h3></a>
+    </div>
+    <div class='inner_item'>
+      <div><textarea placeholder="What is your Feeling now?"></textarea></div>
+      <div>
+        <div class='btn-group'>
+          <a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>
+            Feeling<span class='caret'></span>
+          </a>
+          <ul class='dropdown-menu'>
+            <li>#외롭다</li>
+            <li>#마음아프다</li>
+            <li>#쓸쓸하다</li>
+            <li>#기쁘다</li>
+            <li>#기운차다</li>
+            <li>#기운이없다</li>
+            <li>#우울하다</li>
+            <li>#만족스럽다</li>
+            <li>#걱정된다</li>
+            <li>#삶이힘들다</li>
+            <li>#초조하다</li>
+            <li>#허전하다</li>
+            <li>#무섭다</li>
+            <li>#두렵다</li>
+            <li>#열등감느낀다</li>
+            <li>#의욕이없다</li>
+            <li>#사랑스럽다</li>
+            <li>#소중하다</li>
+            <li>#설레다</li>
+            <li>#즐겁다</li>
+          </ul>
+        </div><!--btn-group-->
+        <a class='btn' href='#' class='_right'>작성하기</a>
+      </div>
+    </div>
+
+    <div class='item'>
+      <div class='content'>
+        <div class='mon'>
+          <strong class='f16'>10</strong> <span>OCT</span>
+        </div>
+        <span class='c2 mr10'>#한심하다</span>
+        <span class='c4 mr10'>#외롭다</span>
+      </div>
+    </div>
+
+    <div class='item'>
+      <div class='content'>
+        <div class='mon'>
+          <strong class='f16'>11</strong> <span>OCT</span>
+        </div>
+        <span class='c5 mr10'>#한심하다</span>
+        <span class='c4 mr10'>#기운이없다</span>
+      </div>
+ 
+      <div class='rd6 feel'>
+        <div class='wrap'>
+          <div class='header'>
+            <div class='c2'>#한심하다</div>
+            <h6>10시10분</h6>
+          </div>
+          <div class='desc'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</div>
+          <div>
+            <small class='_right ml10'>공감 0</small>
+            <small class='_right'>댓글 0</small>
+          </div>
+        </div>
+      </div>
+
+      <div class='rd6 feel'>
+        <div class='wrap'>
+          <div class='header'>
+            <div class='c4'>#기운이없다</div>
+            <h6>10시10분</h6>
+          </div>
+          <div class='desc'>일이 너무 힘들다..</div>
+          <div>
+            <small class='_right ml10'>공감 2</small>
+            <small class='_right'>댓글 1</small>
+          </div>
+        </div>
+        <div class='comments'>
+          <div class='comment'>
+            <span class='mr10'>별거도 아닌거 갖고..</span>
+            <h6 class='mr10'>user****</h6>
+            <h6 class='mr10'>7시간전</h6>
+            <a href='#'><small>삭제</small></a>
+          </div>
+
+          <div class='comment'>
+            <small class='mr10'><strong>#공감해요</strong></small>
+            <span class='mr10'>부러워요 님좀 짱인듯</span>
+            <h6 class='mr10'>user****</h6>
+            <h6 class='mr10'>7시간전</h6>
+            <small>좋아요</small>
+          </div>
+
+          <div class='comment'>
+            <small class='mr10'><strong>#공감해요</strong></small>
+            <h6 class='mr10'>user****</h6>
+            <h6 class='mr10'>7시간전</h6>
+            <a href='#'><small>좋아요</small></a>
+            <a href='#'><small>삭제</small></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='item'>
+      <div class='content'>
+        <div class='mon'>
+          <strong class='f16'>12</strong> <span>OCT</span>
+        </div>
+      </div>
+    </div>
+
+    <div class='more_btn'>more ...</div>
+  </div>
+
+  <div class='rd6 _tab'>
+    <div class='title'>
+      <h3>최근 올라온 느낌</h3>
+      <small class='_right'>받을 수 있는 느낌 9</small>
+    </div>
+    <ul class='wordcloud'>
+      <li class='c0 s2'>#외롭다</li>
+      <li class='c2'>#마음아프다</li>
+      <li class='c4'>#쓸쓸하다</li>
+      <li class='c6 s1'>#기쁘다</li>
+
+      <li class='c8'>#기운차다</li>
+      <li class='c3 s0'>#기운이없다</li>
+      <li class='c1 s0'>#우울하다</li>
+      <li class='c5'>#만족스럽다</li>
+
+      <li class='c7'>#걱정된다</li>
+      <li class='c9'>#삶이힘들다</li>
+      <li class='c3 s0'>#초조하다</li>
+      <li class='c8 s2'>#허전하다</li>
+    </ul>
+
+    <div class='item'>
+      <div class='content'>
+        <strong class='mr10'>usr1****</strong>
+        <div class='_right'>
+          <span class='c2' class='mr10'>#한심하다</span>
+          <span >영화가 ...</span>
+        </div>
+      </div>
+      <div class='content'>
+        <h6>유사성향 6.6</h6>
+        <h6 class='_right'>6시간전</h6>
+      </div>
+    </div>
+
+    <div class='item'>
+      <div class='content'>
+        <strong class='mr10'>usr2****</strong>
+        <div class='_right'>
+          <span class='c4' class='mr10'>#초조하다</span>
+          <span >시험이 ...</span>
+        </div>
+      </div>
+      <div class='content'>
+        <h6>유사성향 6.6</h6>
+        <h6 class='_right'>6시간전</h6>
+      </div>
+    </div>
+
+    <div class='item'>
+      <div class='content'>
+        <strong class='mr10'>usr3****</strong>
+        <div class='_right'>
+          <span class='c3' class='mr10'>#걱정된다</span>
+          <span >목뒤가 ...</span>
+        </div>
+      </div>
+      <div class='content'>
+        <h6>유사성향 6.6</h6>
+        <h6 class='_right'>6시간전</h6>
+      </div>
+    </div>
+
+    <div class='more_btn'>more ...</div>
+  </div>
+
+  <div class='rd6 _tab'>
+    <div class='title'>
+      <h3>나에게 온 느낌</h3>
+    </div>
+
+    <div class='item' style='padding-top:7px'>
+
+      <div class='rd6 feel'>
+        <div class='wrap'>
+          <div class='header'>
+            <div class='c6'>#기쁘다</div>
+            <h6>user****</h6>
+            <h6 class='_right'>8시간전</h6>
+          </div>
+          <div class='desc'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</div>
+          <div>
+            <a href='#' class='_right ml10'><small>포워드</small></a>
+            <a href='#' class='_right'><small>공감</small></a>
+          </div>
+        </div>
+      </div>
+
+      <div class='rd6 feel'>
+        <div class='wrap'>
+          <div class='header'>
+            <div class='c7'>#외롭다</div>
+            <h6>user****</h6>
+            <h6 class='_right'>10시간전</h6>
+          </div>
+          <div class='desc'>설국열차 내 인생 최고의 영화임</div>
+          <div>
+            <a href='#' class='_right ml10'><small>포워드</small></a>
+            <a href='#' class='_right'><small>공감</small></a>
+          </div>
+        </div>
+        <div class='comments'>
+          <div class='comment'>
+            <div>
+              <input type="text" placeholder="남기고 싶은말"></input>
+            </div>
+            <div class='btn_area'>
+              <small class='mr10'><strong>#공감해요</strong></small>
+              <a href='#' class='btn _right'>작성하기</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class='rd6 feel'>
+        <div class='wrap'>
+          <div class='header'>
+            <div class='c6'>#기쁘다</div>
+            <h6>user****</h6>
+            <h6 class='_right'>8시간전</h6>
+          </div>
+          <div class='desc'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</div>
+        </div>
+        <div class='comments'>
+          <div class='comment'>
+            <small class='mr10'><strong>#공감해요</strong></small>
+            <span class='mr10'>힘내세요</span>
+            <h5 class='mr10'><strong>myidmyid</strong></h5>
+            <h6 class='mr10'>7시간전</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='more_btn'>more ...</div>
+
+  </div>
+</script>
+
+<script type='text/template' id='tpl_floats'>
+  <div id='feelings_holder'>
+    <div>
+      <div class='box'>
+        <div style='text-align:center;'>
+          <a href='#feelings/new' class='c0 s2'>+</a>
+        </div>
+      </div>
+      <div class='box'>
+        <div style='height:30px'>
+          <span class='c0'>한심하다</span>
+        </div>
+        <div style='height:130px'>
+          <a href='#feelings/f0/show' class='c0 s2'>영화 돈만 버렸음</a>
+        </div>
+        <div class='s0' style='line-height:20px;'>
+          <span>6시간전</span>
+          <span class='_right'>댓글 <strong class='s2'>1</strong></span>
+        </div>
+      </div>
+      <div class='box'>
+        <div style='height:30px'>
+          <span class='c2'>한심하다님</span>
+          <span class='s0' class='_right'>urid****</span>
+        </div>
+        <div style='height:130px'>
+          <a href='#feelings/f2/show' class='c2 s2'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</a>
+        </div>
+        <div class='s0'>
+          <span>6시간전</span>
+          <span class='_right ml10'>포워드</span>
+          <span class='_right'>공감</span>
+        </div>
+      </div>
+      <div class='box'>
+        <div style='height:30px'>
+          <span class='c2'>한심하다님</span>
+          <span class='s0' class='_right'>urid****</span>
+        </div>
+        <div style='height:130px'>
+          <a href='#feelings/f2/show' class='c2 s2'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</a>
+        </div>
+        <div class='s0'>
+          <span>6시간전</span>
+          <span class='_right ml10'>포워드</span>
+          <span class='_right'>공감</span>
+        </div>
+      </div>
+      <div class='box'>
+        <div style='height:30px'>
+          <span class='c2'>한심하다님</span>
+          <span class='s0' class='_right'>urid****</span>
+        </div>
+        <div style='height:130px'>
+          <a href='#feelings/f2/show' class='c2 s2'>설국열차 내 인생 최고의 영화임</a>
+        </div>
+        <div class='s0'>
+          <span>6시간전</span>
+          <span class='_right ml10'>포워드</span>
+          <span class='_right'>공감</span>
+        </div>
+      </div>
+      <div class='box'>
+        <div style='height:30px'>
+          <span class='c9'>한심하다</span>
+        </div>
+        <div style='height:130px'>
+          <a href='#feelings/f1/show' class='c9 s2'>배고파 죽겠는데 밥은 언제머그러가나 ㅠ.ㅠ</a>      
+        </div>
+        <div class='s0' style='line-height:20px;'>
+          <span>6시간전</span>
+          <span class='_right'>댓글 <strong class='s2'>1</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type='text/template' id='tpl_comments'>
+  <div id='comments_holder'>
+    <div><h2>그동안 내가 보낸 답변들</h2></div>
+    <a href='#toggle/flc1'>
+      <ul class='toggle' id='flc1'>
+        <li class='active'>기운을 내세요 <span class='c0'>@한심하다 셤망침</span></li>
+        <li>11/11/11 11:11 @mmmy****</li>
+      </ul>
+    <a href='#toggle/flc2'>
+      <ul class='toggle' id='flc2'>
+        <li class='active'>혼자가 아니에요 <span class='c9'>@외로워요 바람이 차갑네요</span></li>
+        <li>11/11/11 11:11 @mmmy****</li>
+      </ul>
+    <div><a href='#floats'>&lt;</a></div>
+  </div>
+</script>
+
+</body>
+</html>
+
