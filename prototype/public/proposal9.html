@@ -49,7 +49,7 @@
     .s7 {font-size:32px;}
     h3 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:16px;line-height:20px;}
     h5 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:11px;line-height:16px;}
-    h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:11px;line-height:16px;color:#aaaaaa;}
+    h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:11px;line-height:16px;color:#ffffff;}
     .word{
       background: transparent;
       border: 0;
@@ -70,7 +70,10 @@
       -khtml-border-radius: 50%;
       border-radius: 50%;
     }
-    .wordcloud>li {display:inline-block}
+    .wordcloud {
+      margin:0px;padding:10px;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;cursor:pointer;
+    }
+    .wordcloud>li {display:inline-block;margin-right:5px;}
     #tiles {position:relative;margin-top:14px;}
     #tiles>li {width:225px;overflow:hidden;}
     .f16 {font-size:16px}
@@ -80,13 +83,21 @@
     ._rspc {margin-right:10px}
   </style>
   <script type='text/coffeescript'>
+    wookmark = ->
+      $('#tiles > li').wookmark
+        align: 'left'
+        autoResize: true
+        container: $('#tiles')
+        offset: 10
+        itemWidth: 225
+
     $ ->
       class TestRouter extends Backbone.Router
         routes:
           "": "home"
           "login": "login"
-          "feelings/new": "feelings_new"
-          "feelings": "feelings"
+          "my": "my"
+          "others": "others"
           "feelings/show": "feelings_show"
           "floats": "floats"
           "comments/:id/toggle": "comments_id_toggle"
@@ -94,13 +105,17 @@
           "feelings/:id/show": "feelings_id_show"
           "toggle/:id": "toggle"
         home: ->
-          $('#_content').html _.template $('#tpl_feelings_new').html()
+          $('#_content').html _.template $('#tpl_my').html()
+          wookmark()
         login: ->
           $('#_content').html _.template $('#tpl_login').html()
-        feelings_new: ->
-          $('#_content').html _.template $('#tpl_feelings_new').html()
-        feelings: ->
-          $('#_content').html _.template $('#tpl_feelings').html()
+          wookmark()
+        my: ->
+          $('#_content').html _.template $('#tpl_my').html()
+          wookmark()
+        others: ->
+          $('#_content').html _.template $('#tpl_others').html()
+          wookmark()
         feelings_show: (event) ->
           $('#_content').html _.template $('#tpl_feelings_show').html()
         floats: ->
@@ -115,12 +130,7 @@
           $("##{id}").children().toggleClass 'active'
       new TestRouter
       Backbone.history.start()
-
-      $('#tiles > li').wookmark
-        autoResize: true
-        container: $('#tiles')
-        offset: 10
-        itemWidth: 225
+      wookmark()
 
   </script>
 </head>
@@ -139,8 +149,8 @@
       <a class='brand' href='#'>FEELING SHARE</a>
       <div class='nav-collapse collapse' style='overflow:visible;'>
         <ul class='nav'>    
-          <li class='active'><a href='#feelings'>MY DIARY</a></li>
-          <li><a href='#floats'>RECEIVED</a></li>
+          <li class='active'><a href='#my'>MY DIARY</a></li>
+          <li><a href='#others'>RECEIVED</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i> <b class="caret"></b></a>
             <ul class="dropdown-menu">
@@ -167,7 +177,7 @@
   </div>
 </script>
 
-<script type='text/template' id='tpl_feelings_new'>
+<script type='text/template' id='tpl_my'>
 <ul id='tiles'>
   <li>
   <div class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
@@ -175,7 +185,7 @@
       <a href='#'><h3 style='color:#333333'>myidmyid</h3></a>
     </div>
     <div style='border-top:1px solid #dddddd;padding:10px;'>
-      <h5 class='_rspc'>내 느낌 5</h5><h5>너의 느낌 10</h5>
+      <h5 class='_rspc'>내 느낌 5</h5><h5>받은 느낌 10</h5>
     </div>
     <div style='border-top:1px solid #dddddd;padding:10px;background-color:#edf0ee'>
       <div><textarea placeholder="What is your Feeling now?" style='width:100%;box-sizing:border-box;resize:none;'></textarea></div>
@@ -236,7 +246,7 @@
       </div>
       <div style='padding:10px'>일이 너무 힘들다..</div>
     </div>
-    <div style='margin-top:5px;background-color:#ffd5f1'>
+    <div style='margin-top:5px;background-color:#f9f9f9'>
       <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <span style='margin-right:10px'>별거도 아닌거 갖고..</span>
         <h6 style='margin-right:10px'>user****</h6>
@@ -265,7 +275,7 @@
   <li class='rd6' style='background-color:#aaaae2;border:1px solid #505088;'>
     <div style='padding:10px;'>
       <div style='line-height:20px;'>
-        <div class='c6' style='margin-right:10px;float:left;width:80px;'>#기쁘다</div>
+        <div style='margin-right:10px;float:left;width:80px;'>#기쁘다</div>
         <h6>user****</h6>
         <h6 style='float:right'>8시간전</h6>
       </div>
@@ -290,7 +300,7 @@
         <a href='#' style='float:right'><small>공감</small></a>
       </div>
     </div>
-    <div style='margin-top:5px;background-color:#bad7ff'>
+    <div style='margin-top:5px;background-color:#f9f9f9'>
       <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <div>
           <input type="text" placeholder="남기고 싶은말" style='float:right;width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
@@ -312,7 +322,7 @@
       </div>
       <div style='padding:10px'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</div>
     </div>
-    <div style='margin-top:5px;background-color:#ffffba'>
+    <div style='margin-top:5px;background-color:#f9f9f9'>
       <div style='border-top:1px solid #e2e2e2;padding:10px'>
         <small style='margin-right:10px'><strong>#공감해요</strong></small>
         <span style='margin-right:10px'>힘내세요</span>
@@ -325,99 +335,106 @@
 </ul>
 </script>
 
-<script type='text/template' id='tpl_floats'>
-  <div id='feelings_holder'>
-    <div>
-      <div class='box'>
-        <div style='text-align:center;'>
-          <a href='#feelings/new' class='c0 s2'>+</a>
-        </div>
+<script type='text/template' id='tpl_others'>
+<ul id='tiles'>
+  <li class='rd6' style='background-color:#f9f9f9;border:1px solid #eaeaea;'>
+    <div style='padding:10px;'>
+      <a href='#'><h3 style='color:#333333'>최근 느낌들</h3></a>
+    </div>
+    <div style='border-top:1px solid #dddddd;padding:10px;'>
+      <span><a href='#'>느낌 받기 9</a></span>
+    </div>
+    <div style='border-top:1px solid #dddddd;padding:10px;'>
+      <ul class='wordcloud'>
+        <li>#외롭다</li>
+        <li>#마음아프다</li>
+        <li>#쓸쓸하다</li>
+        <li>#기쁘다</li>
+        <li>#기운차다</li>
+        <li>#기운이없다</li>
+        <li>#우울하다</li>
+        <li>#만족스럽다</li>
+        <li>#걱정된다</li>
+        <li>#삶이힘들다</li>
+        <li>#초조하다</li>
+        <li>#허전하다</li>
+        <li>#무섭다</li>
+        <li>#두렵다</li>
+        <li>#열등감느낀다</li>
+        <li>#의욕이없다</li>
+        <li>#사랑스럽다</li>
+        <li>#소중하다</li>
+        <li>#설레다</li>
+        <li>#즐겁다</li>
+      </ul>
+    </div>
+    <div style='border-top:1px solid #dddddd;padding:10px;'>
+      <span class='_rspc'>idid****</span>
+      <span class='_rspc'>공감도 6.0</span>
+      <span>#한심하다</span>
+    </div>
+    <div style='border-top:1px solid #dddddd;padding:10px;'>
+      <span class='_rspc'>udud****</span>
+      <span class='_rspc'>공감도 6.0</span>
+      <span>#한심하다</span>
+    </div>
+    <div style='border-top:1px solid #dddddd;padding:10px;'>
+      <span class='_rspc'>cdcd****</span>
+      <span class='_rspc'>공감도 6.0</span>
+      <span>#한심하다</span>
+    </div>    
+  </li>
+
+  <li class='rd6' style='background-color:#c6aae2;border:1px solid #997db5;'>
+    <div style='padding:10px;cursor:pointer;'>
+      <div style='line-height:20px;'>
+        <div style='margin-right:10px;float:left;width:80px;'>#한심하다</div>
+        <h6 style='float:right'>6시간전</h6>
       </div>
-      <div class='box'>
-        <div style='height:30px'>
-          <span class='c0'>한심하다</span>
-        </div>
-        <div style='height:130px'>
-          <a href='#feelings/f0/show' class='c0 s2'>영화 돈만 버렸음</a>
-        </div>
-        <div class='s0' style='line-height:20px;'>
-          <span>6시간전</span>
-          <span style='float:right'>댓글 <strong class='s2'>1</strong></span>
-        </div>
-      </div>
-      <div class='box'>
-        <div style='height:30px'>
-          <span class='c2'>한심하다님</span>
-          <span class='s0' style='float:right;'>urid****</span>
-        </div>
-        <div style='height:130px'>
-          <a href='#feelings/f2/show' class='c2 s2'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</a>
-        </div>
-        <div class='s0'>
-          <span>6시간전</span>
-          <span style='float:right;margin-left:10px;'>포워드</span>
-          <span style='float:right'>공감</span>
-        </div>
-      </div>
-      <div class='box'>
-        <div style='height:30px'>
-          <span class='c2'>한심하다님</span>
-          <span class='s0' style='float:right;'>urid****</span>
-        </div>
-        <div style='height:130px'>
-          <a href='#feelings/f2/show' class='c2 s2'>비가와서 조타.. 어차피 놀러갈거도 아닌데 남들도 못가면.. 조치</a>
-        </div>
-        <div class='s0'>
-          <span>6시간전</span>
-          <span style='float:right;margin-left:10px;'>포워드</span>
-          <span style='float:right'>공감</span>
-        </div>
-      </div>
-      <div class='box'>
-        <div style='height:30px'>
-          <span class='c2'>한심하다님</span>
-          <span class='s0' style='float:right;'>urid****</span>
-        </div>
-        <div style='height:130px'>
-          <a href='#feelings/f2/show' class='c2 s2'>설국열차 내 인생 최고의 영화임</a>
-        </div>
-        <div class='s0'>
-          <span>6시간전</span>
-          <span style='float:right;margin-left:10px;'>포워드</span>
-          <span style='float:right'>공감</span>
-        </div>
-      </div>
-      <div class='box'>
-        <div style='height:30px'>
-          <span class='c9'>한심하다</span>
-        </div>
-        <div style='height:130px'>
-          <a href='#feelings/f1/show' class='c9 s2'>배고파 죽겠는데 밥은 언제머그러가나 ㅠ.ㅠ</a>      
-        </div>
-        <div class='s0' style='line-height:20px;'>
-          <span>6시간전</span>
-          <span style='float:right'>댓글 <strong class='s2'>1</strong></span>
-        </div>
+      <div style='padding:10px'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</div>
+      <div style='line-height:20px;clear:left;'>
+        <small style='float:right;margin-left:10px;'>공감 1</small>
+        <small style='float:right'>댓글 1</small>
       </div>
     </div>
-  </div>
-</script>
+  </li>
 
-<script type='text/template' id='tpl_comments'>
-  <div id='comments_holder'>
-    <div><h2>그동안 내가 보낸 답변들</h2></div>
-    <a href='#toggle/flc1'>
-      <ul class='toggle' id='flc1'>
-        <li class='active'>기운을 내세요 <span class='c0'>@한심하다 셤망침</span></li>
-        <li>11/11/11 11:11 @mmmy****</li>
-      </ul>
-    <a href='#toggle/flc2'>
-      <ul class='toggle' id='flc2'>
-        <li class='active'>혼자가 아니에요 <span class='c9'>@외로워요 바람이 차갑네요</span></li>
-        <li>11/11/11 11:11 @mmmy****</li>
-      </ul>
-    <div><a href='#floats'>&lt;</a></div>
-  </div>
+  <li class='rd6' style='background-color:#ffc6e2;border:1px solid #d299b5;'>
+    <div style='padding:10px;'>
+      <div style='line-height:20px;'>
+        <div class='c4' style='margin-right:10px;float:left;width:80px;'>#기운이없다</div>
+        <h5><strong>myidmyid</strong></h5>
+        <h6 style='float:right'>7시간전</h6>
+      </div>
+      <div style='padding:10px'>일이 너무 힘들다..</div>
+    </div>
+    <div style='margin-top:5px;background-color:#f9f9f9'>
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
+        <span style='margin-right:10px'>별거도 아닌거 갖고..</span>
+        <h6 style='margin-right:10px'>user****</h6>
+        <h6 style='margin-right:10px'>7시간전</h6>
+        <a href='#'><small>삭제</small></a>
+      </div>
+
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
+        <small style='margin-right:10px'><strong>#공감해요</strong></small>
+        <span style='margin-right:10px'>부러워요 님좀 짱인듯</span>
+        <h6 style='margin-right:10px'>user****</h6>
+        <h6 style='margin-right:10px'>7시간전</h6>
+        <small>좋아요</small>
+      </div>
+
+      <div style='border-top:1px solid #e2e2e2;padding:10px'>
+        <small style='margin-right:10px'><strong>#공감해요</strong></small>
+        <h6 style='margin-right:10px'>user****</h6>
+        <h6 style='margin-right:10px'>7시간전</h6>
+        <a href='#'><small>좋아요</small></a>
+        <a href='#'><small>삭제</small></a>
+      </div>
+    </div>
+  </li>
+
+</ul>
 </script>
 
 </body>
