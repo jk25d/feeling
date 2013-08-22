@@ -87,7 +87,7 @@
     .wordcloud {
       margin:0px;padding:10px;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;cursor:pointer;
     }
-    .wordcloud>li {display:inline-block;margin-right:5px;}
+    .wordcloud>li {display:inline;margin-right:5px;}
     #tiles {position:relative;margin-top:14px;}
     #tiles>li {width:225px;overflow:hidden;}
     .f16 {font-size:16px}
@@ -194,7 +194,7 @@
       <a href='#'><h3 style='color:#333333'>myidmyid</h3></a>
     </div>
     <div style='border-bottom:1px solid #dddddd;padding:10px;line-height:16px;'>
-      <h5 class='_rspc'>내 느낌 5</h5><h5>받은 느낌 10</h5>
+      <h5 class='_rspc'>내 느낌 5</h5><h5>새로 받은 느낌 10</h5>
     </div>
     <ul style='line-height:30px;color:#777777;overflow:hidden;font-size:11px;text-align:center;padding:7px 2px;'>
       <li class='rd6 cc0' style='margin-right:2px;padding:2px 0;width:68px;display:inline-block;cursor:pointer;'>외롭다</li>
@@ -222,7 +222,7 @@
   </li>
 
   <li class='rd6 _sd0' style='cursor:pointer;'>
-    <div style='background-color:#c6aae2;padding:18px 10px 18px 10px;border-bottom:1px solid #dddddd;'>
+    <div style='background-color:#c6aae2;padding:18px 10px 18px 10px;border-bottom:2px solid #dddddd;'>
       <div style='padding-bottom:6px;overflow:hidden;line-height:20px;border-bottom:1px solid #f0f0f0;'>
         <h6 style='float:right;color:#999999'>6시간전</h6>
       </div>
@@ -231,14 +231,14 @@
         <span style='color:#ffffff'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
       </div>
     </div>
-    <div style='background-color:#f9f9f9;overflow:hidden;line-height:20px;padding:8px 10px;'>
-      <small style='float:right;margin-left:10px;'>공감 1</small>
-      <small style='float:right'>댓글 1</small>
+    <div style='background-color:#f9f9f9;overflow:hidden;line-height:14px;padding:8px 10px;font-size:11px;'>
+      <span style='float:right;margin-left:10px;'><span class='icon-heart'></span> 1</span>
+      <span style='float:right'><span class='icon-comment'></span> 1</span>
     </div>
   </li>
 
   <li class='rd6 _sd0' style=''>
-    <div style='background-color:#ffc6e2;padding:18px 10px 18px 10px;border-bottom:1px solid #dddddd;'>
+    <div style='background-color:#ffc6e2;padding:18px 10px 18px 10px;border-bottom:2px solid #dddddd;'>
       <div style='padding-bottom:6px;overflow:hidden;line-height:20px;border-bottom:1px solid #f0f0f0;'>
         <h6 style='float:right;color:#999999'>6시간전</h6>
       </div>
@@ -248,32 +248,32 @@
       </div>
     </div>
     <div style='background-color:#f9f9f9;overflow:hidden;line-height:20px;'>
-      <div style='border-top:1px solid #e2e2e2;padding:10px'>
+      <div style='border-bottom:1px solid #e2e2e2;padding:10px'>
         <span style='margin-right:10px'>별거도 아닌거 갖고..</span>
-        <div>
+        <div style='overflow:hidden'>
           <h6 style='margin-right:10px'>user****</h6>
           <h6 style='margin-right:10px'>7시간전</h6>
-          <a href='#'><small>삭제</small></a>
+          <a href='#' class='icon-remove' style='float:right'></a>
         </div>
       </div>
 
-      <div style='border-top:1px solid #e2e2e2;padding:10px'>
+      <div style='border-bottom:1px solid #e2e2e2;padding:10px'>
         <strong style='margin-right:10px'>공감해요</strong>
         <span style='margin-right:10px'>부러워요 님좀 짱인듯</span>
-        <div>
+        <div style='overflow:hidden'>
           <h6 style='margin-right:10px'>user****</h6>
           <h6 style='margin-right:10px'>7시간전</h6>
-          <small>좋아요</small>
+          <img src='heart.png' style='float:right'></img>
         </div>
       </div>
 
-      <div style='border-top:1px solid #e2e2e2;padding:10px'>
+      <div style='padding:10px'>
         <strong style='margin-right:10px'>공감해요</strong>
-        <div>
+        <div style='overflow:hidden'>
           <h6 style='margin-right:10px'>user****</h6>
           <h6 style='margin-right:10px'>7시간전</h6>
-          <a href='#'><small>좋아요</small></a>
-          <a href='#'><small>삭제</small></a>
+          <a href='#' class='icon-remove' style='float:right;margin-left:10px;'></a>
+          <a href='#' class='icon-heart' style='float:right'></a>
         </div>
       </div>
     </div>
@@ -285,99 +285,96 @@
 <script type='text/template' id='tpl_others'>
 <ul id='tiles'>
   <li class='rd6 _sd0' style='background-color:#f9f9f9;'>
+    <div style='border-bottom:1px solid #dddddd;padding:10px;'>
+      <a href='#'><h3 style='color:#333333'>실시간 느낌</h3></a>
+    </div>
+    <ul class='wordcloud' style='white-space:normal;background-color:#edf0ee;border-bottom:2px solid #dddddd'>
+      <li><strong>외롭다</strong></li>
+      <li>마음아프다</li>
+      <li>쓸쓸하다</li>
+      <li>기쁘다</li>
+      <li><strong>기운차다</strong></li>
+      <li>기운이없다</li>
+      <li>우울하다</li>
+      <li>만족스럽다</li>
+      <li>걱정된다</li>
+      <li>삶이힘들다</li>
+      <li>초조하다</li>
+      <li><strong>허전하다</strong></li>
+      <li>무섭다</li>
+      <li>두렵다</li>
+      <li>열등감느낀다</li>
+      <li>의욕이없다</li>
+      <li><strong>사랑스럽다</strong></li>
+      <li>소중하다</li>
+      <li>설레다</li>
+      <li>즐겁다</li>
+    </ul>
     <div style='padding:10px;'>
-      <a href='#'><h3 style='color:#333333'>최근 느낌들</h3></a>
-    </div>
-    <div style='border-top:1px solid #dddddd;padding:10px;'>
-      <span><a href='#'>느낌 받기 9</a></span>
-    </div>
-    <div style='border-top:1px solid #dddddd;padding:10px;'>
-      <ul class='wordcloud'>
-        <li>#외롭다</li>
-        <li>#마음아프다</li>
-        <li>#쓸쓸하다</li>
-        <li>#기쁘다</li>
-        <li>#기운차다</li>
-        <li>#기운이없다</li>
-        <li>#우울하다</li>
-        <li>#만족스럽다</li>
-        <li>#걱정된다</li>
-        <li>#삶이힘들다</li>
-        <li>#초조하다</li>
-        <li>#허전하다</li>
-        <li>#무섭다</li>
-        <li>#두렵다</li>
-        <li>#열등감느낀다</li>
-        <li>#의욕이없다</li>
-        <li>#사랑스럽다</li>
-        <li>#소중하다</li>
-        <li>#설레다</li>
-        <li>#즐겁다</li>
-      </ul>
-    </div>
-    <div style='border-top:1px solid #dddddd;padding:10px;'>
-      <span class='_rspc'>idid****</span>
-      <span class='_rspc'>공감도 6.0</span>
-      <span>#한심하다</span>
-    </div>
-    <div style='border-top:1px solid #dddddd;padding:10px;'>
-      <span class='_rspc'>udud****</span>
-      <span class='_rspc'>공감도 6.0</span>
-      <span>#한심하다</span>
-    </div>
-    <div style='border-top:1px solid #dddddd;padding:10px;'>
-      <span class='_rspc'>cdcd****</span>
-      <span class='_rspc'>공감도 6.0</span>
-      <span>#한심하다</span>
-    </div>    
-  </li>
-
-  <li class='rd6 _sd0' style='background-color:#c6aae2;'>
-    <div style='padding:10px;cursor:pointer;'>
-      <div style='overflow:hidden;line-height:20px;'>
-        <div style='margin-right:10px;float:left;width:80px;'>#한심하다</div>
-        <h6 style='float:right'>6시간전</h6>
-      </div>
-      <div style='padding:10px'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</div>
-      <div style='overflow:hidden;line-height:20px;'>
-        <small style='float:right;margin-left:10px;'>공감 1</small>
-        <small style='float:right'>댓글 1</small>
-      </div>
+      <span>느낌포인트 9</span>
     </div>
   </li>
 
-  <li class='rd6 _sd0' style='background-color:#ffc6e2;'>
-    <div style='padding:10px;'>
-      <div style='overflow:hidden;line-height:20px;'>
-        <div class='c4' style='margin-right:10px;float:left;width:80px;'>#기운이없다</div>
-        <h5><strong>myidmyid</strong></h5>
-        <h6 style='float:right'>7시간전</h6>
+  <li class='rd6 _sd0'>
+    <div style='background-color:#c6aae2;padding:18px 10px 18px 10px;border-bottom:2px solid #dddddd;'>
+      <div style='padding-bottom:6px;overflow:hidden;line-height:20px;border-bottom:1px solid #f0f0f0;'>
+        <span style='float:left'><i class='icon-user'></i> <h6 style='color:#454545;font-weight:bold'>idid****</h6></span>
+        <h6 style='float:right;color:#999999'>6시간전</h6>
       </div>
-      <div style='padding:10px'>일이 너무 힘들다..</div>
+      <div style='margin-top:18px;'>
+        <span style='margin-right:10px;font-weight:bold;color:#9966ff'>한심하다</span>
+        <span style='color:#ffffff'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
+      </div>
     </div>
-    <div style='margin-top:5px;background-color:#f9f9f9'>
-      <div style='border-top:1px solid #e2e2e2;padding:10px'>
-        <span style='margin-right:10px'>별거도 아닌거 갖고..</span>
-        <h6 style='margin-right:10px'>user****</h6>
-        <h6 style='margin-right:10px'>7시간전</h6>
-        <a href='#'><small>삭제</small></a>
-      </div>
+    <div style='background-color:#f9f9f9;overflow:hidden;line-height:20px;padding:8px 10px;font-size:11px;'>
+      <a href='#' style='float:right;margin-left:10px;'><i class='icon-share-alt'></i> <span style='margin-top:1px;line-height:14px;'>포워드</span></a>
+      <a href='#' class='icon-heart' style='float:right;margin-left:10px;'></a>
+      <a href='#' class='icon-comment' style='float:right'></a>
+    </div>
+  </li>
 
-      <div style='border-top:1px solid #e2e2e2;padding:10px'>
-        <small style='margin-right:10px'><strong>#공감해요</strong></small>
-        <span style='margin-right:10px'>부러워요 님좀 짱인듯</span>
-        <h6 style='margin-right:10px'>user****</h6>
-        <h6 style='margin-right:10px'>7시간전</h6>
-        <small>좋아요</small>
+  <li class='rd6 _sd0'>
+    <div style='background-color:#ffc6e2;padding:18px 10px 18px 10px;border-bottom:2px solid #dddddd;'>
+      <div style='padding-bottom:6px;overflow:hidden;line-height:20px;border-bottom:1px solid #f0f0f0;'>
+        <span style='float:left'><i class='icon-user'></i> <h6 style='color:#454545;font-weight:bold'>idid****</h6></span>
+        <h6 style='float:right;color:#999999'>6시간전</h6>
       </div>
+      <div style='margin-top:18px;'>
+        <span style='margin-right:10px;font-weight:bold;color:#ff9ecb'>한심하다</span>
+        <span style='color:#ffffff'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
+      </div>
+    </div>
+    <div style='background-color:#f9f9f9;overflow:hidden;line-height:20px;padding:8px 10px;font-size:11px;'>
+      <a href='#' style='float:right;margin-left:10px;'><i class='icon-share-alt'></i> <span style='margin-top:1px;line-height:14px;'>포워드</span></a>
+      <a href='#' style='float:right;margin-left:10px;'><img src='heart.png'></img></a>
+      <a href='#' class='icon-comment' style='float:right'></a>
+    </div>
+    <div style='background-color:#f9f9f9;padding:0 10px 10px 10px;'>
+      <div style='border-top:1px solid #dddddd;padding-top:10px;'>
+        <div style=''>
+          <input type="text" placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
+        </div>
+        <div style='overflow:hidden'>
+          <a href='#' class='btn' style='float:right;'>작성하기</a>
+        </div>
+      </div>
+    </div>
+  </li>
 
-      <div style='border-top:1px solid #e2e2e2;padding:10px'>
-        <small style='margin-right:10px'><strong>#공감해요</strong></small>
-        <h6 style='margin-right:10px'>user****</h6>
-        <h6 style='margin-right:10px'>7시간전</h6>
-        <a href='#'><small>좋아요</small></a>
-        <a href='#'><small>삭제</small></a>
+  <li class='rd6 _sd0'>
+    <div style='background-color:#c6aae2;padding:18px 10px 18px 10px;border-bottom:2px solid #dddddd;'>
+      <div style='padding-bottom:6px;overflow:hidden;line-height:20px;border-bottom:1px solid #f0f0f0;'>
+        <span style='float:left'><i class='icon-user'></i> <h6 style='color:#454545;font-weight:bold'>idid****</h6></span>
+        <h6 style='float:right;color:#999999'>6시간전</h6>
       </div>
+      <div style='margin-top:18px;'>
+        <span style='margin-right:10px;font-weight:bold;color:#9966ff'>한심하다</span>
+        <span style='color:#ffffff'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
+      </div>
+    </div>
+    <div style='background-color:#f9f9f9;overflow:hidden;line-height:20px;padding:8px 10px;font-size:11px;'>
+      <img src='heart.png'></img> <span>힘내세요</span>
+      <h6>6시간전</h6>
     </div>
   </li>
 
