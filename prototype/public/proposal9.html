@@ -209,15 +209,14 @@
 
 <script type='text/template' id='tpl_my'>
 <ul id='tiles'>
-
-  <li class='rd6 _sd0' style='background-color:#f9f9f9;'>
+  <li class='rd6 _sd0' style='background-color:#f9f9f9;padding:2px 0'>
     <div style='border-bottom:2px solid #dddddd;padding:12px 10px 10px 10px;'>
       <a href='#'><h3 style='color:#333333'>myidmyid</h3></a>
     </div>
-    <div style='text-align:center;background-color:#edf0ee;padding:10px;line-height:30px;'>
-      <strong style='font-size:24px;color:#565656'>What is your Feeling now?</strong>
+    <div style='text-align:center;background-color:#eeeeee;padding:30px 10px 16px 10px;line-height:34px;'>
+      <strong style='font-size:28px;color:#656565'>What is your Feeling now?</strong>
     </div>
-    <ul style='line-height:20px;color:#777777;overflow:hidden;font-size:11px;padding:7px 10px;background-color:#edf0ee'>
+    <ul style='line-height:20px;color:#777777;overflow:hidden;font-size:11px;padding:7px 10px;background-color:#eeeeee'>
       <li class='cc0' style='margin-right:2px;padding:2px 0;display:inline-block;cursor:pointer;'><i class='icon-leaf'></i> 외롭다</li>
       <li class='cc1' style='margin-right:2px;padding:2px 0;display:inline-block;cursor:pointer;'><i class='icon-leaf'></i> 마음아프다</li>
       <li class='cc2' style='margin-right:2px;padding:2px 0;display:inline-block;cursor:pointer;'><i class='icon-leaf'></i> 쓸쓸하다</li>
@@ -234,11 +233,49 @@
       <li class='cc8' style='margin-right:2px;padding:2px 0;display:inline-block;cursor:pointer;'><i class='icon-leaf'></i> 두렵다</li>
       <li class='cc9' style='margin-right:2px;padding:2px 0;display:inline-block;cursor:pointer;'><i class='icon-leaf'></i> 열등감느낀다</li>
     </ul>
-    <div style='padding:0 10px 12px 10px;background-color:#edf0ee'>
+    <div style='border-bottom:2px solid #dddddd;padding:0 10px 12px 10px;background-color:#edf0ee'>
       <div><textarea placeholder="What is your Feeling now?" style='width:100%;box-sizing:border-box;resize:none;margin-bottom:6px;'></textarea></div>
       <div style='overflow:hidden'>
         <a class='btn btn-inverse' href='#' style='float:right;'>작성하기</a>
       </div>
+    </div>
+
+    <div style='border-bottom:2px solid #dddddd;padding:10px;'>
+      <a href='#'><h3 style='color:#333333'>실시간 느낌</h3></a>
+    </div>
+    <ul class='wordcloud' style='white-space:normal;background-color:#eeeeee;border-bottom:1px solid #dddddd'>
+      <li><strong>외롭다</strong></li>
+      <li>마음아프다</li>
+      <li>쓸쓸하다</li>
+      <li>기쁘다</li>
+      <li><strong>기운차다</strong></li>
+      <li>기운이없다</li>
+      <li>우울하다</li>
+      <li>만족스럽다</li>
+      <li>걱정된다</li>
+      <li>삶이힘들다</li>
+    </ul>
+    <div style='border-bottom:1px solid #dddddd;padding:10px;line-height:16px;'>
+      <h5 class='_rspc'>받을 수 있는 느낌 9</h5> <a href='#' class='icon-question-sign _r'></a>
+    </div>
+    <div style='padding:10px 10px 8px 10px;'>
+      <span>나와 비슷한 성향의 사람들</span>
+      <a href='#' class='_r'>more</a>
+    </div>
+    <div style='padding:10px;background-color:#f9f9f9'>
+      <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
+      <h6 class='_rspc'>공감도 5.0</h6>
+      <span class='_r'>한심하다</span>
+    </div>
+    <div style='padding:10px;background-color:#f9f9f9'>
+      <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
+      <h6 class='_rspc'>공감도 6.2</h6>
+      <span class='_r'>외롭다</span>
+    </div>
+    <div style='padding:10px;background-color:#f9f9f9'>
+      <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
+      <h6 class='_rspc'>공감도 1.2</h6>    
+      <span class='_r'>즐겁다</span>
     </div>
   </li>
 
@@ -386,13 +423,20 @@
 <script type='text/template' id='tpl_others'>
 <ul id='tiles'>
   <li class='rd6 _sd0' style='background-color:#f9f9f9;padding:2px 0'>
-    <div style='border-bottom:1px solid #dddddd;padding:10px;'>
+    <div style='border-bottom:2px solid #dddddd;padding:12px 10px 10px 10px;'>
+      <a href='#'><h3 style='color:#333333'>myidmyid</h3></a>
+    </div>
+    <div style='text-align:center;background-color:#eeeeee;padding:30px 10px 16px 10px;line-height:34px;'>
+      <strong style='font-size:28px;color:#656565'>What is your Feeling now?</strong>
+    </div>
+    <div style='border-bottom:2px solid #dddddd;padding:0 10px 12px 10px;background-color:#eeeeee'>
+      <div><textarea placeholder="What is your Feeling now?" style='width:100%;box-sizing:border-box;resize:none;margin-bottom:6px;'></textarea></div>
+    </div>
+
+    <div style='border-bottom:2px solid #dddddd;padding:10px;'>
       <a href='#'><h3 style='color:#333333'>실시간 느낌</h3></a>
     </div>
-    <div style='border-bottom:1px solid #dddddd;padding:10px;line-height:16px;'>
-      <h5 class='_rspc'>받을 수 있는 느낌 9</h5> <a href='#' class='icon-question-sign _r'></a>
-    </div>
-    <ul class='wordcloud' style='white-space:normal;background-color:#eeeeee;border-bottom:2px solid #dddddd'>
+    <ul class='wordcloud' style='white-space:normal;background-color:#eeeeee;border-bottom:1px solid #dddddd'>
       <li><strong>외롭다</strong></li>
       <li>마음아프다</li>
       <li>쓸쓸하다</li>
@@ -404,6 +448,9 @@
       <li>걱정된다</li>
       <li>삶이힘들다</li>
     </ul>
+    <div style='border-bottom:1px solid #dddddd;padding:10px;line-height:16px;'>
+      <h5 class='_rspc'>받을 수 있는 느낌 9</h5> <a href='#' class='icon-question-sign _r'></a>
+    </div>
     <div style='padding:10px 10px 8px 10px;'>
       <span>나와 비슷한 성향의 사람들</span>
       <a href='#' class='_r'>more</a>
