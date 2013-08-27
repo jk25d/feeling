@@ -89,20 +89,20 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:11px;li
 /* layout */
 
 #tiles {position:relative;margin-top:14px;}
-.box {width:230px;overflow:hidden;background-color:#f9f9f9}
+.card {width:230px;overflow:hidden;background-color:#f9f9f9}
 .main>.header0 {padding:12px 10px 10px 10px;}
 .main>.content0-header {text-align:center;background-color:#eeeeee;padding:30px 10px 16px 10px;}
 .main>.content0-input {padding:0 10px 12px 10px;background-color:#eeeeee}
 .main>.content1-header { padding:10px 10px 8px 10px;}
 
-.box>.inner {padding:10px;border-bottom:2px solid #dddddd;}
-.box>.inner>.header{padding:8px 0 5px 0;overflow:hidden;border-bottom:1px solid #f0f0f0;}
-.box>.inner>.content{margin:18px 0 8px 0;}
-.box>.inner>.content>._word{margin-right:10px;font-weight:bold;}
-.box>.comments{background-color:#f9f9f9;}
-.box>.comments2 {background-color:#f9f9f9;padding:0 10px 10px 10px;}
-.box>.comments>.content{line-height:16px;padding:8px 10px 10px 10px;font-size:11px;overflow:hidden;}
-.box>.comments2>.content{border-top:1px solid #dddddd;padding-top:10px;}
+.card>.inner {padding:10px;border-bottom:2px solid #dddddd;}
+.card>.inner>.header{padding:8px 0 5px 0;overflow:hidden;border-bottom:1px solid #f0f0f0;}
+.card>.inner>.content{margin:18px 0 8px 0;}
+.card>.inner>.content>._word{margin-right:10px;font-weight:bold;}
+.card>.comments{background-color:#f9f9f9;}
+.card>.comments2 {background-color:#f9f9f9;padding:0 10px 10px 10px;}
+.card>.comments>.content{line-height:16px;padding:8px 10px 10px 10px;font-size:11px;overflow:hidden;}
+.card>.comments2>.content{border-top:1px solid #dddddd;padding-top:10px;}
 
 #wordselect {
   line-height:20px;color:#777777;overflow:hidden;font-size:11px;padding:7px 10px;background-color:#eeeeee

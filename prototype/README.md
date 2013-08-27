@@ -100,7 +100,9 @@ http://www.inwebson.com/demo/blocksit-js/  # no responsive?
 http://isotope.metafizzy.co/		# commercial license
 http://jsonenglish.com/projects/flex/         # no dynamic alignment
 
-----
+
+css structure
+-------------
 
 fonts
   h1: 28px/34px, What is your ..
@@ -129,3 +131,46 @@ box feel
     content0
     content1
 
+-----
+
+routes
+------
+
+my
+ur
+login
+signup
+
+rest
+----
+/info
+  words: [ { 'id': { desc: '', color: ''} } ]
+  live_words: [ {'id': 'n'} ]
+  available_feels: 'n'
+  similar_users: [ {user_id: '', similarity: '', word_id: ''} ]
+
+/my
+  [ {time: '', user_id: '', content: '', comments: [
+    {type: '', content: '', user_id: '', time: '', liked: ''} ] ]
+
+/ur
+  [ {time: '', user_id: '', content: '', comments: [
+    {type: '', content: '', user_id: '', time: ''} ] ]
+
+view
+-----
+
+header
+  - default, my, ur, logout
+  - default, signup
+
+MainCardView
+  - WordsView
+    - WordView
+MyFeelCardsView
+  - MyFeelCardView
+    - CommentsView
+      - CommentView
+UrFeelCardsView
+  - UrFeelCardView
+    - ReplyView
