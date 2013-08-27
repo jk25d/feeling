@@ -99,3 +99,33 @@ http://masonry.desandro.com/		              # MIT, 3.1.1, 70k(24k)
 http://www.inwebson.com/demo/blocksit-js/  # no responsive?
 http://isotope.metafizzy.co/		# commercial license
 http://jsonenglish.com/projects/flex/         # no dynamic alignment
+
+----
+
+fonts
+  h1: 28px/34px, What is your ..
+  h2: 16px, 실시간 느낌, myidid(strong)
+  h3: ..
+  h4: sz12 -- default
+  h5: sz11
+  h6: color: grey, size:11
+
+box main
+  header0
+  content0-header
+  content0-content
+  content0-input
+  header1
+  content1
+  content2
+  content3-header
+  content3-content
+
+box feel
+  inner
+    header
+    content
+  comments
+    content0
+    content1
+
