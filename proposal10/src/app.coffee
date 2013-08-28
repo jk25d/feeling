@@ -6,6 +6,7 @@ app = express()
 #### CONFIGURATION ####
 
 require_auth = (req, res, next) ->
+  console.log req.session.user
   res.send 401 unless req.session.user
   next()
 

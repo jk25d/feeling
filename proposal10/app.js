@@ -7,6 +7,7 @@
   app = express();
 
   require_auth = function(req, res, next) {
+    console.log(req.session.user);
     if (!req.session.user) {
       res.send(401);
     }

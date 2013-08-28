@@ -15,13 +15,92 @@
   };
 
   $(function() {
-    var AppRouter, HeaderView, LoginView, _ref, _ref1, _ref2;
+    var AppRouter, CardHolderView, HeaderView, Info, LoginView, UrFeel, UrFeelCardView, UrFeels, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
+    Info = (function(_super) {
+      __extends(Info, _super);
+
+      function Info() {
+        _ref = Info.__super__.constructor.apply(this, arguments);
+        return _ref;
+      }
+
+      Info.prototype.url = '../auth/info';
+
+      return Info;
+
+    })(Backbone.Model);
+    UrFeel = (function(_super) {
+      __extends(UrFeel, _super);
+
+      function UrFeel() {
+        _ref1 = UrFeel.__super__.constructor.apply(this, arguments);
+        return _ref1;
+      }
+
+      return UrFeel;
+
+    })(Backbone.Model);
+    UrFeels = (function(_super) {
+      __extends(UrFeels, _super);
+
+      function UrFeels() {
+        _ref2 = UrFeels.__super__.constructor.apply(this, arguments);
+        return _ref2;
+      }
+
+      UrFeels.prototype.model = UrFeel;
+
+      UrFeels.prototype.url = '../auth/ur';
+
+      return UrFeels;
+
+    })(Backbone.Collection);
+    UrFeelCardView = (function(_super) {
+      __extends(UrFeelCardView, _super);
+
+      function UrFeelCardView() {
+        _ref3 = UrFeelCardView.__super__.constructor.apply(this, arguments);
+        return _ref3;
+      }
+
+      UrFeelCardView.prototype.tagName = 'li';
+
+      UrFeelCardView.prototype.template = _.template($('#tpl_ur_feel_card').html());
+
+      UrFeelCardView.prototype.render = function(event) {
+        this.$el.html(this.template(this.model.toJSON()));
+        return this;
+      };
+
+      return UrFeelCardView;
+
+    })(Backbone.View);
+    CardHolderView = (function(_super) {
+      __extends(CardHolderView, _super);
+
+      function CardHolderView() {
+        _ref4 = CardHolderView.__super__.constructor.apply(this, arguments);
+        return _ref4;
+      }
+
+      CardHolderView.prototype.tagName = 'ul';
+
+      CardHolderView.prototype.template = _.template($('#tpl_card_holder').html());
+
+      CardHolderView.prototype.render = function(event) {
+        this.$el.html(this.template(this.model.toJSON()));
+        return this;
+      };
+
+      return CardHolderView;
+
+    })(Backbone.View);
     HeaderView = (function(_super) {
       __extends(HeaderView, _super);
 
       function HeaderView() {
-        _ref = HeaderView.__super__.constructor.apply(this, arguments);
-        return _ref;
+        _ref5 = HeaderView.__super__.constructor.apply(this, arguments);
+        return _ref5;
       }
 
       HeaderView.prototype.tagName = 'div';
@@ -31,7 +110,9 @@
       HeaderView.prototype.template = _.template($('#tpl_header').html());
 
       HeaderView.prototype.render = function(event) {
-        this.$el.html(this.template());
+        this.$el.html(this.template({
+          user: this.model
+        }));
         return this;
       };
 
@@ -42,8 +123,8 @@
       __extends(LoginView, _super);
 
       function LoginView() {
-        _ref1 = LoginView.__super__.constructor.apply(this, arguments);
-        return _ref1;
+        _ref6 = LoginView.__super__.constructor.apply(this, arguments);
+        return _ref6;
       }
 
       LoginView.prototype.tagName = 'div';
@@ -51,7 +132,7 @@
       LoginView.prototype.template = _.template($('#tpl_login').html());
 
       LoginView.prototype.events = {
-        'click #login-btn': 'login'
+        'click #login_btn': 'login'
       };
 
       LoginView.prototype.render = function(event) {
@@ -61,11 +142,12 @@
 
       LoginView.prototype.login = function(event) {
         return $.ajax({
-          url: '../login',
+          url: '../sessions',
           type: 'POST',
           dataType: 'json',
           data: {
-            userid: $('#userid').val()
+            user_id: $('#user_id').val(),
+            password: $('#password').val()
           },
           success: function(data) {
             return window.location.replace('#');
@@ -90,8 +172,8 @@
       __extends(AppRouter, _super);
 
       function AppRouter() {
-        _ref2 = AppRouter.__super__.constructor.apply(this, arguments);
-        return _ref2;
+        _ref7 = AppRouter.__super__.constructor.apply(this, arguments);
+        return _ref7;
       }
 
       AppRouter.prototype.routes = {
@@ -104,11 +186,12 @@
       };
 
       AppRouter.prototype.login = function() {
-        alert('ew');
         $('#_header').html(new HeaderView({
-          user: false
+          model: false
         }).render().el);
-        return $('#_content').html(new LoginView({}).render().el);
+        return $('#_content').html(new LoginView({
+          model: {}
+        }).render().el);
       };
 
       AppRouter.prototype.logout = function() {
@@ -131,7 +214,37 @@
       };
 
       AppRouter.prototype.ur = function() {
-        return alert('ur');
+        var info;
+        info = new Info;
+        return info.fetch({
+          success: function(model, res) {
+            var feels;
+            feels = new UrFeels;
+            feels.fetch({
+              data: {
+                skip: 0,
+                n: 3
+              },
+              success: function(model, res) {
+                var feel, _i, _len, _ref8;
+                _ref8 = model.models;
+                for (_i = 0, _len = _ref8.length; _i < _len; _i++) {
+                  feel = _ref8[_i];
+                  $('#content').append(new UrFeelCardView({
+                    model: feel
+                  }).render().el);
+                }
+                return wookmark();
+              }
+            });
+            $('#_header').html(new HeaderView({
+              model: true
+            }).render().el);
+            return $('#_content').html(new CardHolderView({
+              model: model
+            }).render().el);
+          }
+        });
       };
 
       return AppRouter;
