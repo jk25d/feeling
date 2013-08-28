@@ -66,6 +66,10 @@
       Backbone.history.start()
       wookmark()
 
+      $('#wordselect > li').on 'click', (event) ->
+        $('#wordselect').find('.active').removeClass 'active' 
+        $(@).toggleClass 'active'
+
   </script>
 </head>
 
@@ -131,7 +135,7 @@
     <div class='bd2 content0-input'>
       <div><textarea placeholder="What is your Feeling now?"></textarea></div>
       <div class='_ofh'>
-        <a class='btn btn-inverse _r' href='#'>작성하기</a>
+        <a class='btn btn-inverse _r' href='#myModal' data-toggle='modal'>작성하기</a>
       </div>
     </div>
 
@@ -312,6 +316,21 @@
   </li>
 
 </ul>
+
+<div id='myModal' class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h2>공개하시겠습니까?</h2>
+  </div>
+  <div class="modal-body">
+    <p>공개한 글은 24시간동안 공유되며, 다른 사람의 공감을 받을 수 있습니다.</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn">비공개</a>
+    <a href="#" class="btn btn-primary">공개</a>
+  </div>
+</div>
+
 </script>
 
 <script type='text/template' id='tpl_others'>

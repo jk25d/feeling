@@ -26,7 +26,7 @@
 .btn {font-size:12px;}
 [class^="icon-"],
 [class*=" icon-"] {vertical-align:text-bottom}
-
+.modal {width:320px;margin-left:-160px;}
 
 /* common */
 
@@ -74,16 +74,16 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:11px;li
 }
 .icon-heart2 {background-image:url('../heart.png');background-position:0}
 
-.cc0:hover, .cc0:active {color:#c6aae2;}
-.cc1:hover, .cc0:active {color:#ffc6e2;}
-.cc2:hover, .cc0:active {color:#aaaae2;}
-.cc3:hover, .cc0:active {color:#8daae2;}
-.cc4:hover, .cc0:active {color:#ffff8d;}
-.cc5:hover, .cc0:active {color:#336699;}
-.cc6:hover, .cc0:active {color:#ffc6c6;}
-.cc7:hover, .cc0:active {color:#df0000;}
-.cc8:hover, .cc0:active {color:#c6ffff;}
-.cc9:hover, .cc0:active {color:#ffe28d;}
+.cc0:hover, .cc0:active, .cc0.active {color:#c6aae2;}
+.cc1:hover, .cc1:active, .cc1.active {color:#ffc6e2;}
+.cc2:hover, .cc2:active, .cc2.active {color:#aaaae2;}
+.cc3:hover, .cc3:active, .cc3.active {color:#8daae2;}
+.cc4:hover, .cc4:active, .cc4.active {color:#ffff8d;}
+.cc5:hover, .cc5:active, .cc5.active {color:#336699;}
+.cc6:hover, .cc6:active, .cc6.active {color:#ffc6c6;}
+.cc7:hover, .cc7:active, .cc7.active {color:#df0000;}
+.cc8:hover, .cc8:active, .cc8.active {color:#c6ffff;}
+.cc9:hover, .cc9:active, .cc9.active {color:#ffe28d;}
 
 
 /* layout */
