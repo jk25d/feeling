@@ -10,6 +10,11 @@ $ ->
 
   #### MODELS ####
 
+  class Header extends Backbone.Model
+    default:
+      loggedin: false
+      menu: 'login'
+
   class Info extends Backbone.Model
     url: '../auth/info'
 
@@ -37,10 +42,12 @@ $ ->
 
   class HeaderView extends Backbone.View
     tagName: 'div'
-    class: 'container'
+    className: 'container'
     template: _.template $('#tpl_header').html()
     render: (event) ->
-      @$el.html @template(user:@model)
+      console.log @model
+      console.log @model.toJSON()
+      @$el.html @template(@model.toJSON())
       @
 
   class LoginView extends Backbone.View
@@ -79,8 +86,18 @@ $ ->
       "my": "my"
       "ur": "ur"
     login: ->
-      $('#_header').html new HeaderView(model: false).render().el
-      $('#_content').html new LoginView(model: {}).render().el
+      $.ajax
+        url: '../sessions'
+        dataType: 'json'
+        success: (data) ->
+          if data.user
+            window.location.replace '/'
+          else
+            h = new Header
+            h.set {loggedin: false, menu: 'login'}
+            $('#_header').html new HeaderView(model: h).render().el
+            $('#_content').html new LoginView(model: data).render().el            
+
     logout: ->
       $.ajax
         url: '../sessions'
@@ -101,9 +118,12 @@ $ ->
             data: {skip:0, n:3}
             success: (model, res) ->
               for feel in model.models
-                $('#content').append new UrFeelCardView(model: feel).render().el
+                console.log feel
+                $('#tiles').append new UrFeelCardView(model: feel).render().el
               wookmark()
-          $('#_header').html new HeaderView(model: true).render().el
+          h = new Header
+          h.set {loggedin: true, menu: 'ur'}
+          $('#_header').html new HeaderView(model: h).render().el
           $('#_content').html new CardHolderView(model: model).render().el
 
 

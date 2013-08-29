@@ -15,13 +15,29 @@
   };
 
   $(function() {
-    var AppRouter, CardHolderView, HeaderView, Info, LoginView, UrFeel, UrFeelCardView, UrFeels, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
+    var AppRouter, CardHolderView, Header, HeaderView, Info, LoginView, UrFeel, UrFeelCardView, UrFeels, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
+    Header = (function(_super) {
+      __extends(Header, _super);
+
+      function Header() {
+        _ref = Header.__super__.constructor.apply(this, arguments);
+        return _ref;
+      }
+
+      Header.prototype["default"] = {
+        loggedin: false,
+        menu: 'login'
+      };
+
+      return Header;
+
+    })(Backbone.Model);
     Info = (function(_super) {
       __extends(Info, _super);
 
       function Info() {
-        _ref = Info.__super__.constructor.apply(this, arguments);
-        return _ref;
+        _ref1 = Info.__super__.constructor.apply(this, arguments);
+        return _ref1;
       }
 
       Info.prototype.url = '../auth/info';
@@ -33,8 +49,8 @@
       __extends(UrFeel, _super);
 
       function UrFeel() {
-        _ref1 = UrFeel.__super__.constructor.apply(this, arguments);
-        return _ref1;
+        _ref2 = UrFeel.__super__.constructor.apply(this, arguments);
+        return _ref2;
       }
 
       return UrFeel;
@@ -44,8 +60,8 @@
       __extends(UrFeels, _super);
 
       function UrFeels() {
-        _ref2 = UrFeels.__super__.constructor.apply(this, arguments);
-        return _ref2;
+        _ref3 = UrFeels.__super__.constructor.apply(this, arguments);
+        return _ref3;
       }
 
       UrFeels.prototype.model = UrFeel;
@@ -59,8 +75,8 @@
       __extends(UrFeelCardView, _super);
 
       function UrFeelCardView() {
-        _ref3 = UrFeelCardView.__super__.constructor.apply(this, arguments);
-        return _ref3;
+        _ref4 = UrFeelCardView.__super__.constructor.apply(this, arguments);
+        return _ref4;
       }
 
       UrFeelCardView.prototype.tagName = 'li';
@@ -79,8 +95,8 @@
       __extends(CardHolderView, _super);
 
       function CardHolderView() {
-        _ref4 = CardHolderView.__super__.constructor.apply(this, arguments);
-        return _ref4;
+        _ref5 = CardHolderView.__super__.constructor.apply(this, arguments);
+        return _ref5;
       }
 
       CardHolderView.prototype.tagName = 'ul';
@@ -99,20 +115,20 @@
       __extends(HeaderView, _super);
 
       function HeaderView() {
-        _ref5 = HeaderView.__super__.constructor.apply(this, arguments);
-        return _ref5;
+        _ref6 = HeaderView.__super__.constructor.apply(this, arguments);
+        return _ref6;
       }
 
       HeaderView.prototype.tagName = 'div';
 
-      HeaderView.prototype["class"] = 'container';
+      HeaderView.prototype.className = 'container';
 
       HeaderView.prototype.template = _.template($('#tpl_header').html());
 
       HeaderView.prototype.render = function(event) {
-        this.$el.html(this.template({
-          user: this.model
-        }));
+        console.log(this.model);
+        console.log(this.model.toJSON());
+        this.$el.html(this.template(this.model.toJSON()));
         return this;
       };
 
@@ -123,8 +139,8 @@
       __extends(LoginView, _super);
 
       function LoginView() {
-        _ref6 = LoginView.__super__.constructor.apply(this, arguments);
-        return _ref6;
+        _ref7 = LoginView.__super__.constructor.apply(this, arguments);
+        return _ref7;
       }
 
       LoginView.prototype.tagName = 'div';
@@ -172,8 +188,8 @@
       __extends(AppRouter, _super);
 
       function AppRouter() {
-        _ref7 = AppRouter.__super__.constructor.apply(this, arguments);
-        return _ref7;
+        _ref8 = AppRouter.__super__.constructor.apply(this, arguments);
+        return _ref8;
       }
 
       AppRouter.prototype.routes = {
@@ -186,12 +202,28 @@
       };
 
       AppRouter.prototype.login = function() {
-        $('#_header').html(new HeaderView({
-          model: false
-        }).render().el);
-        return $('#_content').html(new LoginView({
-          model: {}
-        }).render().el);
+        return $.ajax({
+          url: '../sessions',
+          dataType: 'json',
+          success: function(data) {
+            var h;
+            if (data.user) {
+              return window.location.replace('/');
+            } else {
+              h = new Header;
+              h.set({
+                loggedin: false,
+                menu: 'login'
+              });
+              $('#_header').html(new HeaderView({
+                model: h
+              }).render().el);
+              return $('#_content').html(new LoginView({
+                model: data
+              }).render().el);
+            }
+          }
+        });
       };
 
       AppRouter.prototype.logout = function() {
@@ -218,7 +250,7 @@
         info = new Info;
         return info.fetch({
           success: function(model, res) {
-            var feels;
+            var feels, h;
             feels = new UrFeels;
             feels.fetch({
               data: {
@@ -226,19 +258,25 @@
                 n: 3
               },
               success: function(model, res) {
-                var feel, _i, _len, _ref8;
-                _ref8 = model.models;
-                for (_i = 0, _len = _ref8.length; _i < _len; _i++) {
-                  feel = _ref8[_i];
-                  $('#content').append(new UrFeelCardView({
+                var feel, _i, _len, _ref9;
+                _ref9 = model.models;
+                for (_i = 0, _len = _ref9.length; _i < _len; _i++) {
+                  feel = _ref9[_i];
+                  console.log(feel);
+                  $('#tiles').append(new UrFeelCardView({
                     model: feel
                   }).render().el);
                 }
                 return wookmark();
               }
             });
+            h = new Header;
+            h.set({
+              loggedin: true,
+              menu: 'ur'
+            });
             $('#_header').html(new HeaderView({
-              model: true
+              model: h
             }).render().el);
             return $('#_content').html(new CardHolderView({
               model: model

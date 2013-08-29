@@ -40,9 +40,9 @@
 <a class='brand' href='#'>FEELING SHARE</a>
 <div class='nav-collapse collapse'>
   <ul class='nav'>    
-  <% if(user){ %>
-    <li><a href='#my'>MY DIARY</a></li>
-    <li><a href='#ur'>RECEIVED</a></li>
+  <% if(loggedin){ %>
+    <li id='my' class='<%= menu=="my" ? "active" : "" %>'><a href='#my'>MY DIARY</a></li>
+    <li id='ur' class='<%= menu=="ur" ? "active" : "" %>'><a href='#ur'>RECEIVED</a></li>
     <li class="dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i> <b class="caret"></b></a>
       <ul class="dropdown-menu">
@@ -50,8 +50,8 @@
       </ul>
     </li>
   <% }else{ %>
-    <li><a href='#login'>LOGIN</a></li>
-    <li><a href='#signup'>SIGN UP</a></li>
+    <li id='login' class='<%= menu=="login" ? "active" : "" %>'><a href='#login'>LOGIN</a></li>
+    <li id='signup' class='<%= menu=="signup" ? "active" : "" %>'><a href='#signup'>SIGN UP</a></li>
   <% } %>
   </ul>
 </div>
@@ -61,12 +61,12 @@
 <li class='rd6 _sd0 card'>
   <div class='inner' style='background-color:#c6aae2;'>
     <div class='header'>
-      <span class='_l'><i class='icon-user'></i> <h5 style='color:#454545'><strong>idid****</strong></h6></span>
+      <span class='_l'><i class='icon-user'></i> <h5 style='color:#454545'><strong><%= user_id %></strong></h6></span>
       <h6 class='_r' style='color:#999999'>6시간전</h6>
     </div>
     <div class='content'>
-      <strong class='_rspc' style='color:#9966ff'>한심하다</strong>
-      <span style='color:#ffffff'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
+      <strong class='_rspc' style='color:#9966ff'><%= word_id %></strong>
+      <span style='color:#ffffff'><%= content %></span>
     </div>
   </div>
   <div class='comments'>
@@ -168,6 +168,96 @@
   </div>
 </div>
 </script>
+
+<script type='text/template' id='tpl_my_feel_card'>
+<li class='rd6 _sd0 card'>
+  <div class='inner' style='background-color:#ffc6e2;'>
+    <div class='header'>
+      <strong class='_rspc' style='color:#343434'>OCT 13</strong>
+      <h5 style='color:#999999;'>10:10</h5>
+    </div>
+    <div class='content'>
+      <strong class='_rspc' style='color:#ff9ecb'>기운이없다</strong>
+      <span style='color:#ffffff'>머도 그러코 머도 그러코 머드 그러코..</span>
+    </div>
+  </div>
+  <div class='comments'>
+    <div class='bd1 content'>
+      <div>별거도 아닌거 갖고..</div>
+      <div style='overflow:hidden'>
+        <h6 class='_rspc'>user****</h6>
+        <h6 class='_rspc'>7시간전</h6>
+        <span class='_r'>
+          <a href='#' class='icon-remove'></a>
+        </span>
+      </div>
+    </div>
+
+    <div class='bd1 content'>
+      <div>
+        <strong class='_rspc'>공감해요</strong>
+        <span>부러워요 님좀 짱인듯</span>
+      </div>
+      <div style='overflow:hidden'>
+        <h6 class='_rspc'>user****</h6>
+        <h6 class='_rspc'>7시간전</h6>
+        <span class='_r'>
+          <span class='icon-heart2'></span>
+        </span>
+      </div>
+    </div>
+
+    <div class='content'>
+      <div>
+        <strong class='_rspc'>공감해요</strong>
+      </div>
+      <div style='overflow:hidden'>
+        <h6 class='_rspc'>user****</h6>
+        <h6 class='_rspc'>7시간전</h6>
+        <span class='_r'>
+          <a href='#' class='icon-heart _rspc2'></a>
+          <a href='#' class='icon-remove'></a>
+        </span>
+      </div>
+    </div>
+  </div>
+</li>
+</script>
+
+<script type='text/template' id='tpl_ur_feel_card'>
+<li class='rd6 _sd0 card'>
+  <div class='inner' style='background-color:#ffc6e2;'>
+    <div class='header'>
+      <span class='_l'><i class='icon-user'></i> <h6 style='color:#454545;font-weight:bold'>idid****</h6></span>
+      <h6 class='_r' style='color:#999999'>6시간전</h6>
+    </div>
+    <div class='content'> 
+      <strong class='_rspc' style='color:#ff9ecb'>한심하다</strong>
+      <span style='color:#ffffff'>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
+    </div>
+  </div>
+  <div class='comments'>
+    <div class='content'>
+    <span class='_r'>
+      <a href='#' class='icon-comment _rspc'></a>
+      <a href='#' class='icon-heart _rspc'></a>
+      <a href='#'><i class='icon-share-alt'></i> <span style='margin-top:1px;'>포워드</span></a>
+    </span>
+    </div>
+  </div>
+  <div class='comments2'>
+    <div class='content'>
+      <div>
+        <input type="text" placeholder="남기고 싶은말"></input>
+      </div>
+      <div class='_ofh'>
+        <a href='#' class='btn _r'>작성하기</a>
+      </div>
+    </div>
+  </div>
+</li>
+</script>
+
 
 <script type='text/template' id='tpl_my'>
 <ul id='tiles'>

@@ -6,7 +6,7 @@ app = express()
 #### CONFIGURATION ####
 
 require_auth = (req, res, next) ->
-  console.log req.session.user
+  console.log "auth: #{req.session.user}"
   res.send 401 unless req.session.user
   next()
 
@@ -29,17 +29,21 @@ app.configure ->
 app.get '/', (req,res) ->
   res.sendfile 'public/index.html' 
 
+app.get '/sessions', (req,res) ->
+  res.json 
+    user: (req.session.user || false)
+
 app.post '/sessions', (req,res) -> 
   req.session.user = req.body.user_id
-  res.json ok: true
+  res.json true
 
 app.del '/sessions', (req,res) ->
   res.send 401 unless req.session.user
   delete req.session.user
-  res.json ok: true
+  res.json true
 
 app.post '/users', (req,res) ->
-  res.json ok: true
+  res.json true
 
 
 #### GLOBAL DATA ####
@@ -67,7 +71,7 @@ _words =
 #### ROUTES ####
 
 app.get '/auth/info', (req,res) ->
-  res.json ok:
+  res.json
     words: _words
     live_words: [ {'w03': 10}, {'w04': 3}, {'w07': 2}, {'w01': 8} ]
     available_feels: 10
@@ -83,7 +87,7 @@ app.get '/auth/my', (req,res) ->
   user = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
-  res.json ok: [
+  res.json [
     { id: 0, time: 0, user_id: 'uuuuu', word_id: 'w03',\
       content: 'aefe aefef fa',\
       comments: [
@@ -99,7 +103,7 @@ app.get '/auth/ur', (req,res) ->
   user = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
-  res.json ok: [
+  res.json [
     { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
       content: '블라블라블라',\
       comments: [
@@ -113,7 +117,7 @@ app.get '/auth/ur/news', (req,res) ->
   user = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
-  res.json ok: [
+  res.json [
     { id: 2, time: 0, user_id: 'qwer', word_id: 'w03',\
       content: '블라블라블라',\
       comments: []
@@ -125,14 +129,14 @@ app.post '/auth/feels/:id/comments', (req,res) ->
   user = req.session.user
   type = req.body.type        # TODO: valid check
   content = req.body.content  # TODO: valid check
-  req.json ok: true
+  req.json true
 
 app.put '/auth/feels/:id/comments/:comment_id', (req,res) ->
   id = req.params.id
   comment_id = req.params.comment_id
   user = req.session.user
   likeit = req.body.likeit
-  req.json ok: true
+  req.json true
 
 
 

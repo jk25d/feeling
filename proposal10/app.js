@@ -7,7 +7,7 @@
   app = express();
 
   require_auth = function(req, res, next) {
-    console.log(req.session.user);
+    console.log("auth: " + req.session.user);
     if (!req.session.user) {
       res.send(401);
     }
@@ -34,11 +34,15 @@
     return res.sendfile('public/index.html');
   });
 
+  app.get('/sessions', function(req, res) {
+    return res.json({
+      user: req.session.user || false
+    });
+  });
+
   app.post('/sessions', function(req, res) {
     req.session.user = req.body.user_id;
-    return res.json({
-      ok: true
-    });
+    return res.json(true);
   });
 
   app.del('/sessions', function(req, res) {
@@ -46,15 +50,11 @@
       res.send(401);
     }
     delete req.session.user;
-    return res.json({
-      ok: true
-    });
+    return res.json(true);
   });
 
   app.post('/users', function(req, res) {
-    return res.json({
-      ok: true
-    });
+    return res.json(true);
   });
 
   _users = {};
@@ -112,44 +112,42 @@
 
   app.get('/auth/info', function(req, res) {
     return res.json({
-      ok: {
-        words: _words,
-        live_words: [
-          {
-            'w03': 10
-          }, {
-            'w04': 3
-          }, {
-            'w07': 2
-          }, {
-            'w01': 8
-          }
-        ],
-        available_feels: 10,
-        simailar_users: [
-          {
-            user_id: 'uuuuu',
-            similarity: 1.7,
-            word_id: 'w02'
-          }, {
-            user_id: 'ppp',
-            similarity: 2.7,
-            word_id: 'w03'
-          }, {
-            user_id: 'asdfef',
-            similarity: 3.7,
-            word_id: 'w04'
-          }, {
-            user_id: 'f73ur',
-            similarity: 2.1,
-            word_id: 'w06'
-          }, {
-            user_id: 'myidififi',
-            similarity: 4.7,
-            word_id: 'w02'
-          }
-        ]
-      }
+      words: _words,
+      live_words: [
+        {
+          'w03': 10
+        }, {
+          'w04': 3
+        }, {
+          'w07': 2
+        }, {
+          'w01': 8
+        }
+      ],
+      available_feels: 10,
+      simailar_users: [
+        {
+          user_id: 'uuuuu',
+          similarity: 1.7,
+          word_id: 'w02'
+        }, {
+          user_id: 'ppp',
+          similarity: 2.7,
+          word_id: 'w03'
+        }, {
+          user_id: 'asdfef',
+          similarity: 3.7,
+          word_id: 'w04'
+        }, {
+          user_id: 'f73ur',
+          similarity: 2.1,
+          word_id: 'w06'
+        }, {
+          user_id: 'myidififi',
+          similarity: 4.7,
+          word_id: 'w02'
+        }
+      ]
     });
   });
 
@@ -158,32 +156,30 @@
     user = req.session.user;
     mon = req.params.skip || 0;
     n = req.params.n || 3;
-    return res.json({
-      ok: [
-        {
-          id: 0,
-          time: 0,
-          user_id: 'uuuuu',
-          word_id: 'w03',
-          content: 'aefe aefef fa',
-          comments: [
-            {
-              type: 'heart',
-              content: '블블블',
-              user_id: 'asdf',
-              time: 0,
-              liked: 1
-            }, {
-              type: 'comment',
-              content: '블블블asdf',
-              user_id: 'qwer',
-              time: 0,
-              liked: 0
-            }
-          ]
-        }
-      ]
-    });
+    return res.json([
+      {
+        id: 0,
+        time: 0,
+        user_id: 'uuuuu',
+        word_id: 'w03',
+        content: 'aefe aefef fa',
+        comments: [
+          {
+            type: 'heart',
+            content: '블블블',
+            user_id: 'asdf',
+            time: 0,
+            liked: 1
+          }, {
+            type: 'comment',
+            content: '블블블asdf',
+            user_id: 'qwer',
+            time: 0,
+            liked: 0
+          }
+        ]
+      }
+    ]);
   });
 
   app.get('/auth/ur', function(req, res) {
@@ -191,27 +187,25 @@
     user = req.session.user;
     mon = req.params.skip || 0;
     n = req.params.n || 3;
-    return res.json({
-      ok: [
-        {
-          id: 1,
-          time: 0,
-          user_id: 'f23rf',
-          word_id: 'w03',
-          content: '블라블라블라',
-          comments: [
-            {
-              id: 0,
-              type: 'heart',
-              content: '블블블',
-              user_id: 'asdf',
-              time: 0,
-              liked: 1
-            }
-          ]
-        }
-      ]
-    });
+    return res.json([
+      {
+        id: 1,
+        time: 0,
+        user_id: 'f23rf',
+        word_id: 'w03',
+        content: '블라블라블라',
+        comments: [
+          {
+            id: 0,
+            type: 'heart',
+            content: '블블블',
+            user_id: 'asdf',
+            time: 0,
+            liked: 1
+          }
+        ]
+      }
+    ]);
   });
 
   app.get('/auth/ur/news', function(req, res) {
@@ -219,18 +213,16 @@
     user = req.session.user;
     mon = req.params.skip || 0;
     n = req.params.n || 3;
-    return res.json({
-      ok: [
-        {
-          id: 2,
-          time: 0,
-          user_id: 'qwer',
-          word_id: 'w03',
-          content: '블라블라블라',
-          comments: []
-        }
-      ]
-    });
+    return res.json([
+      {
+        id: 2,
+        time: 0,
+        user_id: 'qwer',
+        word_id: 'w03',
+        content: '블라블라블라',
+        comments: []
+      }
+    ]);
   });
 
   app.post('/auth/feels/:id/comments', function(req, res) {
@@ -239,9 +231,7 @@
     user = req.session.user;
     type = req.body.type;
     content = req.body.content;
-    return req.json({
-      ok: true
-    });
+    return req.json(true);
   });
 
   app.put('/auth/feels/:id/comments/:comment_id', function(req, res) {
@@ -250,9 +240,7 @@
     comment_id = req.params.comment_id;
     user = req.session.user;
     likeit = req.body.likeit;
-    return req.json({
-      ok: true
-    });
+    return req.json(true);
   });
 
   remove = function(arr, x) {
