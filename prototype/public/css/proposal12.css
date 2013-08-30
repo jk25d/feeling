@@ -36,7 +36,7 @@ input[type="text"] {font-size:12px;box-sizing:border-box;padding:4px 6px 4px 6px
 ul {list-style:none;margin:0;padding:0;}
 div {box-sizing:border-box;}
 
-h1 {font-size:36px;line-height:40px;color:#656565}
+h1 {font-size:48px;line-height:56px;color:#656565}
 h2 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:20px;line-height:24px;}
 h3 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:25px;line-height:30px;}
 h4 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:16px;line-height:24px;}
@@ -101,17 +101,17 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 .main>.content0-input {padding:0 10px 12px 10px;background-color:#E8E8E8}
 .main>.content1-header { padding:10px 10px 8px 10px;}
 
-.card>.inner {padding:10px;border-bottom:4px solid #eeeeee}
-.card>.inner>.header{padding:8px 0 5px 0;overflow:hidden;border-bottom:1px solid #ffffff;}
-.card>.inner>.content{margin:18px 0 8px 0;height:120px;}
+.card>.inner {padding:20px;border-bottom:4px solid #eeeeee}
+.card>.inner>.header{padding:18px 0 5px 0;overflow:hidden;border-bottom:1px solid #ffffff;}
+.card>.inner>.content{margin:22px 0 0 0;height:120px;}
 .card>.inner>.content>._word{margin-right:10px;font-weight:bold;}
 .card>.comments{background-color:#ffffff;}
 .card>.comments2 {background-color:#ffffff;padding:0 10px 10px 10px;}
-.card>.comments>.content{line-height:18px;padding:12px 10px 14px 10px;font-size:13px;overflow:hidden;}
+.card>.comments>.content{line-height:18px;padding:16px 20px 20px 20px;font-size:13px;overflow:hidden;}
 .card>.comments2>.content{border-top:1px solid #dddddd;padding-top:10px;}
 
 #wordselect {
-  line-height:26px;color:#333333;overflow:hidden;font-size:13px;padding:14px 20px;background-color:#E8E8E8
+  line-height:26px;color:#333333;overflow:hidden;font-size:13px;padding:14px 20px;
 }
 #wordselect>li {
   margin-right:2px;padding:2px 4px;display:inline-block;cursor:pointer;
