@@ -9,7 +9,7 @@
     body {background-color:#cccccc;padding-top:40px;padding-bottom:40px;font-size:13px;}
   </style>
   <!--link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" media='screen'-->
-  <link rel="stylesheet" href="css/proposal11.css" media='screen'>
+  <link rel="stylesheet" href="css/proposal12.css" media='screen'>
   <script src="js/jquery-1.10.2.min.js"></script>
   <script src="js/jquery.wookmark.js"></script>
   <script src="bootstrap/js/bootstrap.js"></script>
@@ -107,7 +107,7 @@
 <!-- TEMPLATES -->
 
 <script type='text/template' id='tpl_my'>
-<ul id='tiles'>
+<ul id='tiles' class='contentwrap'>
   <li class='rd6 _sd0 card main'>
     <div class='header0 bd2'>
       <a href='#'><h2 style='color:#333333'>myidmyid</h2></a>
@@ -512,74 +512,89 @@
 </script>
 
 <script type='text/template' id='tpl_others'>
-<ul id='tiles'>
-  <li class='rd6 _sd0 card main'>
-    <div class='header0 bd2'>
-      <a href='#'><h2 style='color:#333333'>myidmyid</h2></a>
+<div class='contentwrap' style='overflow:hidden;padding:20px 0;'>
+<div class='rd6 _sd0 card main' style='width:400px;float:left;margin-right:16px;'>
+  <div class='header0 bd2'>
+    <a href='#'><h2 style='color:#333333'>myidmyid</h2></a>
+  </div>
+  <div class='content0-header'>
+    <h1><strong>What is your Feeling now?</strong></h1>
+  </div>
+  <ul id='wordselect'>
+    <li class='cc0'>외롭다</li>
+    <li class='cc1'>마음아프다</li>
+    <li class='cc2'>쓸쓸하다</li>
+    <li class='cc3'>기쁘다</li>
+    <li class='cc4'>기운차다</li>
+    <li class='cc5'>기운이없다</li>
+    <li class='cc6'>우울하다</li>
+    <li class='cc7'>만족스럽다</li>
+    <li class='cc0'>걱정된다</li>
+    <li class='cc1'>삶이힘들다</li>
+    <li class='cc2'>초조하다</li>
+    <li class='cc3'>허전하다</li>
+    <li class='cc4'>무섭다</li>
+    <li class='cc8'>두렵다</li>
+    <li class='cc9'>열등감느낀다</li>
+  </ul>
+  <div class='bd2 content0-input'>
+    <div><textarea placeholder="What is your Feeling now?"></textarea></div>
+    <div class='_ofh'>
+      <a class='btn btn-inverse _r' href='#myModal' data-toggle='modal'>작성하기</a>
     </div>
-    <div class='content0-header'>
-      <h1><strong>What is your Feeling now?</strong></h1>
-    </div>
-    <ul id='wordselect'>
-      <li class='cc0'>외롭다</li>
-      <li class='cc1'>마음아프다</li>
-      <li class='cc2'>쓸쓸하다</li>
-      <li class='cc3'>기쁘다</li>
-      <li class='cc4'>기운차다</li>
-      <li class='cc5'>기운이없다</li>
-      <li class='cc6'>우울하다</li>
-      <li class='cc7'>만족스럽다</li>
-      <li class='cc0'>걱정된다</li>
-      <li class='cc1'>삶이힘들다</li>
-      <li class='cc2'>초조하다</li>
-      <li class='cc3'>허전하다</li>
-      <li class='cc4'>무섭다</li>
-      <li class='cc8'>두렵다</li>
-      <li class='cc9'>열등감느낀다</li>
-    </ul>
-    <div class='bd2 content0-input'>
-      <div><textarea placeholder="What is your Feeling now?"></textarea></div>
-      <div class='_ofh'>
-        <a class='btn btn-inverse _r' href='#myModal' data-toggle='modal'>작성하기</a>
-      </div>
-    </div>
+  </div>
+</div>
 
-    <div class='bd2 _pad10'>
-      <a href='#'><h2 style='color:#333333'>실시간 느낌</h2></a>
-    </div>
-    <ul class='wordcloud bd1'>
-      <li><strong>외롭다</strong></li>
-      <li>마음아프다</li>
-      <li>쓸쓸하다</li>
-      <li>기쁘다</li>
-      <li><strong>기운차다</strong></li>
-      <li>기운이없다</li>
-      <li>우울하다</li>
-      <li>만족스럽다</li>
-      <li>걱정된다</li>
-      <li>삶이힘들다</li>
-    </ul>
-    <div class='bd1 _pad10'>
-      <h5>받을 수 있는 느낌 9</h5> <a href='#' class='icon-question-sign _r'></a>
-    </div>
-    <div class='content1-header'>
-      <span>나와 비슷한 성향의 사람들</span>
-      <a href='#' class='_r'>more</a>
-    </div>
-    <div class='_pad10'>
-      <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
-      <h6 class='_rspc'>공감도 5.0</h6>
-      <span class='_r'>한심하다</span>
-    </div>
-    <div class='_pad10'>
-      <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
-      <h6 class='_rspc'>공감도 6.2</h6>
-      <span class='_r'>외롭다</span>
-    </div>
-    <div class='_pad10'>
-      <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
-      <h6 class='_rspc'>공감도 1.2</h6>    
-      <span class='_r'>즐겁다</span>
+<div class='rd6 _sd0 card main' style='width:400px;float:left;'>
+  <div class='bd2 _pad10'>
+    <a href='#'><h2 style='color:#333333'>실시간 느낌</h2></a>
+  </div>
+  <ul class='wordcloud bd1'>
+    <li><strong>외롭다</strong></li>
+    <li>마음아프다</li>
+    <li>쓸쓸하다</li>
+    <li>기쁘다</li>
+    <li><strong>기운차다</strong></li>
+    <li>기운이없다</li>
+    <li>우울하다</li>
+    <li>만족스럽다</li>
+    <li>걱정된다</li>
+    <li>삶이힘들다</li>
+  </ul>
+  <div class='bd1 _pad10'>
+    <h5>받을 수 있는 느낌 9</h5> <a href='#' class='icon-question-sign _r'></a>
+  </div>
+  <div class='content1-header'>
+    <span>나와 비슷한 성향의 사람들</span>
+    <a href='#' class='_r'>more</a>
+  </div>
+  <div class='_pad10'>
+    <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
+    <h6 class='_rspc'>공감도 5.0</h6>
+    <span class='_r'>한심하다</span>
+  </div>
+  <div class='_pad10'>
+    <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
+    <h6 class='_rspc'>공감도 6.2</h6>
+    <span class='_r'>외롭다</span>
+  </div>
+  <div class='_pad10'>
+    <i class='icon-user'></i> <strong class='_rspc'>uid0****</strong>
+    <h6 class='_rspc'>공감도 1.2</h6>    
+    <span class='_r'>즐겁다</span>
+  </div>
+</div>
+</div>
+
+<div style='text-align:center;padding:20px;'>
+  <h2><strong style='color:#676767'>나의 느낌</strong></h2>
+</div>
+
+<ul id='tiles' class='contentwrap'>
+  <li class='rd6 _sd0 card'>
+    <div style='background-color:#c6aae2;height:258px;color:#eeeeee;text-align:center;padding-top:100px;'>
+      <div>새 느낌이 도착했습니다.</div>
+      <div><span class='icon-heart icon-white'></span></div>
     </div>
   </li>
 
