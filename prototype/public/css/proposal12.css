@@ -36,7 +36,7 @@ input[type="text"] {font-size:12px;box-sizing:border-box;padding:4px 6px 4px 6px
 ul {list-style:none;margin:0;padding:0;}
 div {box-sizing:border-box;}
 
-h1 {font-size:48px;line-height:56px;color:#656565}
+h1 {font-size:48px;line-height:56px;color:#bfbfbf}
 h2 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:20px;line-height:24px;}
 h3 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:25px;line-height:30px;}
 h4 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:16px;line-height:24px;}
@@ -68,9 +68,9 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 ._ofh {overflow:hidden}
 ._pad10 {padding:10px}
 ._sd0 {
-  box-shadow: 1px 1px 2px 1px rgba(119, 119, 119, 0.72);
-  -moz-box-shadow: 1px 1px 2px 1px rgba(119, 119, 119, 0.72);
-  -webkit-box-shadow: 1px 1px 2px 1px rgba(119, 119, 119, 0.72);
+  box-shadow: 1px 1px 2px 1px rgba(60, 60, 60, 0.72);
+  -moz-box-shadow: 1px 1px 2px 1px rgba(60, 60, 60, 0.72);
+  -webkit-box-shadow: 1px 1px 2px 1px rgba(60, 60, 60, 0.72);
 }
 ._sd1 {
 -webkit-box-shadow: 7px 7px 7px rgba(50, 50, 50, 1);
@@ -90,6 +90,17 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 .cc8:hover, .cc8:active, .cc8.active {color:#ffffff;background-color:#F0B300;}
 .cc9:hover, .cc9:active, .cc9.active {color:#ffffff;background-color:#033649;}
 
+.cc0 {background-color:#c3ff68;}
+.cc1 {background-color:#77cca4;}
+.cc2 {background-color:#7f94b0;}
+.cc3 {background-color:#44F9B8;}
+.cc4 {background-color:#c6aae2;}
+.cc5 {background-color:#e177b3;}
+.cc6 {background-color:#7f94b0;}
+.cc7 {background-color:#44F9B8;}
+.cc8 {background-color:#c3ff68;}
+.cc9 {background-color:#77cca4;}
+
 
 /* layout */
 
@@ -101,7 +112,7 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 .main>.content0-input {padding:0 10px 12px 10px;background-color:#E8E8E8}
 .main>.content1-header { padding:10px 10px 8px 10px;}
 
-.card>.inner {padding:20px;border-bottom:4px solid #eeeeee}
+.card>.inner {padding:20px;}
 .card>.inner>.header{padding:18px 0 5px 0;overflow:hidden;border-bottom:1px solid #ffffff;}
 .card>.inner>.content{margin:22px 0 0 0;height:120px;}
 .card>.inner>.content>._word{margin-right:10px;font-weight:bold;}
@@ -121,7 +132,7 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
   border-radius: 4px;
 }
 .wordcloud {
-  margin:0px;padding:10px;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;cursor:pointer;white-space:normal;background-color:#eeeeee;
+  margin:0px;padding:10px;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;cursor:pointer;white-space:normal;
 }
 .wordcloud>li {display:inline;margin-right:5px;}
 .word{
