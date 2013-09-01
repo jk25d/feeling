@@ -6,7 +6,7 @@
   <title>NANAV</title>
   <link rel="stylesheet" href="bootstrap/css/bootstrap.css" media='screen'>
   <style>
-    body {background-color:#dddddd;padding-top:40px;padding-bottom:40px;font-size:13px;}
+    body {background-color:#6c6f78;padding-top:40px;padding-bottom:40px;font-size:13px;}
   </style>
   <link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" media='screen'>
   <link rel="stylesheet" href="css/proposal12.css" media='screen'>
@@ -75,43 +75,37 @@
 
 <body>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-  <div class='navbar-inner'>
-    <div class='container'>
-      <button type='button' class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
-        <span class='icon-bar'></span>
-        <span class='icon-bar'></span>
-        <span class='icon-bar'></span>
-      </button>
+<div id='_header' style='background-image:url(../img/back-billiard.jpg);background-repeat:no-repeat;background-size:cover;'>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class='navbar-inner'>
+      <div class='container'>
+        <button type='button' class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
+          <span class='icon-bar'></span>
+          <span class='icon-bar'></span>
+          <span class='icon-bar'></span>
+        </button>
 
-      <a class='brand' href='#'>FEELING SHARE</a>
-      <div class='nav-collapse collapse'>
-        <ul class='nav'>    
-          <li class='active'><a href='#my'>MY DIARY</a></li>
-          <li><a href='#others'>RECEIVED</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i> <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href='#login'>LOGOUT</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div> <!-- /.nav-collapse -->
+        <a class='brand' href='#'>FEELING SHARE</a>
+        <div class='nav-collapse collapse'>
+          <ul class='nav'>    
+            <li class='active'><a href='#my'>MY DIARY</a></li>
+            <li><a href='#others'>RECEIVED</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i> <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href='#login'>LOGOUT</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div> <!-- /.nav-collapse -->
+      </div>
     </div>
   </div>
-</div>
 
-<div id='_content'>
-</div>
-
-<!-- TEMPLATES -->
-
-<script type='text/template' id='tpl_my'>
-<div style='background-color:#6c6f78;padding:20px 0;'>
-  <div class='container'>
+    <div class='container'>
     <div class='row'>
 
-      <div style='padding:20px 0;' class='span8 offset2'>
+      <div style='padding:20px 0;' class='span5 offset2'>
         <div style='text-align:center'>
           <h1><strong>What is your Feeling now?</strong></h1>
         </div>
@@ -140,16 +134,11 @@
         </div>
       </div>
 
-    </div><!-- row -->
-
-    <div class='row'>
-      <div class='span4' style='height:200px;background-color:#45474c;padding:14px 50px;margin-top:16px;color:#bfbfbf'>
+      <div class='span3' style='background-color:rgba(0,0,0,0.7);padding:14px 20px;color:#bfbfbf'>
         <div style='text-align:center'>
           <a href='#'><h2 style='color:#6f99c0'>myidmyid</h2></a>
         </div>
-      </div>
 
-      <div class='span4' style='height:200px;background-color:#45474c;padding:14px 50px;margin-top:16px;color:#bfbfbf'>
         <div style='text-align:center'>
           <h2 style='color:#fe005f;'>실시간 느낌</h2>
         </div>
@@ -165,9 +154,7 @@
           <li>걱정된다</li>
           <li>삶이힘들다</li>
         </ul>
-      </div>
 
-      <div class='span4' style='height:200px;background-color:#45474c;padding:14px 50px;margin-top:16px;color:#bfbfbf'>
         <div style='text-align:center;overflow:hidden;'>
           <h2 style='color:#9472b0;'>비슷한 성향의 사람들</h2>
         </div>
@@ -192,8 +179,16 @@
   </div>
 </div>
 
+<div id='_content'>
+</div>
+
+<!-- TEMPLATES -->
+
+<script type='text/template' id='tpl_my'>
+
+
 <div style='text-align:center;padding:20px;'>
-  <h2><strong style='color:#bfbfbf'>나의 느낌</strong></h2>
+  <h2><strong style='color:#43454a'>나의 느낌</strong></h2>
 </div>
 
 <ul id='tiles' class='contentwrap'>

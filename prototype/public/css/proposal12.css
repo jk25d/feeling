@@ -29,7 +29,7 @@
 .modal {width:320px;margin-left:-160px;}
 
 /* common */
-
+@media (max-width: 767px) { body { padding-right: 0px; padding-left: 0px; } }
 a {color:#536e5c}
 textarea {background-color:#f9f9f9;color:#aaaaaa;font-size:12px;width:100%;box-sizing:border-box;resize:none;margin-bottom:6px;}
 input[type="text"] {font-size:12px;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;}
