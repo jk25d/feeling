@@ -25,7 +25,7 @@
     app.use(express.cookieSession({
       secret: 'deadbeef'
     }));
-    app.all('/auth/*', require_auth);
+    app.all('/api/*', require_auth);
     app.all('*', log);
     return app.use(express["static"]("" + __dirname + "/public"));
   });
@@ -35,26 +35,33 @@
   });
 
   app.get('/sessions', function(req, res) {
-    return res.json({
-      user: req.session.user || false
-    });
+    if (req.session.user) {
+      return res.json({
+        id: req.session.user || false
+      });
+    } else {
+      return res.send(401);
+    }
   });
 
   app.post('/sessions', function(req, res) {
+    var password;
     req.session.user = req.body.user_id;
-    return res.json(true);
+    password = req.body.password;
+    return res.json({});
   });
 
   app.del('/sessions', function(req, res) {
-    if (!req.session.user) {
-      res.send(401);
+    if (req.session.user) {
+      delete req.session.user;
+      return res.json({});
+    } else {
+      return res.send(401);
     }
-    delete req.session.user;
-    return res.json(true);
   });
 
   app.post('/users', function(req, res) {
-    return res.json(true);
+    return res.json({});
   });
 
   _users = {};
@@ -110,48 +117,53 @@
     }
   };
 
-  app.get('/auth/info', function(req, res) {
+  app.get('/api/me', function(req, res) {
     return res.json({
-      words: _words,
-      live_words: [
-        {
-          'w03': 10
-        }, {
-          'w04': 3
-        }, {
-          'w07': 2
-        }, {
-          'w01': 8
-        }
-      ],
-      available_feels: 10,
-      simailar_users: [
-        {
-          user_id: 'uuuuu',
-          similarity: 1.7,
-          word_id: 'w02'
-        }, {
-          user_id: 'ppp',
-          similarity: 2.7,
-          word_id: 'w03'
-        }, {
-          user_id: 'asdfef',
-          similarity: 3.7,
-          word_id: 'w04'
-        }, {
-          user_id: 'f73ur',
-          similarity: 2.1,
-          word_id: 'w06'
-        }, {
-          user_id: 'myidififi',
-          similarity: 4.7,
-          word_id: 'w02'
-        }
-      ]
+      id: req.session.user
     });
   });
 
-  app.get('/auth/my', function(req, res) {
+  app.get('/api/live_feelings', function(req, res) {
+    return res.json([
+      {
+        'w03': 10
+      }, {
+        'w04': 3
+      }, {
+        'w07': 2
+      }, {
+        'w01': 8
+      }
+    ]);
+  });
+
+  app.get('/api/associates', function(req, res) {
+    return res.json([
+      {
+        user_id: 'uuuuu',
+        similarity: 1.7,
+        word_id: 'w02'
+      }, {
+        user_id: 'ppp',
+        similarity: 2.7,
+        word_id: 'w03'
+      }, {
+        user_id: 'asdfef',
+        similarity: 3.7,
+        word_id: 'w04'
+      }, {
+        user_id: 'f73ur',
+        similarity: 2.1,
+        word_id: 'w06'
+      }, {
+        user_id: 'myidififi',
+        similarity: 4.7,
+        word_id: 'w02'
+      }
+    ]);
+  });
+
+  app.get('/api/my_feelings', function(req, res) {
     var mon, n, user;
     user = req.session.user;
     mon = req.params.skip || 0;
@@ -182,7 +194,37 @@
     ]);
   });
 
-  app.get('/auth/ur', function(req, res) {
+  app.get('/api/my_feelings/:id', function(req, res) {
+    var id, mon, n, user;
+    id = req.params.id;
+    user = req.session.user;
+    mon = req.params.skip || 0;
+    n = req.params.n || 3;
+    return res.json({
+      id: 0,
+      time: 0,
+      user_id: 'uuuuu',
+      word_id: 'w03',
+      content: 'aefe aefef fa',
+      comments: [
+        {
+          type: 'heart',
+          content: '블블블',
+          user_id: 'asdf',
+          time: 0,
+          liked: 1
+        }, {
+          type: 'comment',
+          content: '블블블asdf',
+          user_id: 'qwer',
+          time: 0,
+          liked: 0
+        }
+      ]
+    });
+  });
+
+  app.get('/api/received_feelings', function(req, res) {
     var mon, n, user;
     user = req.session.user;
     mon = req.params.skip || 0;
@@ -194,53 +236,97 @@
         user_id: 'f23rf',
         word_id: 'w03',
         content: '블라블라블라',
-        comments: [
-          {
-            id: 0,
-            type: 'heart',
-            content: '블블블',
-            user_id: 'asdf',
-            time: 0,
-            liked: 1
-          }
-        ]
+        comment: {
+          id: 0,
+          type: 'heart',
+          content: '블블블',
+          user_id: 'asdf',
+          time: 0,
+          liked: 1
+        }
       }
     ]);
   });
 
-  app.get('/auth/ur/news', function(req, res) {
-    var mon, n, user;
+  app.get('/api/received_feelings/:id', function(req, res) {
+    var id, mon, n, user;
+    id = req.params.id;
+    user = req.session.user;
+    mon = req.params.skip || 0;
+    n = req.params.n || 3;
+    return res.json({
+      id: 1,
+      time: 0,
+      user_id: 'f23rf',
+      word_id: 'w03',
+      content: '블라블라블라',
+      comment: {
+        id: 0,
+        type: 'heart',
+        content: '블블블',
+        user_id: 'asdf',
+        time: 0,
+        liked: 1
+      }
+    });
+  });
+
+  app.get('/api/new_arrived_feelings', function(req, res) {
+    var id, mon, n, user;
+    id = req.params.id;
     user = req.session.user;
     mon = req.params.skip || 0;
     n = req.params.n || 3;
     return res.json([
       {
-        id: 2,
+        id: 1,
         time: 0,
-        user_id: 'qwer',
+        user_id: 'f23rf',
         word_id: 'w03',
         content: '블라블라블라',
-        comments: []
+        comment: {
+          id: 0,
+          type: 'heart',
+          content: '블블블',
+          user_id: 'asdf',
+          time: 0,
+          liked: 1
+        }
       }
     ]);
   });
 
-  app.post('/auth/feels/:id/comments', function(req, res) {
+  app.put('/api/new_arrived_feelings/:id', function(req, res) {
+    var id, user;
+    id = req.params.id;
+    user = req.session.user;
+    return res.json({});
+  });
+
+  app.post('/api/my_feelings', function(req, res) {
+    var content, user, word_id;
+    user = req.session.user;
+    word_id = req.body.word_id;
+    content = req.body.content;
+    return req.json({});
+  });
+
+  app.post('/api/received_feelings/:id/comments', function(req, res) {
     var content, id, type, user;
     id = req.params.id;
     user = req.session.user;
     type = req.body.type;
     content = req.body.content;
-    return req.json(true);
+    return req.json({});
   });
 
-  app.put('/auth/feels/:id/comments/:comment_id', function(req, res) {
-    var comment_id, id, likeit, user;
+  app.put('/api/my_feelings/:id/comments/:comment_id', function(req, res) {
+    var comment_id, id, like, user;
     id = req.params.id;
     comment_id = req.params.comment_id;
     user = req.session.user;
-    likeit = req.body.likeit;
-    return req.json(true);
+    like = req.body.like;
+    return req.json({});
   });
 
   remove = function(arr, x) {

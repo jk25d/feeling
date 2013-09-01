@@ -177,7 +177,7 @@ get /auth/my, skip=?, n=?
   [ {id: '', time: '', user_id: '', word_id: '', content: '', comments: [
     {id: '', type: '', content: '', user_id: '', time: '', liked: ''} ] ]
 get /auth/ur, skip=?, n=?
-  [ {id: '', time: '', user_id: '', word_id: '', content: '', comments: [
+  [ {id: '', time: '', user_id: '', word_id: '', content: '', comment: [
     {id: '', type: '', content: '', user_id: '', time: ''} ] ]
 get /auth/ur/news, 
   [ {id: '', time: '', user_id: '', word_id: '', content: '', comments: [
@@ -186,4 +186,105 @@ post /auth/feels/:id/comments, type(heart/comment/forward), content
 put /auth/feels/:id/comments/:comment_id, likeit(t/f)
 
 
+0901
+====
 
+
+layout
+-----
+
+<div> <!-- header background -->
+  <div>... 
+    <div id='fs_navbar' class='container'></div> 
+  ...</div>
+  <div class='container'>
+    <div id='fs_header' class='row'></div>
+  </div>
+</div>
+
+<div class='fs_container'>
+  <div id='fs_title'></div>
+  <ul id='fs_tiles'></ul>
+</div>
+
+
+flow
+-----
+
+draw_login = ->
+  $('#fs_navbar').html new NavBarView(model: null).render().el
+  $('#fs_header').html new LoginView().render().el
+
+draw_header = ->
+  $('#fs_header').html new HeaderHolderView().render().el
+  $('#fs_header_write').html new HeaderHolderView().render().el
+  get /api/me ->
+    $('#fs_header_me').html new MeView().render().el
+  get /api/live_feelings -->
+    $('#fs_header_live_feelings').html new LiveFeelingsView().render().el
+  get /api/associates -->
+    $('#fs_header_associates').html new AssociatesView().render().el
+
+401, 403 --> draw_login()
+
+/api/* --> 401 --> draw_login()
+# --> #received_feelings
+#logout --> delete /sessions --> draw_login()
+#received_feelings 
+  --> get /sessions -> 
+    $('#fs_navbar').html new NavBarView(model: model).render().el
+    draw_header()
+    get /api/new_arrived_feeling ->
+      $('#tiles').prepend new NewFeelingView(model:model).render().el
+      get /api/received_feelings -> 
+        $('#tiles').html new FeelingsView(model:model).render().el
+        wookmark()
+#my_feelings
+  --> get /sessions -> 
+    $('#fs_navbar').html new NavBarView(model: model).render().el
+    draw_header()
+    get /api/my_feelings -> 
+      $('#tiles').html new MyFeelingsView(model:model).render().el
+      wookmark()
+#event: new_feeling
+  --> post /api/my_feelings ->
+    window.location.replace '/#my_feelings'
+#event: new_comment
+  --> post /api/received_feelings/:id/comments ->
+    get /api/received_feelings/:id ->
+      model.set 'expand', true
+      $("#feeling_#{id}").html new FeelingView(model:model).render().el
+#event: update_my_feeling_comment
+  --> put /api/my_feelings/:id/comments ->
+    get /api/my_feelings/:id ->
+      model.set 'expand', true
+      $("#feeling_#{id}").html new MyFeelingView(model:model).render().el
+#event: new_session
+  --> post /sessions --> #
+    
+
+api
+---
+
+get /sessions
+post /sessions
+del /sessions
+post /users
+
+get /api/live_feelings
+get /api/associates
+get /api/me
+
+get /api/received_feelings, skip=?, n=?
+  [ {..., comment: [] } ]
+get /api/my_feelings, skip=?, n=?
+  [ {..., comments: [] } ]
+get /api/received_feelings/:id
+get /api/my_feelings/:id
+get /api/new_arrived_feelings
+  {...}
+put /api/new_arrived_feelings/:id
+
+post /api/my_feelings
+post /api/received_feelings/:id/comments
+put /api/my_feelings/:id/comments

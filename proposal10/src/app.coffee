@@ -18,7 +18,7 @@ app.configure ->
   app.use express.bodyParser()
   app.use express.cookieParser()
   app.use express.cookieSession(secret: 'deadbeef')
-  app.all '/auth/*', require_auth
+  app.all '/api/*', require_auth
   app.all '*', log
   app.use express.static("#{__dirname}/public")
 
@@ -30,20 +30,25 @@ app.get '/', (req,res) ->
   res.sendfile 'public/index.html' 
 
 app.get '/sessions', (req,res) ->
-  res.json 
-    user: (req.session.user || false)
+  if req.session.user
+    res.json { id: (req.session.user || false) }
+  else
+    res.send 401
 
 app.post '/sessions', (req,res) -> 
   req.session.user = req.body.user_id
-  res.json true
+  password = req.body.password
+  res.json {}
 
 app.del '/sessions', (req,res) ->
-  res.send 401 unless req.session.user
-  delete req.session.user
-  res.json true
+  if req.session.user
+    delete req.session.user
+    res.json {}
+  else
+    res.send 401
 
 app.post '/users', (req,res) ->
-  res.json true
+  res.json {}
 
 
 #### GLOBAL DATA ####
@@ -70,24 +75,45 @@ _words =
 
 #### ROUTES ####
 
-app.get '/auth/info', (req,res) ->
+app.get '/api/me', (req,res) ->
   res.json
-    words: _words
-    live_words: [ {'w03': 10}, {'w04': 3}, {'w07': 2}, {'w01': 8} ]
-    available_feels: 10
-    simailar_users: [
-      {user_id: 'uuuuu', similarity: 1.7, word_id: 'w02'},
+    id: req.session.user
+
+app.get '/api/live_feelings', (req,res) ->
+  res.json \
+    [ {'w03': 10}, {'w04': 3}, {'w07': 2}, {'w01': 8} ]
+
+app.get '/api/associates', (req,res) ->
+  res.json \
+    [ {user_id: 'uuuuu', similarity: 1.7, word_id: 'w02'},
       {user_id: 'ppp', similarity: 2.7, word_id: 'w03'},
       {user_id: 'asdfef', similarity: 3.7, word_id: 'w04'},
       {user_id: 'f73ur', similarity: 2.1, word_id: 'w06'},
-      {user_id: 'myidififi', similarity: 4.7, word_id: 'w02'} 
+      {user_id: 'myidififi', similarity: 4.7, word_id: 'w02'}
     ]
 
-app.get '/auth/my', (req,res) ->
+app.get '/api/my_feelings', (req,res) ->
   user = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
-  res.json [
+  res.json \
+    [ { id: 0, time: 0, user_id: 'uuuuu', word_id: 'w03',\
+        content: 'aefe aefef fa',\
+        comments: [
+          { type: 'heart', content: '블블블',\ 
+            user_id: 'asdf', time: 0, liked: 1},
+          { type: 'comment', content: '블블블asdf',\ 
+            user_id: 'qwer', time: 0, liked: 0}
+        ]
+      }
+    ]
+
+app.get '/api/my_feelings/:id', (req,res) ->
+  id = req.params.id
+  user = req.session.user
+  mon = req.params.skip || 0
+  n = req.params.n || 3
+  res.json \
     { id: 0, time: 0, user_id: 'uuuuu', word_id: 'w03',\
       content: 'aefe aefef fa',\
       comments: [
@@ -97,46 +123,68 @@ app.get '/auth/my', (req,res) ->
           user_id: 'qwer', time: 0, liked: 0}
       ]
     }
-  ]
 
-app.get '/auth/ur', (req,res) ->
+app.get '/api/received_feelings', (req,res) ->
   user = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
-  res.json [
-    { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
-      content: '블라블라블라',\
-      comments: [
-        { id: 0, type: 'heart', content: '블블블',\ 
-          user_id: 'asdf', time: 0, liked: 1}
-      ]
-    }
-  ]
+  res.json \
+    [ { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+        content: '블라블라블라',\
+        comment: { id: 0, type: 'heart', content: '블블블',\ 
+            user_id: 'asdf', time: 0, liked: 1}\
+      }\
+    ]
 
-app.get '/auth/ur/news', (req,res) ->
-  user = req.session.user
-  mon = req.params.skip || 0
-  n = req.params.n || 3
-  res.json [
-    { id: 2, time: 0, user_id: 'qwer', word_id: 'w03',\
-      content: '블라블라블라',\
-      comments: []
-    }
-  ]
-
-app.post '/auth/feels/:id/comments', (req,res) ->
+app.get '/api/received_feelings/:id', (req,res) ->
   id = req.params.id
   user = req.session.user
-  type = req.body.type        # TODO: valid check
-  content = req.body.content  # TODO: valid check
-  req.json true
+  mon = req.params.skip || 0
+  n = req.params.n || 3
+  res.json \
+    { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+      content: '블라블라블라',\
+      comment: { id: 0, type: 'heart', content: '블블블',\ 
+          user_id: 'asdf', time: 0, liked: 1}
+    }
 
-app.put '/auth/feels/:id/comments/:comment_id', (req,res) ->
+app.get '/api/new_arrived_feelings', (req,res) ->
+  id = req.params.id
+  user = req.session.user
+  mon = req.params.skip || 0
+  n = req.params.n || 3
+  res.json \
+    [ { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+        content: '블라블라블라',\
+        comment: { id: 0, type: 'heart', content: '블블블',\ 
+            user_id: 'asdf', time: 0, liked: 1}\
+      }\
+    ]
+
+app.put '/api/new_arrived_feelings/:id', (req,res) ->
+  id = req.params.id
+  user = req.session.user
+  res.json {}
+
+app.post '/api/my_feelings', (req,res) ->
+  user = req.session.user
+  word_id = req.body.word_id
+  content = req.body.content
+  req.json {}
+
+app.post '/api/received_feelings/:id/comments', (req,res) ->
+  id = req.params.id
+  user = req.session.user
+  type = req.body.type        # like, comment, forward
+  content = req.body.content
+  req.json {}
+
+app.put '/api/my_feelings/:id/comments/:comment_id', (req,res) ->
   id = req.params.id
   comment_id = req.params.comment_id
   user = req.session.user
-  likeit = req.body.likeit
-  req.json true
+  like = req.body.like
+  req.json {}
 
 
 

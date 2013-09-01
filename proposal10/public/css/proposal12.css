@@ -3,22 +3,22 @@
 /* responsive */
 
 @media (min-width: 1440px) {
-  .contentwrap {width: 1430px;margin:0 auto}
+  .fs_container {width: 1430px;margin:0 auto}
 }
 @media (min-width: 1200px) and (max-width: 1439px) {
-  .contentwrap {width: 1190px;margin:0 auto}
+  .fs_container {width: 1190px;margin:0 auto}
 }
 @media (min-width: 960px) and (max-width: 1199px) {
-  .contentwrap {width: 950px;margin:0 auto}
+  .fs_container {width: 950px;margin:0 auto}
 }
 @media (min-width: 720px) and (max-width: 959px) {
-  .contentwrap {width: 710px;margin:0 auto}
+  .fs_container {width: 710px;margin:0 auto}
 }
 @media (min-width: 480px) and (max-width: 719px) {
-  .contentwrap {width: 470px;margin:0 auto}
+  .fs_container {width: 470px;margin:0 auto}
 }
 @media (max-width: 479px) {
-  .contentwrap {width: 230px;margin:0 auto}
+  .fs_container {width: 230px;margin:0 auto}
 }
 
 /* override */
