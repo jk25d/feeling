@@ -31,7 +31,7 @@ app.get '/', (req,res) ->
 
 app.get '/sessions', (req,res) ->
   if req.session.user
-    res.json { id: (req.session.user || false) }
+    res.json { user_id: (req.session.user || false) }
   else
     res.send 401
 

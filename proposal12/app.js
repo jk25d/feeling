@@ -37,7 +37,7 @@
   app.get('/sessions', function(req, res) {
     if (req.session.user) {
       return res.json({
-        id: req.session.user || false
+        user_id: req.session.user || false
       });
     } else {
       return res.send(401);
