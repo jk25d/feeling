@@ -119,22 +119,17 @@
 
   app.get('/api/me', function(req, res) {
     return res.json({
-      id: req.session.user
+      user_id: req.session.user
     });
   });
 
   app.get('/api/live_feelings', function(req, res) {
-    return res.json([
-      {
-        'w03': 10
-      }, {
-        'w04': 3
-      }, {
-        'w07': 2
-      }, {
-        'w01': 8
-      }
-    ]);
+    return res.json({
+      'w03': 10,
+      'w04': 3,
+      'w07': 2,
+      'w01': 8
+    });
   });
 
   app.get('/api/associates', function(req, res) {
@@ -308,6 +303,7 @@
     user = req.session.user;
     word_id = req.body.word_id;
     content = req.body.content;
+    console.log("word_id: " + word_id + ", content: " + content);
     return req.json({});
   });
 
@@ -317,6 +313,7 @@
     user = req.session.user;
     type = req.body.type;
     content = req.body.content;
+    console.log("id: " + id + ", type: " + type + ", content: " + content);
     return req.json({});
   });
 
@@ -326,6 +323,7 @@
     comment_id = req.params.comment_id;
     user = req.session.user;
     like = req.body.like;
+    console.log("id: " + id + ", comment_id: " + comment_id + ", like: " + like);
     return req.json({});
   });
 

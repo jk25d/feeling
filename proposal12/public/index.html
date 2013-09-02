@@ -36,7 +36,7 @@
 </div>
 
 <div style='text-align:center;padding:20px;'>
-  <h2><strong id='fs_title' style='color:#43454a'>나의 느낌</strong></h2>
+  <h2><strong id='fs_title' style='color:#43454a'></strong></h2>
 </div>
 
 <div id='fs_content' class='fs_container'>
@@ -56,8 +56,8 @@
 <div class='nav-collapse collapse'>
   <ul class='nav'>    
   <% if(typeof user_id !== "undefined" && user_id !== null && user_id != false){ %>
-    <li class='<%= menu=="my" ? "active" : "" %>'><a href='#my'>MY DIARY</a></li>
-    <li class='<%= menu=="received" ? "active" : "" %>'><a href='#ur'>RECEIVED</a></li>
+    <li class='<%= menu=="my" ? "active" : "" %>'><a href='#my_feelings'>MY DIARY</a></li>
+    <li class='<%= menu=="received" ? "active" : "" %>'><a href='#received_feelings'>RECEIVED</a></li>
     <li class="dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i> <b class="caret"></b></a>
       <ul class="dropdown-menu">
@@ -77,8 +77,18 @@
   </div>
   <div class='span4' style='background-color:rgba(0,0,0,0.7);padding:14px 20px;color:#bfbfbf'>
     <div id='fs_header_me'></div>
-    <div id='fs_header_live_feelings'></div>
-    <div id='fs_header_associates'></div>
+    
+    <div style='text-align:center'>
+      <h2 style='color:#fe005f;'>실시간 느낌</h2>
+    </div>
+    <div id='fs_header_live_feelings'>
+    </div>
+
+    <div style='text-align:center;overflow:hidden;'>
+      <h2 style='color:#9472b0;'>비슷한 성향의 사람들</h2>
+    </div>
+    <div id='fs_header_associates'>
+    </div>
   </div>
 </script>
 
@@ -87,97 +97,102 @@
     <h1><strong>What is your Feeling now?</strong></h1>
   </div>
   <ul id='wordselect'>
-    <li class='cc0'>외롭다</li>
-    <li class='cc1'>마음아프다</li>
-    <li class='cc2'>쓸쓸하다</li>
-    <li class='cc3'>기쁘다</li>
-    <li class='cc4'>기운차다</li>
-    <li class='cc5'>기운이없다</li>
-    <li class='cc6'>우울하다</li>
-    <li class='cc7'>만족스럽다</li>
-    <li class='cc0'>걱정된다</li>
-    <li class='cc1'>삶이힘들다</li>
-    <li class='cc2'>초조하다</li>
-    <li class='cc3'>허전하다</li>
-    <li class='cc4'>무섭다</li>
-    <li class='cc8'>두렵다</li>
-    <li class='cc9'>열등감느낀다</li>
+    <li class='cc0' word-id="w00">외롭다</li>
+    <li class='cc1' word-id="w01">마음아프다</li>
+    <li class='cc2' word-id="w02">쓸쓸하다</li>
+    <li class='cc3' word-id="w03">기쁘다</li>
+    <li class='cc4' word-id="w04">기운차다</li>
+    <li class='cc5' word-id="w05">기운이없다</li>
+    <li class='cc6' word-id="w06">우울하다</li>
+    <li class='cc7' word-id="w07">만족스럽다</li>
+    <li class='cc0' word-id="w08">걱정된다</li>
+    <li class='cc1' word-id="w09">삶이힘들다</li>
+    <li class='cc2' word-id="w10">초조하다</li>
+    <li class='cc3' word-id="w11">허전하다</li>
+    <li class='cc4' word-id="w12">무섭다</li>
+    <li class='cc8' word-id="w13">두렵다</li>
+    <li class='cc9' word-id="w14">열등감느낀다</li>
   </ul>
   <div class='content0-input'>
-    <div><textarea placeholder="What is your Feeling now?"></textarea></div>
+    <div><textarea id='new_feeling_content' placeholder="What is your Feeling now?"></textarea></div>
     <div class='_ofh' style='text-align:center'>
-      <a class='btn btn-inverse btn-large' href='#myModal' data-toggle='modal'>작성하기</a>
+      <a id='new_feeling_submit' class='btn btn-inverse btn-large' href='#myModal' data-toggle='modal'>작성하기</a>
     </div>
   </div>
 </script>
 
 <script type='text/template' id='tpl_me'>
   <div style='text-align:center'>
-    <a href='#'><h2 style='color:#6f99c0'>myidmyid</h2></a>
+    <a href='#'><h2 style='color:#6f99c0'><%= user_id %></h2></a>
   </div>
 </script>
 
 <script type='text/template' id='tpl_live_feelings'>
-  <div style='text-align:center'>
-    <h2 style='color:#fe005f;'>실시간 느낌</h2>
-  </div>
   <ul class='wordcloud'>
-    <li><strong>외롭다</strong></li>
-    <li>마음아프다</li>
-    <li>쓸쓸하다</li>
-    <li>기쁘다</li>
-    <li><strong>기운차다</strong></li>
-    <li>기운이없다</li>
-    <li>우울하다</li>
-    <li>만족스럽다</li>
-    <li>걱정된다</li>
-    <li>삶이힘들다</li>
   </ul>
 </script>
 
 <script type='text/template' id='tpl_associates'>
-  <div style='text-align:center;overflow:hidden;'>
-    <h2 style='color:#9472b0;'>비슷한 성향의 사람들</h2>
-  </div>
   <div class='_pad10'>
-    <i class='icon-user icon-white'></i> <strong class='_rspc'>uid0****</strong>
-    <h6 class='_rspc'>공감도 5.0</h6>
-    <span class='_r'>한심하다</span>
-  </div>
-  <div class='_pad10'>
-    <i class='icon-user icon-white'></i> <strong class='_rspc'>uid0****</strong>
-    <h6 class='_rspc'>공감도 6.2</h6>
-    <span class='_r'>외롭다</span>
-  </div>
-  <div class='_pad10'>
-    <i class='icon-user icon-white'></i> <strong class='_rspc'>uid0****</strong>
-    <h6 class='_rspc'>공감도 1.2</h6>    
-    <span class='_r'>즐겁다</span>
+    <i class='icon-user icon-white'></i> <strong class='_rspc'><%= user_id %></strong>
+    <h6 class='_rspc'>공감도 <%= similarity %></h6>
+    <span class='_r'><%= word_id %></span>
   </div>
 </script>
 
-<script type='text/template' id='tpl_ur_feel_card'>
-<li class='rd6 _sd0 card'>
-  <div class='inner' style='background-color:#c6aae2;'>
-    <div class='header'>
-      <span class='_l'><i class='icon-user'></i> <h5 style='color:#454545'><strong><%= user_id %></strong></h6></span>
-      <h6 class='_r' style='color:#999999'>6시간전</h6>
+<script type='text/template' id='tpl_received_feeling'>
+  <li class='rd6 _sd0 card'>
+    <div class='inner' style='background-color:#14b0d9;color:#333333;'>
+      <div class='header' style='border-bottom:1px solid #333333'>
+        <h3><strong class='_rspc' style=''>OCT 13</strong></h3>
+        <h5 style=''>10:10</h5>
+      </div>
+      <div class='content'>
+        <h4><strong class='_rspc10' style=''>한심하다</strong></h4>
+        <span>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
+      </div>
     </div>
-    <div class='content'>
-      <strong class='_rspc' style='color:#9966ff'><%= word_id %></strong>
-      <span style='color:#ffffff'><%= content %></span>
+    <div class='comments' style='background-color:#45474c;color:#14b0d9'>
+      <div class='content'>
+        <span class='_r'>
+          <span class='icon-heart icon-trans' style='background-color:#14b0d9'></span> <span class='_rspc'>1</span>
+          <span class='icon-comment icon-trans' style='background-color:#14b0d9'></span> <span>1</span>
+        </span>
+      </div>
     </div>
-  </div>
-  <div class='comments'>
-    <div class='content'>
-      <span class='_r'>
-        <a href='#' class='icon-comment _rspc'></a>
-        <a href='#' class='icon-heart _rspc'></a>
-        <a href='#'><i class='icon-share-alt'></i> 포워드</a>
-      </span>
+  </li>
+</script>
+
+<script type='text/template' id='tpl_arrived_feeling'>
+  <li class='rd6 _sd0 card'>
+    <div style='background-color:#45474c;height:290px;color:#c6aae2;text-align:center;padding-top:120px;'>
+      <div>새 느낌이 도착했습니다.</div>
+      <div><span class='icon-heart icon-trans' style='background-color:#c6aae2'></span></div>
     </div>
-  </div>
-</li>
+  </li>
+</script>
+
+<script type='text/template' id='tpl_my_feeling'>
+  <li class='rd6 _sd0 card'>
+    <div class='inner' style='background-color:#44F9B8;color:#333333;'>
+      <div class='header' style='border-bottom:1px solid #333333'>
+        <h3><strong class='_rspc' style=''>OCT 13</strong></h3>
+        <h5 style=''>10:10</h5>
+      </div>
+      <div class='content'>
+        <h4><strong class='_rspc10' style=''>한심하다</strong></h4>
+        <span>난 왜 되는게 없을까요.. 머도 그러코 머도 그러코 머드 그러코..</span>
+      </div>
+    </div>
+    <div class='comments' style='background-color:#45474c;color:#44F9B8'>
+      <div class='content'>
+        <span class='_r'>
+          <span class='icon-heart icon-trans' style='background-color:#44f9b8'></span> <span class='_rspc'>1</span>
+          <span class='icon-comment icon-trans' style='background-color:#44f9b8'></span> <span>1</span>
+        </span>
+      </div>
+    </div>
+  </li>
 </script>
 
 <script type='text/template' id='tpl_login'>

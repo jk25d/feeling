@@ -23,7 +23,6 @@ app.configure ->
   app.use express.static("#{__dirname}/public")
 
 
-
 #### COMMON ROUTES ####
 
 app.get '/', (req,res) ->
@@ -77,11 +76,11 @@ _words =
 
 app.get '/api/me', (req,res) ->
   res.json
-    id: req.session.user
+    user_id: req.session.user
 
 app.get '/api/live_feelings', (req,res) ->
   res.json \
-    [ {'w03': 10}, {'w04': 3}, {'w07': 2}, {'w01': 8} ]
+    {'w03': 10, 'w04': 3, 'w07': 2, 'w01': 8}
 
 app.get '/api/associates', (req,res) ->
   res.json \
@@ -170,6 +169,7 @@ app.post '/api/my_feelings', (req,res) ->
   user = req.session.user
   word_id = req.body.word_id
   content = req.body.content
+  console.log "word_id: #{word_id}, content: #{content}"
   req.json {}
 
 app.post '/api/received_feelings/:id/comments', (req,res) ->
@@ -177,6 +177,7 @@ app.post '/api/received_feelings/:id/comments', (req,res) ->
   user = req.session.user
   type = req.body.type        # like, comment, forward
   content = req.body.content
+  console.log "id: #{id}, type: #{type}, content: #{content}"
   req.json {}
 
 app.put '/api/my_feelings/:id/comments/:comment_id', (req,res) ->
@@ -184,6 +185,7 @@ app.put '/api/my_feelings/:id/comments/:comment_id', (req,res) ->
   comment_id = req.params.comment_id
   user = req.session.user
   like = req.body.like
+  console.log "id: #{id}, comment_id: #{comment_id}, like: #{like}"
   req.json {}
 
 

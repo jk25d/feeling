@@ -60,7 +60,7 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 .dropdown-submenu:focus > a > [class^="icon-"],
 .dropdown-submenu:hover > a > [class*=" icon-"],
 .dropdown-submenu:focus > a > [class*=" icon-"] {
-  background-image: url("../bootstrap/img/glyphicons-halflings-transparent.png");
+  background-image: url("../img/glyphicons-halflings-transparent.png");
 }
 
 /* common classes */
@@ -96,7 +96,6 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 -moz-box-shadow:    7px 7px 7px rgba(50, 50, 50, 1);
 box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 }
-.icon-heart2 {background-image:url('../heart.png');background-position:0}
 
 .cc0:hover, .cc0:active, .cc0.active {color:#ffffff;background-color:#FF9900;}
 .cc1:hover, .cc1:active, .cc1.active {color:#ffffff;background-color:#FA2A00;}
@@ -123,8 +122,7 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 
 /* layout */
 
-#tiles {position:relative;margin-top:14px;}
-#tiles2>li {margin:8px 8px;}
+#fs_tiles {position:relative;margin-top:14px;}
 .card {width:226px;overflow:hidden;background-color:#ffffff}
 .main>.header0 {padding:12px 10px 10px 10px;}
 .main>.content0-header {text-align:center;background-color:#E8E8E8;padding:30px 10px 16px 10px;}
