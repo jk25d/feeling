@@ -25,6 +25,7 @@
     app.use(express.cookieSession({
       secret: 'deadbeef'
     }));
+    app.use(app.router);
     app.all('/api/*', require_auth);
     app.all('*', log);
     return app.use(express["static"]("" + __dirname + "/public"));
@@ -304,7 +305,7 @@
     word_id = req.body.word_id;
     content = req.body.content;
     console.log("word_id: " + word_id + ", content: " + content);
-    return req.json({});
+    return res.json({});
   });
 
   app.post('/api/received_feelings/:id/comments', function(req, res) {
@@ -314,7 +315,7 @@
     type = req.body.type;
     content = req.body.content;
     console.log("id: " + id + ", type: " + type + ", content: " + content);
-    return req.json({});
+    return res.json({});
   });
 
   app.put('/api/my_feelings/:id/comments/:comment_id', function(req, res) {
@@ -324,7 +325,7 @@
     user = req.session.user;
     like = req.body.like;
     console.log("id: " + id + ", comment_id: " + comment_id + ", like: " + like);
-    return req.json({});
+    return res.json({});
   });
 
   remove = function(arr, x) {

@@ -18,6 +18,7 @@ app.configure ->
   app.use express.bodyParser()
   app.use express.cookieParser()
   app.use express.cookieSession(secret: 'deadbeef')
+  app.use app.router
   app.all '/api/*', require_auth
   app.all '*', log
   app.use express.static("#{__dirname}/public")
@@ -170,7 +171,7 @@ app.post '/api/my_feelings', (req,res) ->
   word_id = req.body.word_id
   content = req.body.content
   console.log "word_id: #{word_id}, content: #{content}"
-  req.json {}
+  res.json {}
 
 app.post '/api/received_feelings/:id/comments', (req,res) ->
   id = req.params.id
@@ -178,7 +179,7 @@ app.post '/api/received_feelings/:id/comments', (req,res) ->
   type = req.body.type        # like, comment, forward
   content = req.body.content
   console.log "id: #{id}, type: #{type}, content: #{content}"
-  req.json {}
+  res.json {}
 
 app.put '/api/my_feelings/:id/comments/:comment_id', (req,res) ->
   id = req.params.id
@@ -186,7 +187,7 @@ app.put '/api/my_feelings/:id/comments/:comment_id', (req,res) ->
   user = req.session.user
   like = req.body.like
   console.log "id: #{id}, comment_id: #{comment_id}, like: #{like}"
-  req.json {}
+  res.json {}
 
 
 
