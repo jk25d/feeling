@@ -595,6 +595,8 @@ class ReceivedFeelingsView extends FsView
         n: 10
       success: (model, res) ->
         @concat model.models
+  unrender: ->
+    @collection.off 'prepend'
 
 class ArrivedFeelingView extends FsView
   tagName: 'li'
@@ -606,7 +608,7 @@ class ArrivedFeelingView extends FsView
   initialize: ->
     @data = new ArrivedFeelingHolder()
   render: ->
-    @$el.html @template(@model.toJSON())
+    @$el.html @template(@data.toJSON())
     @
   fetch: (event) ->
     @data.fetch
