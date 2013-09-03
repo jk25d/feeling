@@ -288,3 +288,323 @@ put /api/new_arrived_feelings/:id
 post /api/my_feelings
 post /api/received_feelings/:id/comments
 put /api/my_feelings/:id/comments
+
+
+
+design
+------
+
+<div class='header_wrap'>
+  <div id='navbar'></div>
+  <div id='header'></div>
+</div>
+<div id='body'></div>
+
+------------- tpl_navbar
+<ul>
+  <li class='menu public'><a href='#login'>LOGIN</a></li>
+  <li class='menu public'><a href='#signup'>SIGNUP</a></li>
+  <li class='menu private'><a href='#my_feelings'></a>MY</li>
+  <li class='menu private'><a href='#received_feelings'>RECEIVED</a></li>
+  <li class='dropdown'>
+    <ul><li class='private'><a href='#logout'></a></li></ul>
+  </li>
+</ul>
+
+-----------------------------------------
+
+router = new Router()
+Backbone.history.start({pushState: true})
+$.ajaxSetup
+  statusCode:
+    401: -> router.draw_login()
+    403: -> router.draw_login()
+
+class Wookmark
+  apply:
+    @handler?.wookmarkInstance?.clear()
+    @handler = $('#tiles>li')
+    @handler.wookmark
+      align: 'left'
+      autoResize: true
+      container: $('#fs_tiles')
+      offset: 16
+      itemWidth: 226   
+  
+wookmark = new Wookmark
+
+class Router
+  routes:
+    '': 'received_feelings'
+    'logout': 'logout'
+    'signup': 'signup'
+    'my_feelings': 'my_feelings'
+    'received_feelings': 'received_feelings'
+  views: {}
+  active_views: {}
+  initialize: ->
+    _.bindAll @, unrender, logout, signup, login, my_feelings, received_feelings
+
+    @views.login = new LoginView()
+    @views.signup = new SignupView()
+    @views.new_feeling = new NewFeelingView()
+    @views.my_feelings = new MyFeelingsView()
+    @views.received_feelings = new ReceivedFeelingsView()
+
+    @app = new App()
+    @app_view = new AppView(model:@app)
+
+    router.navigate '#received_feelings', true
+  unrender:
+    while @active_views.length > 0
+      @active_views.pop().unrender()
+  draw_login:
+    @unrender()
+    @app.set {user: null, menu: '#login'}
+    @views.login.render()
+    @active_views.push @views.login
+  logout:
+    $.ajax
+      url: '../sessions'
+      type: 'DELETE'
+      dataType: 'json'
+      success: (data) -> @draw_login()
+  signup:
+    @unrender()
+    @app_view.fetch('signup')
+    @views.signup.render()
+    @active_views.push @views.signup
+  my_feelings:  
+    @unrender()
+    @app_view.fetch('my_feelings')
+    @views.new_feeling.fetch()
+    @views.my_feelings.fetch()
+    @active_views.push @views.new_feeling
+    @active_views.push @views.my_feelings
+  received_feelings:
+    @unrender()
+    @app_view.fetch('received_feelings')
+    @views.new_feeling.fetch()
+    @views.received_feelings.fetch()
+    @active_views.push @views.new_feeling
+    @active_views.push @views.received_feelings
+
+class App extends Backbone.Model
+  defaults:
+    user: null
+    menu: '#login'
+  url: '../sessions'
+
+class FsView extends Backbone.View
+  unrender: ->
+  fetch: -> @render()
+
+class AppView extends FsView
+  template: _.template($('#tpl_navbar').html())
+  initialize: ->
+    _.bindAll @, 'update', 'fetch'
+    @model.bind 'change', @update, @
+    $('#navbar').html @template(@model.toJSON())
+  update: ->
+    $('#navbar .menu').removeClass 'active'
+    $(@model.get('menu')).addClass 'active'
+    $('.public').hide() if user
+    $('.private').show() if user
+    $('.private').hide() unless user
+    $('.public').hide() unless user
+  fetch: (menu) ->
+    @menu = menu || '#login'
+    @model.fetch ->
+      success: (model, res) ->
+        @app.set {user: model.get('user'), menu: @menu}
+      error: ->
+        @app.set {user: null, menu: @menu}
+
+class LoginView extends FsView
+  events:
+    'click #login_btn': 'login'
+  template: _.template($('#tpl_login').html())
+  render: ->
+    $('#header').html @template()
+  login: ->
+    $.ajax
+      url: '../sessions'
+      type: 'POST'
+      dataType: 'json'
+      data:
+        user_id: $('#user_id').val()
+        password: $('#password').val()
+      success: (data) ->
+        router.navigate '', true
+
+class SignupView extends FsView
+
+
+
+class NewFeelingView extends FsView
+  events:
+    'click #submit_btn': 'new_feeling'
+  template: _.template($('#tpl_login').html())
+  live_feeling_template: _.template($('#tpl_live_feeling').html())
+  associates_template: _.template($('#tpl_associates').html())
+  initialize: ->
+    _.bindAll @, 'fetch', 'new_feeling'
+  fetch: ->
+    $('#header').html @template()
+    $.getJSON '../api/me', (data) ->
+      $('#header_me').html @me_template(JSON.stringify(data))
+    $.getJSON '../api/live_feelings', (data) ->
+      $('#header_live_feeling').html @live_feeling_template(JSON.stringify(data))
+    $.getJSON '../api/associates', (data) ->
+      $('#header_associates').html @associates_template(JSON.stringify(data))
+  new_feeling: ->
+    $.ajax
+      url: '../my_feelings'
+      type: 'POST'
+      dataType: 'json'
+      data:
+        word_id: $('#wordselect').find('.active').attr('word-id')
+        content: $('#new_feeling_content').val()
+      success: (data) ->
+        router.navigate 'my_feelings', true
+
+class CommentView extends FsView
+  events:
+    'click .remove': 'remove'
+    'click .like': 'like'
+  template: _.template($('#tpl_comment').html())
+  render: ->
+    @$el.html @template(@model.toJSON())
+    @
+  remove: -> alert 'not implemented'
+  like: -> alert 'not implemented'
+
+class MyFeelingView extends FsView
+  tagName: 'li'
+  events:
+    'click .comments': 'expand'
+  template: _.template($('#tpl_my_feeling').html())
+  render: ->
+    @$el.html @template(@model.toJSON())
+    @
+  expand: (event) ->
+    return if @model.get('comments').length == 0
+    holder = $(event.target).find('.comments')
+    holder.empty()
+    for data in @model.get('comments')
+      comment = new Comment(data)
+      holder.append new CommentView(model: comment).render().el
+
+class MyFeelingsView extends FsView
+  tagName: 'ul'
+  id: 'tiles'
+  events:
+    'click #more': 'fetch'
+  template: _.template($('#tpl_my_feelings').html())
+  initialize: ->
+    _.bindAll @, 'concat', 'fetch'
+    @collection = []
+    $('#body').html(@$el)
+  concat: (list) ->
+    @collection.concat list
+    for model in list
+      @$el.append new MyFeelingView(model: model).render().el
+    wookmark.apply()
+  fetch: ->
+    new MyFeelings().fetch
+      data:
+        skip: @collection.length
+        n: 10
+      success: (model, res) ->
+        @concat model.models
+      
+class NewCommentView extends FsView
+  events:
+    'click .comment_submit': 'submit'
+  template: _.template($('#tpl_new_comment').html())
+  render: ->
+    @$el.html @template(@model.toJSON())
+    @
+  submit: -> alert 'not implemented'
+
+class ReceivedFeelingView extends FsView
+  tagName: 'li'
+  events:
+    'click .comment_link': 'comment'
+    'click .like_link': 'like'
+    'click .forward_link': 'forward'
+  template: _.template($('#tpl_received_feeling').html())
+  render: ->
+    @$el.html @template(@model.toJSON())
+    @
+  comment: (event) ->
+    @draw_new_comment new NewComment({type: 'comment'})
+  like: (event) ->
+    @draw_new_comment new NewComment({type: 'comment'})
+  forward: (event) ->
+    @draw_new_comment new NewComment({type: 'comment'})
+  draw_new_comment: (comment) ->
+    $(event.target).find('.inputarea').html new NewCommentView(model: comment).render().el  
+
+class ReceivedFeelingsView extends FsView
+  tagName: 'ul'
+  id: 'tiles'
+  events:
+    'click #more': 'fetch'
+  template: _.template($('#tpl_received_feelings').html())
+  initialize: ->
+    _.bindAll @, 'concat', 'fetch'
+    @collection = []
+    @$el.append new ArrivedFeelingView.render().el
+    $('#body').html(@$el)
+  concat: (list) ->
+    @collection.concat list
+    for model in list
+      @$el.append new ReceivedFeelingView (model: model).render().el
+    wookmark.apply()
+  fetch: ->
+    new ReceivedFeelings().fetch
+      data:
+        skip: @collection.length
+        n: 10
+      success: (model, res) ->
+        @concat model.models
+
+class ArrivedFeelingView extends FsView
+  tagName: 'li'
+  events:
+    'click .holder': 'fetch'
+    'click .backside': 'flip'
+  template: _.template($('#tpl_arrived_card_holder').html())
+  initialize: ->
+    @data = new ArrivedFeelingHolder()
+  render: ->
+    @$el.html @template(@model.toJSON())
+    @
+  fetch: (event) ->
+    @data.fetch
+      success: (model, res) -> @render()
+  flip: (event) ->
+############### TODO #################
+    @data.save
+      data:
+        id: @data.get('id')
+      success: (model, res) ->
+        collection.unshift model
+        $('#tiles').prepend new ReceivedFeelingView(model: model).render().el
+  
+
+class ArrivedFeelingView extends FsView
+  tagName: 'li'
+  events:
+    'click #collect': 'fetch'
+    'click .back_card': 'flip'
+  template: _.template($('#tpl_arrived_feeling').html())
+  initialize: ->
+  render: ->
+    @$el.html
+  fetch: ->
+  flip: ->
+    @$el.
+
+
