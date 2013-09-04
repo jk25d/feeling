@@ -86,6 +86,7 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 ._rspc2 {margin-right:4px}
 ._ofh {overflow:hidden}
 ._pad10 {padding:10px}
+.fs_submit, .fs_link {cursor:pointer}
 ._sd0 {
   box-shadow: 1px 1px 2px 1px rgba(60, 60, 60, 0.72);
   -moz-box-shadow: 1px 1px 2px 1px rgba(60, 60, 60, 0.72);
@@ -123,7 +124,7 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 /* layout */
 
 #fs_tiles {position:relative;margin-top:14px;}
-.card {width:226px;overflow:hidden;background-color:#ffffff}
+.card {width:226px;overflow:hidden;}
 .main>.header0 {padding:12px 10px 10px 10px;}
 .main>.content0-header {text-align:center;background-color:#E8E8E8;padding:30px 10px 16px 10px;}
 .main>.content0-input {padding:0 10px 12px 10px;background-color:#E8E8E8}
@@ -161,5 +162,6 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
   line-height:40px;
 }
 
+#flipcard {background-color:#45474c;height:290px;color:#c6aae2;text-align:center;padding-top:120px;}
 
 

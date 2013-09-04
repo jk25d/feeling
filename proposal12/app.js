@@ -49,7 +49,9 @@
     var password;
     req.session.user = req.body.user_id;
     password = req.body.password;
-    return res.json({});
+    return res.json({
+      user: req.session.user
+    });
   });
 
   app.del('/sessions', function(req, res) {
@@ -120,7 +122,8 @@
 
   app.get('/api/me', function(req, res) {
     return res.json({
-      user_id: req.session.user
+      user_id: req.session.user,
+      n_available_feelings: 3
     });
   });
 
@@ -177,13 +180,13 @@
             content: '블블블',
             user_id: 'asdf',
             time: 0,
-            liked: 1
+            like: true
           }, {
             type: 'comment',
             content: '블블블asdf',
             user_id: 'qwer',
             time: 0,
-            liked: 0
+            like: false
           }
         ]
       }
@@ -208,13 +211,13 @@
           content: '블블블',
           user_id: 'asdf',
           time: 0,
-          liked: 1
+          like: true
         }, {
           type: 'comment',
           content: '블블블asdf',
           user_id: 'qwer',
           time: 0,
-          liked: 0
+          like: false
         }
       ]
     });
@@ -279,15 +282,7 @@
         time: 0,
         user_id: 'f23rf',
         word_id: 'w03',
-        content: '블라블라블라',
-        comment: {
-          id: 0,
-          type: 'heart',
-          content: '블블블',
-          user_id: 'asdf',
-          time: 0,
-          liked: 1
-        }
+        content: '블라블라블라'
       }
     ]);
   });
@@ -296,7 +291,21 @@
     var id, user;
     id = req.params.id;
     user = req.session.user;
-    return res.json({});
+    return res.json({
+      id: 1,
+      time: 0,
+      user_id: 'f23rf',
+      word_id: 'w03',
+      content: '블라블라블라',
+      comment: {
+        id: 0,
+        type: 'heart',
+        content: '블블블',
+        user_id: 'asdf',
+        time: 0,
+        liked: 1
+      }
+    });
   });
 
   app.post('/api/my_feelings', function(req, res) {

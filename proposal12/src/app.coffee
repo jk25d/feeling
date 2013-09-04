@@ -38,7 +38,7 @@ app.get '/sessions', (req,res) ->
 app.post '/sessions', (req,res) -> 
   req.session.user = req.body.user_id
   password = req.body.password
-  res.json {}
+  res.json {user: req.session.user}
 
 app.del '/sessions', (req,res) ->
   if req.session.user
@@ -78,6 +78,7 @@ _words =
 app.get '/api/me', (req,res) ->
   res.json
     user_id: req.session.user
+    n_available_feelings: 3
 
 app.get '/api/live_feelings', (req,res) ->
   res.json \
@@ -101,9 +102,9 @@ app.get '/api/my_feelings', (req,res) ->
         content: 'aefe aefef fa',\
         comments: [
           { type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, liked: 1},
+            user_id: 'asdf', time: 0, like: true},
           { type: 'comment', content: '블블블asdf',\ 
-            user_id: 'qwer', time: 0, liked: 0}
+            user_id: 'qwer', time: 0, like: false}
         ]
       }
     ]
@@ -118,9 +119,9 @@ app.get '/api/my_feelings/:id', (req,res) ->
       content: 'aefe aefef fa',\
       comments: [
         { type: 'heart', content: '블블블',\ 
-          user_id: 'asdf', time: 0, liked: 1},
+          user_id: 'asdf', time: 0, like: true},
         { type: 'comment', content: '블블블asdf',\ 
-          user_id: 'qwer', time: 0, liked: 0}
+          user_id: 'qwer', time: 0, like: false}
       ]
     }
 
@@ -155,16 +156,19 @@ app.get '/api/new_arrived_feelings', (req,res) ->
   n = req.params.n || 3
   res.json \
     [ { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
-        content: '블라블라블라',\
-        comment: { id: 0, type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, liked: 1}\
+        content: '블라블라블라'
       }\
     ]
 
 app.put '/api/new_arrived_feelings/:id', (req,res) ->
   id = req.params.id
   user = req.session.user
-  res.json {}
+  res.json \
+    { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+      content: '블라블라블라',\
+      comment: { id: 0, type: 'heart', content: '블블블',\ 
+          user_id: 'asdf', time: 0, liked: 1}\
+    }
 
 app.post '/api/my_feelings', (req,res) ->
   user = req.session.user
