@@ -192,13 +192,13 @@
       <span class='icon-share-alt icon-trans fs_link' style='background-color:#cccccc'></span>
     </span>
   </div>
-  <div class='inputarea' style='border-top:1px solid #dddddd;padding-top:10px;overflow:hidden'>
+  <div class='inputarea'>
   </div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_new_comment'>
-<div>
+<div style='border-top:1px solid #dddddd;padding-top:10px;overflow:hidden'>
   <input type="text" placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
 </div>
 <div style='overflow:hidden'>
@@ -207,9 +207,8 @@
 </script>
 
 <script type='text/template' id='tpl_arrived_holder'>
-<div style='border:2px dashed #45474c;height:290px;color:#c6aae2;text-align:center;padding-top:120px;'>
+<div id='receive_arrived' class='fs_link' style='border:2px dashed #45474c;height:290px;color:#c6aae2;text-align:center;padding-top:120px;'>
   <div>받을 수 있는 느낌: <%= n_available_feelings %></div>
-  <div><a id='receive_arrived' class='fs_link'>RECEIVE</a></div>
 </div>
 </script>
 

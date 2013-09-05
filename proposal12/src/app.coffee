@@ -10,17 +10,13 @@ require_auth = (req, res, next) ->
   res.send 401 unless req.session.user
   next()
 
-log = (req, res, next) ->
-  console.log req.path
-  next()
-
 app.configure ->
   app.use express.bodyParser()
   app.use express.cookieParser()
   app.use express.cookieSession(secret: 'deadbeef')
+  app.use express.logger { format: ':method :url' }
   app.use app.router
   app.all '/api/*', require_auth
-  app.all '*', log
   app.use express.static("#{__dirname}/public")
 
 

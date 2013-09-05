@@ -758,3 +758,14 @@ navigate
 several render..
 @$el.html
 sync
+
+new on render()
+model.once
+double listening..
+
+parent's array or hash is call by ref
+class Parent
+  x: []
+classs Child extends Parent
+  constructor: -> @x.push 1
+parent.x=[1]

@@ -67,10 +67,10 @@
           live_feelings: this.models.live_feelings,
           associates: this.models.associates
         });
-        this.views.my_feelings = new MyFeelingsView({
+        this.views.my = new MyFeelingsView({
           model: this.models.my
         });
-        this.views.received_feelings = new ReceivedFeelingsView({
+        this.views.received = new ReceivedFeelingsView({
           model: this.models.received
         });
         this.app_view = new AppView({
@@ -134,9 +134,9 @@
       Router.prototype.my_feelings = function() {
         this.unrender();
         this.views.new_feeling.render();
-        this.views.my_feelings.render();
+        this.views.my.render();
         this.active_views.push(this.views.new_feeling);
-        this.active_views.push(this.views.my_feelings);
+        this.active_views.push(this.views.my);
         this.models.app.fetch();
         this.models.app.set({
           menu: '#menu_my'
@@ -153,9 +153,9 @@
         console.log('#received_feelings');
         this.unrender();
         this.views.new_feeling.render();
-        this.views.received_feelings.render();
+        this.views.received.render();
         this.active_views.push(this.views.new_feeling);
-        this.active_views.push(this.views.received_feelings);
+        this.active_views.push(this.views.received);
         this.models.app.fetch();
         this.models.app.set({
           menu: '#menu_received'
@@ -377,10 +377,9 @@
         return _ref14;
       }
 
-      FsView.prototype.views = [];
-
       FsView.prototype.unrender = function() {
         var _results;
+        console.log(this);
         _results = [];
         while (this.views.length > 0) {
           _results.push(this.views.pop().unrender());
@@ -401,22 +400,16 @@
 
       AppView.prototype.template = _.template($('#tpl_navbar').html());
 
-      AppView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
-      };
-
       AppView.prototype.render = function() {
+        console.log('appview.render');
         this.$el.html(this.template(this.model.toJSON()));
         $('#fs_navbar').html(this.$el);
         $('#fs_navbar .fs_menu').removeClass('active');
         $(this.model.get('menu')).addClass('active');
-        this.model.on('change', this.render, this);
-        return this.model.on('sync', this.render, this);
+        return this.model.once('change', this.render, this);
       };
 
       AppView.prototype.unrender = function() {
-        this.model.off('change');
-        this.model.off('sync');
         this.$el.empty();
         return $('#fs_navbar').empty();
       };
@@ -438,11 +431,8 @@
 
       LoginView.prototype.template = _.template($('#tpl_login').html());
 
-      LoginView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
-      };
-
       LoginView.prototype.render = function() {
+        console.log('login.render');
         this.$el.html(this.template());
         return $('#fs_header').html(this.$el);
       };
@@ -474,7 +464,7 @@
 
       return LoginView;
 
-    })(Backbone.View);
+    })(FsView);
     SignupView = (function(_super) {
       __extends(SignupView, _super);
 
@@ -489,11 +479,8 @@
 
       SignupView.prototype.template = _.template($('#tpl_signup').html());
 
-      SignupView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
-      };
-
       SignupView.prototype.render = function() {
+        console.log('signup.render');
         this.$el.html(this.template());
         return $('#fs_header').html(this.$el);
       };
@@ -531,18 +518,15 @@
       NewFeelingView.prototype.initialize = function() {
         this.me = this.options.me;
         this.live_feelings = this.options.live_feelings;
-        this.associates = this.options.associates;
-        return _.bindAll(this, 'unrender');
+        return this.associates = this.options.associates;
       };
 
       NewFeelingView.prototype.render = function() {
+        console.log('newfeeling.render');
         this.$el.html(this.template());
         $('#fs_header').html(this.$el);
-        this.me.on('change', this.render_me, this);
         this.me.on('sync', this.render_me, this);
-        this.live_feelings.on('change', this.render_live_feelings, this);
         this.live_feelings.on('sync', this.render_live_feelings, this);
-        this.associates.on('change', this.render_associates, this);
         return this.associates.on('sync', this.render_associates, this);
       };
 
@@ -596,9 +580,6 @@
       };
 
       NewFeelingView.prototype.unrender = function() {
-        this.me.off('change');
-        this.live_feelings.off('change');
-        this.associates.off('change');
         this.me.off('sync');
         this.live_feelings.off('sync');
         this.associates.off('sync');
@@ -624,14 +605,10 @@
 
       CommentView.prototype.template = _.template($('#tpl_comment').html());
 
-      CommentView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
-      };
-
       CommentView.prototype.render = function() {
+        console.log('comment.render');
         this.$el.html(this.template(this.model.toJSON()));
-        this.model.on('change', this.render, this);
-        this.model.on('sync', this.render, this);
+        this.model.once('change', this.render, this);
         return this;
       };
 
@@ -644,8 +621,6 @@
       };
 
       CommentView.prototype.unrender = function() {
-        this.model.off('change');
-        this.model.off('sync');
         return this.$el.empty();
       };
 
@@ -668,12 +643,10 @@
 
       MyFeelingView.prototype.template = _.template($('#tpl_my_feeling').html());
 
-      MyFeelingView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
-      };
-
       MyFeelingView.prototype.render = function() {
         var holder, m, view, _i, _len, _ref21;
+        console.log('myfeeling.render');
+        this.unrender();
         this.set_comments_count();
         this.$el.addClass('rd6').addClass('_sd0').addClass('card');
         this.$el.html(this.template(this.model.toJSON()));
@@ -690,8 +663,7 @@
             holder.append(view.render().el);
           }
         }
-        this.model.on('change', this.render, this);
-        this.model.on('sync', this.render, this);
+        this.model.once('change', this.render, this);
         return this;
       };
 
@@ -723,8 +695,6 @@
 
       MyFeelingView.prototype.unrender = function() {
         MyFeelingView.__super__.unrender.call(this);
-        this.model.off('change');
-        this.model.off('sync');
         return this.$el.empty();
       };
 
@@ -746,12 +716,12 @@
       MyFeelingsView.prototype.className = 'fs_tiles';
 
       MyFeelingsView.prototype.initialize = function() {
-        this.wookmark = new Wookmark(this.id);
-        return _.bindAll(this, 'unrender');
+        return this.wookmark = new Wookmark(this.id);
       };
 
       MyFeelingsView.prototype.render = function() {
         var m, view, _i, _len, _ref22;
+        console.log('myfeelings.render');
         view = new FeelingsHolderView({
           model: this.model
         });
@@ -809,11 +779,8 @@
 
       FeelingsHolderView.prototype.template = _.template($('#tpl_feelings').html());
 
-      FeelingsHolderView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
-      };
-
       FeelingsHolderView.prototype.render = function() {
+        console.log('feelingsholder.render');
         this.$el.html(this.template());
         return $('#fs_body').html(this.$el);
       };
@@ -847,14 +814,9 @@
 
       NewCommentView.prototype.template = _.template($('#tpl_new_comment').html());
 
-      NewCommentView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
-      };
-
       NewCommentView.prototype.render = function() {
+        console.log('newcomment.render');
         this.$el.html(this.template());
-        this.model.on('change', this.render, this);
-        this.model.on('sync', this.render, this);
         return this;
       };
 
@@ -864,8 +826,6 @@
 
       NewCommentView.prototype.unrender = function() {
         NewCommentView.__super__.unrender.call(this);
-        this.model.off('change');
-        this.model.off('sync');
         return this.$el.empty();
       };
 
@@ -891,29 +851,34 @@
       ReceivedFeelingView.prototype.template = _.template($('#tpl_received_feeling').html());
 
       ReceivedFeelingView.prototype.initialize = function() {
-        return _.bindAll(this, 'unrender');
+        this.coment_view = new NewCommentView;
+        return this.views.push(this.coment_view);
       };
 
       ReceivedFeelingView.prototype.render = function() {
-        var view;
+        var type;
+        console.log('received.render');
         this.$el.addClass('rd6').addClass('_sd0').addClass('card');
         this.$el.html(this.template(this.model.toJSON()));
-        if (this.model.type === 'comment') {
-          $('.icon-comment').css('background-color', '#44f9b8');
+        type = this.model.get('type');
+        if (type) {
+          $('.icon-trans').css('background-color', '#cccccc');
+          if (type === 'comment') {
+            $('.icon-comment').css('background-color', '#44f9b8');
+          }
+          if (type === 'like') {
+            $('.icon-heart').css('background-color', '#44f9b8');
+          }
+          if (type === 'forward') {
+            $('.icon-share-alt').css('background-color', '#44f9b8');
+          }
+          this.$el.find('.inputarea').html(this.coment_view.render().el);
+          if (!this.expanded) {
+            router.views.received.wookmark.apply();
+          }
+          this.expanded = true;
         }
-        if (this.model.type === 'like') {
-          $('.icon-heart').css('background-color', '#44f9b8');
-        }
-        if (this.model.type === 'forward') {
-          $('.icon-share-alt').css('background-color', '#44f9b8');
-        }
-        if (this.model.type) {
-          view = new NewCommentView;
-          this.views.push(view);
-          this.$.find('.inputarea').html(view.render().el);
-        }
-        this.model.on('change', this.render, this);
-        this.model.on('sync', this.render, this);
+        this.model.once('change', this.render, this);
         return this;
       };
 
@@ -931,8 +896,6 @@
 
       ReceivedFeelingView.prototype.unrender = function() {
         ReceivedFeelingView.__super__.unrender.call(this);
-        this.model.off('change');
-        this.model.off('sync');
         return this.$el.empty();
       };
 
@@ -960,12 +923,12 @@
       ReceivedFeelingsView.prototype.template = _.template($('#tpl_feelings').html());
 
       ReceivedFeelingsView.prototype.initialize = function() {
-        this.wookmark = new Wookmark(this.id);
-        return _.bindAll(this, 'unrender');
+        return this.wookmark = new Wookmark(this.id);
       };
 
       ReceivedFeelingsView.prototype.render = function() {
         var m, view, _i, _len, _ref26;
+        console.log('receiveds.render');
         view = new FeelingsHolderView({
           model: this.model
         });
@@ -1052,12 +1015,14 @@
       ArrivedFeelingView.prototype.holder_template = _.template($('#tpl_arrived_holder').html());
 
       ArrivedFeelingView.prototype.initialize = function() {
-        this.model = new ArrivedFeelings;
-        return _.bindAll(this, 'unrender');
+        return this.model = new ArrivedFeelings;
       };
 
       ArrivedFeelingView.prototype.render = function() {
         console.log('arrived.render');
+        console.log(this);
+        console.log(this.views);
+        this.unrender();
         if (this.model.length > 0) {
           this.$el.addClass('rd6').addClass('_sd0').addClass('card');
           this.$el.html(this.template(this.model.toJSON()));
@@ -1065,9 +1030,7 @@
           this.$el.addClass('rd6').addClass('card');
           this.$el.html(this.holder_template(router.models.me.toJSON()));
         }
-        this.model.on('reset', this.render, this);
         this.model.on('sync', this.render, this);
-        router.models.me.on('change', this.render, this);
         router.models.me.on('sync', this.render, this);
         return this;
       };
@@ -1094,10 +1057,8 @@
       };
 
       ArrivedFeelingView.prototype.unrender = function() {
-        router.models.me.off('change');
-        router.models.me.off('sync');
-        this.model.off('reset');
-        this.model.off('sync');
+        router.models.me.off('sync', this.render);
+        this.model.off('sync', this.render);
         return this.$el.empty();
       };
 
