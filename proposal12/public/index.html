@@ -165,8 +165,8 @@
 </script>
 
 <script type='text/template' id='tpl_feelings'>
-<ul class='contentwrap'>
-</ul>
+<div id='fs_holder'>
+</div>
 <div style='background-color:#cccccc'>
   <a class='fs_more fs_link'>more</a>
 </div>
@@ -193,7 +193,7 @@
     </span>
   </div>
   <div class='inputarea' style='border-top:1px solid #dddddd;padding-top:10px;overflow:hidden'>
-  <</div>
+  </div>
 </div>
 </script>
 
@@ -207,21 +207,17 @@
 </script>
 
 <script type='text/template' id='tpl_arrived_holder'>
-<li class='rd6 card'>
-  <div style='border:2px dashed #45474c;height:290px;color:#c6aae2;text-align:center;padding-top:120px;'>
-    <div>받을 수 있는 느낌: <%= n_available_feelings %></div>
-    <div><a id='receive_arrived' class='fs_link'>RECEIVE</a></div>
-  </div>
-</li>
+<div style='border:2px dashed #45474c;height:290px;color:#c6aae2;text-align:center;padding-top:120px;'>
+  <div>받을 수 있는 느낌: <%= n_available_feelings %></div>
+  <div><a id='receive_arrived' class='fs_link'>RECEIVE</a></div>
+</div>
 </script>
 
 <script type='text/template' id='tpl_arrived_feeling'>
-<li class='rd6 _sd0 card'>
-  <div id='flipcard'>
-    <div>새 느낌이 도착했습니다.</div>
-    <div><span class='icon-heart icon-trans' style='background-color:#c6aae2'></span></div>
-  </div>
-</li>
+<div id='flipcard'>
+  <div>새 느낌이 도착했습니다.</div>
+  <div><span class='icon-heart icon-trans' style='background-color:#c6aae2'></span></div>
+</div>
 </script>
 
 <script type='text/template' id='tpl_my_feeling'>

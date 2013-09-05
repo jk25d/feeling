@@ -1,12 +1,13 @@
 $ ->
   class Wookmark
-    apply: (id) ->
+    constructor: (@id) ->
+    apply: ->
       @handler?.wookmarkInstance?.clear()
-      @handler = $("##{id}>ul>li")
+      @handler = $("##{@id} > li")
       @handler.wookmark
         align: 'left'
         autoResize: true
-        container: $("##{id}>ul")
+        container: $("##{@id}")
         offset: 16
         itemWidth: 226   
 
@@ -61,6 +62,7 @@ $ ->
         url: '../sessions'
         type: 'DELETE'
         dataType: 'json'
+        context: @
         success: (data) -> @draw_login()
     signup: ->
       @unrender()
@@ -80,7 +82,7 @@ $ ->
       @models.me.fetch()
       @models.live_feelings.fetch()
       @models.associates.fetch()
-      @models.my.fetch()
+      @models.my.fetch() if @models.my.length == 0
     received_feelings: ->
       console.log '#received_feelings'
       @unrender()
@@ -94,7 +96,8 @@ $ ->
       @models.me.fetch()
       @models.live_feelings.fetch()
       @models.associates.fetch()
-      @models.received.fetch()
+      @models.received.fetch() if @models.received.length == 0
+
 
   #--- MODELS ---#
 
@@ -119,11 +122,12 @@ $ ->
     model: MyFeeling
     url: '../api/my_feelings'
     fetch: ->
-      data:
-        skip: @models?.length || 0
-        n: 10
-      success: (model, res) ->
-        @.trigger 'concat', model.models
+      super
+        data:
+          skip: @models?.length || 0
+          n: 10
+        success: (model, res) ->
+          router.models.my.trigger 'concat', model.models
 
   class ArrivedFeeling extends Backbone.Model
   class ArrivedFeelings extends Backbone.Collection
@@ -135,11 +139,12 @@ $ ->
     model: ReceivedFeeling
     url: '../api/received_feelings'
     fetch: ->
-      data:
-        skip: @models?.length || 0
-        n: 10
-      success: (model, res) ->
-        @.trigger 'concat', model.models
+      super
+        data:
+          skip: @models?.length || 0
+          n: 10
+        success: (model, res) ->
+          router.models.received.trigger 'concat', model.models
 
   #--- VIEWS ---#
 
@@ -163,6 +168,7 @@ $ ->
     unrender: ->
       @model.off 'change'
       @model.off 'sync'
+      @$el.empty()
       $('#fs_navbar').empty()
 
   class LoginView extends Backbone.View
@@ -181,6 +187,7 @@ $ ->
         url: '../sessions'
         type: 'POST'
         dataType: 'json'
+        context: @
         data:
           user_id: $('#user_id').val()
           password: $('#password').val()
@@ -188,6 +195,7 @@ $ ->
           router.models.app.set 'user', data.user
           router.navigate 'received_feelings', {trigger: true}
     unrender: ->
+      @$el.empty()
       $('#fs_header').empty()
 
   class SignupView extends FsView
@@ -202,6 +210,7 @@ $ ->
     on_submit: ->
       console.log 'signup submit'
     unrender: ->
+      @$el.empty()
       $('#fs_header').empty()
 
   class NewFeelingView extends FsView
@@ -244,6 +253,7 @@ $ ->
         url: '../api/my_feelings'
         type: 'POST'
         dataType: 'json'
+        context: @
         data:
           word_id: $('#wordselect').find('.active').attr('word-id')
           content: $('#new_feeling_content').val()
@@ -256,6 +266,7 @@ $ ->
       @me.off 'sync'
       @live_feelings.off 'sync'
       @associates.off 'sync'
+      @$el.empty()
       $('#fs_header').empty()
 
   class CommentView extends FsView
@@ -277,6 +288,7 @@ $ ->
     unrender: ->
       @model.off 'change'
       @model.off 'sync'
+      @$el.empty()
 
   class MyFeelingView extends FsView
     tagName: 'li'
@@ -312,9 +324,41 @@ $ ->
       super()
       @model.off 'change'
       @model.off 'sync'
+      @$el.empty()
 
   class MyFeelingsView extends FsView
+    tagName: 'ul'
     id: 'my_feelings_holder'
+    className: 'fs_tiles'
+    initialize: ->
+      @wookmark = new Wookmark(@id)
+      _.bindAll @, 'unrender'
+    render: ->
+      view = new FeelingsHolderView(model: @model)
+      @views.push view
+      view.render()
+
+      for m in @model.models
+        view = new MyFeelingView(model: m)
+        @views.push view
+        @$el.append view.render().el
+      $('#fs_holder').html @$el
+      @wookmark.apply()
+      @model.on 'concat', @on_concat, @
+    on_concat: (list) ->
+      @model.models.concat list
+      for m in list
+        view = new MyFeelingView(model: m)
+        @views.push view
+        @$el.append view.render().el
+      @wookmark.apply()
+    unrender: ->
+      super()
+      @model.off 'concat'
+      @$el.empty()
+      $('#fs_holder').empty()
+
+  class FeelingsHolderView extends FsView
     events:
       'click .fs_more': 'on_more'
     template: _.template($('#tpl_feelings').html())
@@ -323,19 +367,11 @@ $ ->
     render: ->
       @$el.html @template()
       $('#fs_body').html @$el
-      @model.on 'concat', @on_concat, @
-    on_concat: (list) ->
-      @model.models.concat list
-      for m in list
-        view = new MyFeelingView(model: m)
-        @views.push view
-        @$el.append view.render().el
-      wookmark.apply(@id)
     on_more: (event) ->
       @model.fetch()
     unrender: ->
       super()
-      @model.off 'concat'
+      @$el.empty()
       $('#fs_body').empty()
 
   class NewCommentView extends FsView
@@ -356,6 +392,7 @@ $ ->
       super()
       @model.off 'change'
       @model.off 'sync'
+      @$el.empty()
 
   class ReceivedFeelingView extends FsView
     tagName: 'li'
@@ -392,45 +429,58 @@ $ ->
       super()
       @model.off 'change'
       @model.off 'sync'
+      @$el.empty()
 
   class ReceivedFeelingsView extends FsView
+    tagName: 'ul'
     id: 'received_feelings_holder'
+    className: 'fs_tiles'
     events:
       'click .fs_more': 'on_more'
     template: _.template($('#tpl_feelings').html())
     initialize: ->
+      @wookmark = new Wookmark(@id)
       _.bindAll @, 'unrender'
     render: ->
-      @$el.html @template()
+      view = new FeelingsHolderView(model: @model)
+      @views.push view
+      view.render()
 
       view = new ArrivedFeelingView
       @views.push view
       @$el.append view.render().el
 
-      $('#fs_body').html @$el
+      for m in @model.models
+        view = new ReceivedFeelingView(model: m)
+        @views.push view
+        @$el.append view.render().el
+
+      $('#fs_holder').html @$el
+      @wookmark.apply()
       @model.on 'prepend', @on_prepend, @
       @model.on 'concat', @on_concat, @
     on_concat: (list) ->
+      console.log 'on_concat'
       @model.models.concat list
       for m in list
         view = new ReceivedFeelingView(model: m)
         @views.push view
         @$el.append view.render().el
-      wookmark.apply(@id)
+      @wookmark.apply()
     on_prepend: (data) ->
       model = new ReceivedFeeling(data)
       @model.models.unshift model
       view = new ReceivedFeelingView(model: model)
       @views.push view
       $('#arrived_feeling').after view.render().el
-      wookmark.apply(@id)
+      @wookmark.apply()
     on_more: (event) ->
       @model.fetch()
     unrender: ->
       super()
       @model.off 'concat'
       @model.off 'prepend'
-      $('#fs_body').empty()
+      @$el.empty()
 
   class ArrivedFeelingView extends FsView
     tagName: 'li'
@@ -444,22 +494,29 @@ $ ->
       @model = new ArrivedFeelings
       _.bindAll @, 'unrender'
     render: ->
+      console.log 'arrived.render'
       if @model.length > 0
+        @$el.addClass('rd6').addClass('_sd0').addClass('card')
         @$el.html @template(@model.toJSON())
       else
+        @$el.addClass('rd6').addClass('card')
         @$el.html @holder_template(router.models.me.toJSON())
       @model.on 'reset', @render, @
+      @model.on 'sync', @render, @
       router.models.me.on 'change', @render, @
       router.models.me.on 'sync', @render, @
       @
     on_receive: (event) ->
+      console.log 'receive'
       @model.fetch()
     on_flip: (event) ->
+      console.log 'flip'
       model = @model.at 0
       $.ajax
         url: "../api/new_arrived_feelings/#{model.get('id')}"
         type: 'PUT'
         dataType: 'json'
+        context: @
         success: (data) ->
           @model.reset()
           router.models.received.trigger 'prepend', data
@@ -467,9 +524,9 @@ $ ->
       router.models.me.off 'change'
       router.models.me.off 'sync'
       @model.off 'reset'
+      @model.off 'sync'
+      @$el.empty()
     
-
-  wookmark = new Wookmark
   router = new Router
   $.ajaxSetup
     statusCode:
