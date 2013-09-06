@@ -68,6 +68,8 @@ _words =
   'w06': {desc: '두렵다', color: '#ffc6c6'}
   'w07': {desc: '초조하다', color: '#c6ffff'}
 
+_my_time=0
+
 
 #### ROUTES ####
 
@@ -94,7 +96,7 @@ app.get '/api/my_feelings', (req,res) ->
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    [ { id: 0, time: 0, user_id: 'uuuuu', word_id: 'w03',\
+    [ { id: 0, time: _my_time++, user_id: 'uuuuu', word_id: 'w03',\
         content: 'aefe aefef fa',\
         comments: [
           { type: 'heart', content: '블블블',\ 

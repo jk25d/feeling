@@ -37,6 +37,9 @@ myAuthMiddleware = (req, res, next) ->
 app.use(myAuthMiddleware, func) for func in [editPhoto, deletePhoto]
 
 
+## backbone.js page transition.. unrender.. event unbind..
+http://lostechies.com/derickbailey/2011/09/15/zombies-run-managing-page-transitions-in-backbone-apps/
+
 ## backbone.js authentication
 
 http://clintberry.com/2012/backbone-js-apps-authentication-tutorial/
