@@ -57,7 +57,7 @@
           </li>
         <% }else{ %>
           <li id='menu_signup' class='fs_menu'><a href='#'>SIGN UP</a></li>
-          <li><a class='fs_link' id='login_toggle'>LOGIN</a></li>
+          <li><button class='btn btn-small' id='login_toggle'>LOGIN</button></li>
         <% } %>
         </ul>
       </div>
@@ -68,7 +68,7 @@
 <div id='login_holder'></div>
 </script>
 <script type='text/template' id='tpl_login'>
-<div id='login' style='background-color:#ffffff;position:absolute;'>
+<div id='login' style='background-color:#ffffff;position:absolute;display:none;z-index:1040'>
   <div style='padding:10px;'>
     <input id='user_id' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
   </div>

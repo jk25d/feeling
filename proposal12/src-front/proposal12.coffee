@@ -208,8 +208,8 @@ $ ->
       @login_view = @attach new LoginView
       $('#fs_navbar .fs_menu').removeClass 'active'
       $(@model.get('menu')).addClass 'active'
-    login: ->
-      @login_view.toggle()
+    login: (e) ->
+      @login_view.toggle($(e.target))
     close: ->
       super()
       @model.off 'change', @render
@@ -222,12 +222,9 @@ $ ->
       super()
       @$el.html @template()
       $('#login_holder').html @$el
-    toggle: ->
-      console.log 'asdf'
-      console.log $('#login').html()
-      navbar = $('#fs_navbar')
-      t = navbar.offset().top + navbar.outerHeight()
-      l = navbar.offset().left
+    toggle: (target) ->
+      t = target.offset().top + target.outerHeight()
+      l = target.offset().left
       $('#login').css('top', t).css('left', l)
       $('#login').toggle()
     on_submit: ->

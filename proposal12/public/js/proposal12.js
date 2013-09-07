@@ -574,8 +574,8 @@
         return $(this.model.get('menu')).addClass('active');
       };
 
-      AppView.prototype.login = function() {
-        return this.login_view.toggle();
+      AppView.prototype.login = function(e) {
+        return this.login_view.toggle($(e.target));
       };
 
       AppView.prototype.close = function() {
@@ -606,13 +606,10 @@
         return $('#login_holder').html(this.$el);
       };
 
-      LoginView.prototype.toggle = function() {
-        var l, navbar, t;
-        console.log('asdf');
-        console.log($('#login').html());
-        navbar = $('#fs_navbar');
-        t = navbar.offset().top + navbar.outerHeight();
-        l = navbar.offset().left;
+      LoginView.prototype.toggle = function(target) {
+        var l, t;
+        t = target.offset().top + target.outerHeight();
+        l = target.offset().left;
         $('#login').css('top', t).css('left', l);
         return $('#login').toggle();
       };
