@@ -45,7 +45,7 @@
 
       <a class='brand' href='#'>FEELING SHARE</a>
       <div class='nav-collapse collapse'>
-        <ul class='nav'>
+        <ul class='nav fs_menu'>
         <% if(user){ %>
           <li id='menu_my' class='fs_menu'><a href='#my_feelings'>MY FEELINGS</a></li>
           <li id='menu_received' class='fs_menu'><a href='#received_feelings'>RECEIVED</a></li>
@@ -56,8 +56,8 @@
             </ul>
           </li>
         <% }else{ %>
-          <li id='menu_login' class='fs_menu'><a href='#login'>LOGIN</a></li>
-          <li id='menu_signup' class='fs_menu'><a href='#signup'>SIGN UP</a></li>
+          <li id='menu_signup' class='fs_menu'><a href='#'>SIGN UP</a></li>
+          <li><a class='fs_link' id='login_toggle'>LOGIN</a></li>
         <% } %>
         </ul>
       </div>
@@ -65,24 +65,19 @@
     </div><!-- container -->
   </div>
 </div>
+<div id='login_holder'></div>
 </script>
-
-
 <script type='text/template' id='tpl_login'>
-<div class='container'>
-  <div class='row'>
-    <div class='span4 offset4'>
-      <div style='padding:0 10px 0 10px;'>
-        <input id='user_id' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
-      </div>
-      <div style='padding:0 10px 0 10px;'>
-        <input id='password' type="password" placeholder="PASSWORD" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;font-size:12px;'></input>
-      </div>
-      <div style='overflow:hidden;padding:0 10px 10px 10px;'>
-        <a id='login_btn' class='btn fs_submit _r'>LOGIN</a>
-      </div>
-    </div>
-  </div><!-- row -->
+<div id='login' style='background-color:#ffffff;position:absolute;'>
+  <div style='padding:10px;'>
+    <input id='user_id' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
+  </div>
+  <div style='padding:0 10px 0 10px;'>
+    <input id='password' type="password" placeholder="PASSWORD" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;font-size:12px;'></input>
+  </div>
+  <div style='overflow:hidden;padding:0 10px 10px 10px;'>
+    <a id='login_btn' class='btn fs_submit _r'>LOGIN</a>
+  </div>
 </div>
 </script>
 

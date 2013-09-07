@@ -4,7 +4,129 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    var App, AppView, ArrivedFeeling, ArrivedFeelingView, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, CommentView, EmptyBodyView, FeelingsHolderView, FsView, HeaderLayout, Layout, LiveFeelings, LoginView, Me, MyFeeling, MyFeelingView, MyFeelings, MyFeelingsView, NavLayout, NewComment, NewCommentView, NewFeelingView, ReceivedFeeling, ReceivedFeelingView, ReceivedFeelings, ReceivedFeelingsView, Router, SignupView, Wookmark, router, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    var App, AppView, ArrivedFeeling, ArrivedFeelingView, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, CommentView, EmptyBodyView, FeelingsHolderView, FsView, HeaderLayout, Layout, LiveFeelings, LoginView, Me, MyFeeling, MyFeelingView, MyFeelings, MyFeelingsView, NavLayout, NewComment, NewCommentView, NewFeelingView, ReceivedFeeling, ReceivedFeelingView, ReceivedFeelings, ReceivedFeelingsView, Router, SignupView, Wookmark, gW, router, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    gW = {
+      w00: {
+        w: '두렵다',
+        c: '#556270'
+      },
+      w01: {
+        w: '무섭다',
+        c: ''
+      },
+      w02: {
+        w: '우울하다',
+        c: '#7f94b0'
+      },
+      w03: {
+        w: '기운이없다',
+        c: ''
+      },
+      w04: {
+        w: '무기력하다',
+        c: ''
+      },
+      w05: {
+        w: '의욕이없다',
+        c: ''
+      },
+      w06: {
+        w: '불안하다',
+        c: ''
+      },
+      w07: {
+        w: '외롭다',
+        c: ''
+      },
+      w08: {
+        w: '걱정된다',
+        c: ''
+      },
+      w09: {
+        w: '허전하다',
+        c: ''
+      },
+      w10: {
+        w: '삶이힘들다',
+        c: ''
+      },
+      w11: {
+        w: '한심하다',
+        c: ''
+      },
+      w12: {
+        w: '짜증난다',
+        c: ''
+      },
+      w13: {
+        w: '슬프다',
+        c: ''
+      },
+      w14: {
+        w: '절망스럽다',
+        c: ''
+      },
+      w15: {
+        w: '화난다',
+        c: ''
+      },
+      w16: {
+        w: '쓸쓸하다',
+        c: ''
+      },
+      w17: {
+        w: '초조하다',
+        c: ''
+      },
+      w18: {
+        w: '마음아프다',
+        c: ''
+      },
+      w19: {
+        w: '열등감느낀다',
+        c: ''
+      },
+      w20: {
+        w: '사랑스럽다',
+        c: ''
+      },
+      w21: {
+        w: '소중하다',
+        c: ''
+      },
+      w22: {
+        w: '설레다',
+        c: ''
+      },
+      w23: {
+        w: '즐겁다',
+        c: ''
+      },
+      w24: {
+        w: '기쁘다',
+        c: ''
+      },
+      w25: {
+        w: '뿌듯하다',
+        c: ''
+      },
+      w26: {
+        w: '만족스럽다',
+        c: ''
+      },
+      w27: {
+        w: '가슴벅차다',
+        c: ''
+      },
+      w28: {
+        w: '자신있다',
+        c: ''
+      },
+      w29: {
+        w: '기운차다',
+        c: ''
+      }
+    };
     Wookmark = (function() {
       function Wookmark(id) {
         this.id = id;
@@ -43,7 +165,6 @@
         '': 'index',
         'login': 'index',
         'logout': 'logout',
-        'signup': 'signup',
         'my_feelings': 'my_feelings',
         'received_feelings': 'received_feelings'
       };
@@ -67,7 +188,7 @@
         this.layout.nav.show(new AppView({
           model: this.models.app
         }));
-        return _.bindAll(this, 'index', 'logout', 'signup', 'draw_login', 'my_feelings', 'received_feelings');
+        return _.bindAll(this, 'index', 'logout', 'my_feelings', 'received_feelings');
       };
 
       Router.prototype.index = function() {
@@ -76,17 +197,13 @@
             trigger: true
           });
         } else {
-          return this.draw_login();
+          this.models.app.set({
+            user: null,
+            menu: '#menu_signup'
+          });
+          this.layout.header.show(new SignupView);
+          return this.layout.body.show(new EmptyBodyView);
         }
-      };
-
-      Router.prototype.draw_login = function() {
-        this.models.app.set({
-          user: null,
-          menu: '#menu_login'
-        });
-        this.layout.header.show(new LoginView);
-        return this.layout.body.show(new EmptyBodyView);
       };
 
       Router.prototype.logout = function() {
@@ -96,18 +213,9 @@
           dataType: 'json',
           context: this,
           success: function(data) {
-            return this.draw_login();
+            return window.location = '/';
           }
         });
-      };
-
-      Router.prototype.signup = function() {
-        this.models.app.set({
-          user: null,
-          menu: '#menu_signup'
-        });
-        this.layout.header.show(new SignupView);
-        return this.layout.body.show(new EmptyBodyView);
       };
 
       Router.prototype.my_feelings = function() {
@@ -165,7 +273,7 @@
 
       App.prototype.defaults = {
         user: null,
-        menu: '#menu_login'
+        menu: '#menu_signup'
       };
 
       App.prototype.url = '../sessions';
@@ -447,6 +555,10 @@
         return _ref18;
       }
 
+      AppView.prototype.events = {
+        'click #login_toggle': 'login'
+      };
+
       AppView.prototype.template = _.template($('#tpl_navbar').html());
 
       AppView.prototype.initialize = function() {
@@ -457,8 +569,13 @@
         AppView.__super__.render.call(this);
         this.$el.html(this.template(this.model.toJSON()));
         $('#fs_navbar').html(this.$el);
+        this.login_view = this.attach(new LoginView);
         $('#fs_navbar .fs_menu').removeClass('active');
         return $(this.model.get('menu')).addClass('active');
+      };
+
+      AppView.prototype.login = function() {
+        return this.login_view.toggle();
       };
 
       AppView.prototype.close = function() {
@@ -486,7 +603,18 @@
       LoginView.prototype.render = function() {
         LoginView.__super__.render.call(this);
         this.$el.html(this.template());
-        return $('#fs_header').html(this.$el);
+        return $('#login_holder').html(this.$el);
+      };
+
+      LoginView.prototype.toggle = function() {
+        var l, navbar, t;
+        console.log('asdf');
+        console.log($('#login').html());
+        navbar = $('#fs_navbar');
+        t = navbar.offset().top + navbar.outerHeight();
+        l = navbar.offset().left;
+        $('#login').css('top', t).css('left', l);
+        return $('#login').toggle();
       };
 
       LoginView.prototype.on_submit = function() {
@@ -910,15 +1038,15 @@
         this.$el.html(this.template(this.model.toJSON()));
         type = this.model.get('type');
         if (type) {
-          $('.icon-trans').css('background-color', '#cccccc');
+          this.$el.find('.icon-trans').css('background-color', '#cccccc');
           if (type === 'comment') {
-            $('.icon-comment').css('background-color', '#44f9b8');
+            this.$el.find('.icon-comment').css('background-color', '#44f9b8');
           }
           if (type === 'like') {
-            $('.icon-heart').css('background-color', '#44f9b8');
+            this.$el.find('.icon-heart').css('background-color', '#44f9b8');
           }
           if (type === 'forward') {
-            $('.icon-share-alt').css('background-color', '#44f9b8');
+            this.$el.find('.icon-share-alt').css('background-color', '#44f9b8');
           }
           this.$el.find('.inputarea').html(this.attach(new NewCommentView).el);
           if (!this.expanded) {
@@ -1103,10 +1231,10 @@
     $.ajaxSetup({
       statusCode: {
         401: function() {
-          return router.draw_login();
+          return window.location = '/';
         },
         403: function() {
-          return router.draw_login();
+          return window.location = '/';
         }
       }
     });

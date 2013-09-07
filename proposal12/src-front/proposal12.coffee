@@ -1,4 +1,37 @@
 $ ->
+  gW =
+    w00: { w: '두렵다', c: '#556270' }
+    w01: { w: '무섭다', c: '' }
+    w02: { w: '우울하다', c: '#7f94b0' }
+    w03: { w: '기운이없다', c: '' }
+    w04: { w: '무기력하다', c: '' }
+    w05: { w: '의욕이없다', c: '' }
+    w06: { w: '불안하다', c: '' }
+    w07: { w: '외롭다', c: '' }
+    w08: { w: '걱정된다', c: '' }
+    w09: { w: '허전하다', c: '' }
+    w10: { w: '삶이힘들다', c: '' }
+    w11: { w: '한심하다', c: '' }
+    w12: { w: '짜증난다', c: '' }
+    w13: { w: '슬프다', c: '' }
+    w14: { w: '절망스럽다', c: '' }
+    w15: { w: '화난다', c: '' }
+    w16: { w: '쓸쓸하다', c: '' }
+    w17: { w: '초조하다', c: '' }
+    w18: { w: '마음아프다', c: '' }
+    w19: { w: '열등감느낀다', c: '' }
+    w20: { w: '사랑스럽다', c: '' }
+    w21: { w: '소중하다', c: '' }
+    w22: { w: '설레다', c: '' }
+    w23: { w: '즐겁다', c: '' }
+    w24: { w: '기쁘다', c: '' }
+    w25: { w: '뿌듯하다', c: '' }
+    w26: { w: '만족스럽다', c: '' }
+    w27: { w: '가슴벅차다', c: '' }
+    w28: { w: '자신있다', c: '' }
+    w29: { w: '기운차다', c: '' }
+
+
   class Wookmark
     constructor: (@id) ->
     apply: ->
@@ -17,7 +50,6 @@ $ ->
       '': 'index'
       'login': 'index'
       'logout': 'logout'
-      'signup': 'signup'
       'my_feelings': 'my_feelings'
       'received_feelings': 'received_feelings'
     views: {}
@@ -37,27 +69,21 @@ $ ->
 
       @layout.nav.show new AppView(model: @models.app)
 
-      _.bindAll @, 'index', 'logout', 'signup', 'draw_login', 'my_feelings', 'received_feelings'
+      _.bindAll @, 'index', 'logout', 'my_feelings', 'received_feelings'
     index: ->
       if @models.app.get 'user'
         @navigate 'received_feelings', {trigger: true}
       else
-        @draw_login()
-    draw_login: ->
-      @models.app.set {user: null, menu: '#menu_login'}
-      @layout.header.show new LoginView
-      @layout.body.show new EmptyBodyView
+        @models.app.set {user: null, menu: '#menu_signup'}
+        @layout.header.show new SignupView
+        @layout.body.show new EmptyBodyView
     logout: ->
       $.ajax
         url: '../sessions'
         type: 'DELETE'
         dataType: 'json'
         context: @
-        success: (data) -> @draw_login()
-    signup: ->
-      @models.app.set {user: null, menu: '#menu_signup'}
-      @layout.header.show new SignupView
-      @layout.body.show new EmptyBodyView
+        success: (data) -> window.location = '/'
     my_feelings: ->
       @layout.header.show new NewFeelingView
         me: @models.me
@@ -92,7 +118,7 @@ $ ->
   class App extends Backbone.Model
     defaults:
       user: null
-      menu: '#menu_login'
+      menu: '#menu_signup'
     url: '../sessions'  
   class Me extends Backbone.Model
     defaults:
@@ -150,6 +176,7 @@ $ ->
 
   #--- VIEWS ---#
 
+  # rerender 시 render했던 모든 view를 destroy하는 컨셉
   class FsView extends Backbone.View
     attach: (view) ->
       @views.push view
@@ -169,15 +196,20 @@ $ ->
       @off()
 
   class AppView extends FsView
-    template: _.template($('#tpl_navbar').html())
+    events:
+      'click #login_toggle': 'login'
+    template: _.template $('#tpl_navbar').html()
     initialize: ->
       @model.on 'change', @render, @
     render: ->
       super()
       @$el.html @template(@model.toJSON())
       $('#fs_navbar').html @$el
+      @login_view = @attach new LoginView
       $('#fs_navbar .fs_menu').removeClass 'active'
       $(@model.get('menu')).addClass 'active'
+    login: ->
+      @login_view.toggle()
     close: ->
       super()
       @model.off 'change', @render
@@ -189,7 +221,15 @@ $ ->
     render: ->
       super()
       @$el.html @template()
-      $('#fs_header').html @$el
+      $('#login_holder').html @$el
+    toggle: ->
+      console.log 'asdf'
+      console.log $('#login').html()
+      navbar = $('#fs_navbar')
+      t = navbar.offset().top + navbar.outerHeight()
+      l = navbar.offset().left
+      $('#login').css('top', t).css('left', l)
+      $('#login').toggle()
     on_submit: ->
       $.ajax
         url: '../sessions'
@@ -388,13 +428,13 @@ $ ->
 
       type = @model.get 'type'
       if type
-        $('.icon-trans').css 'background-color', '#cccccc'
+        @$el.find('.icon-trans').css 'background-color', '#cccccc'
         if type == 'comment'
-          $('.icon-comment').css 'background-color', '#44f9b8'
+          @$el.find('.icon-comment').css 'background-color', '#44f9b8'
         if type == 'like'
-          $('.icon-heart').css 'background-color', '#44f9b8'
+          @$el.find('.icon-heart').css 'background-color', '#44f9b8'
         if type == 'forward'
-          $('.icon-share-alt').css 'background-color', '#44f9b8'
+          @$el.find('.icon-share-alt').css 'background-color', '#44f9b8'
         @$el.find('.inputarea').html @attach(new NewCommentView).el
         unless @expanded
           @$el.trigger 'refreshWookmark'
@@ -495,6 +535,6 @@ $ ->
   router = new Router
   $.ajaxSetup
     statusCode:
-      401: -> router.draw_login()
-      403: -> router.draw_login()
+      401: -> window.location = '/'
+      403: -> window.location = '/'
   Backbone.history.start()
