@@ -140,14 +140,10 @@ box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 .card>.comments2>.content{border-top:1px solid #dddddd;padding-top:10px;}
 
 #wordselect {
-  line-height:26px;color:#333333;overflow:hidden;font-size:13px;padding:14px 20px;
+  line-height:26px;overflow:hidden;font-size:12px;padding:14px 0;text-align:center
 }
 #wordselect>li {
-  margin-right:2px;padding:2px 4px;display:inline-block;cursor:pointer;
-    -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  border-radius: 4px;
+  box-sizing:border-box;width:90px;height:60px;margin:4px 2px;display:inline-block;cursor:pointer;padding-top:16px;text-align:center;
 }
 .wordcloud {
   margin:0px;padding:10px;width:100%;line-height:30px;text-align:justify;box-sizing:border-box;cursor:pointer;white-space:normal;

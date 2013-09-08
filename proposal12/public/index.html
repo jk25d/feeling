@@ -6,7 +6,7 @@
   <title>NANAV</title>
   <link rel="stylesheet" href="bootstrap/css/bootstrap.css" media='screen'>
   <style>
-    body {background-color:#6c6f78;padding-top:40px;padding-bottom:40px;font-size:13px;}
+    body {background-color:#222e42;padding-top:40px;padding-bottom:40px;font-size:13px;}
   </style>
   <link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" media='screen'>
   <link rel="stylesheet" href="css/proposal12.css" media='screen'>
@@ -21,7 +21,7 @@
 
 <body>
 
-<div style='background-image:url(img/back-billiard.jpg);background-repeat:no-repeat;background-size:cover;'>
+<div style='background-color:#161928;'>
   <div id='fs_navbar'></div>
   <div id='fs_header'></div>
 </div>
@@ -93,13 +93,13 @@
 <script type='text/template' id='tpl_new_feeling'>
 <div class='container'>
   <div class='row'>
-    <div class='span6 offset1' style='padding:20px 0;'>
+    <div class='span6 offset1' style='padding:20px 0;background-color:rgba(0,0,0,0.3)'>
       <div style='text-align:center'>
         <h1><strong>What is your Feeling now?</strong></h1>
       </div>
       <ul id='wordselect'>
         <% for(var wid in gW){ %>
-          <li class='fs_link' style='background-color:<%= gW[wid].c %>' word-id="<%= wid %>"><%=gW[wid].w%></li>
+          <li class='fs_link' style='background-color:rgba(0,0,0,0.7);color:<%= gW[wid].c %>' word-id="<%= wid %>"><%=gW[wid].w%></li>
         <% } %>
       </ul>
       <div class='content0-input'>
@@ -110,19 +110,19 @@
       </div>
     </div>
 
-    <div class='span4' style='background-color:rgba(0,0,0,0.7);padding:14px 20px;color:#bfbfbf'>
-      <div id='fs_header_me'></div>
+    <div class='span4' style='color:#bfbfbf'>
+      <div id='fs_header_me' style='padding:20px;background-color:rgba(0,0,0,0.7);'></div>
       
-      <div style='text-align:center'>
+      <div style='text-align:center;padding:20px;background-color:rgba(0,0,0,0.3)'>
         <h2 style='color:#fe005f;'>실시간 느낌</h2>
       </div>
-      <ul id='fs_header_live_feelings' class='wordcloud'>
+      <ul id='fs_header_live_feelings' class='wordcloud' style='background-color:rgba(0,0,0,0.3)'>
       </ul>
 
-      <div style='text-align:center;overflow:hidden;'>
+      <div style='text-align:center;overflow:hidden;padding:20px;background-color:rgba(0,0,0,0.7);'>
         <h2 style='color:#9472b0;'>비슷한 성향의 사람들</h2>
       </div>
-      <div id='fs_header_associates'>
+      <div id='fs_header_associates' style='background-color:rgba(0,0,0,0.7)'>
       </div>
     </div>
   </div><!-- row -->
