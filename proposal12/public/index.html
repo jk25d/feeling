@@ -57,7 +57,6 @@
           </li>
         <% }else{ %>
           <li id='menu_signup' class='fs_menu'><a href='#'>SIGN UP</a></li>
-          <li><button class='btn btn-small' id='login_toggle'>LOGIN</button></li>
         <% } %>
         </ul>
       </div>
@@ -65,19 +64,16 @@
     </div><!-- container -->
   </div>
 </div>
-<div id='login_holder'></div>
 </script>
 <script type='text/template' id='tpl_login'>
-<div id='login' style='background-color:#ffffff;position:absolute;display:none;z-index:1040'>
-  <div style='padding:10px;'>
-    <input id='user_id' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
-  </div>
-  <div style='padding:0 10px 0 10px;'>
-    <input id='password' type="password" placeholder="PASSWORD" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;font-size:12px;'></input>
-  </div>
-  <div style='overflow:hidden;padding:0 10px 10px 10px;'>
-    <a id='login_btn' class='btn fs_submit _r'>LOGIN</a>
-  </div>
+<div style='padding:10px;'>
+  <input id='user_id' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
+</div>
+<div style='padding:0 10px 0 10px;'>
+  <input id='password' type="password" placeholder="PASSWORD" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;font-size:12px;'></input>
+</div>
+<div style='overflow:hidden;padding:0 10px 10px 10px;'>
+  <a id='login_btn' class='btn fs_submit _r'>LOGIN</a>
 </div>
 </script>
 
@@ -102,21 +98,9 @@
         <h1><strong>What is your Feeling now?</strong></h1>
       </div>
       <ul id='wordselect'>
-        <li class='cc0' word-id="w00">외롭다</li>
-        <li class='cc1' word-id="w01">마음아프다</li>
-        <li class='cc2' word-id="w02">쓸쓸하다</li>
-        <li class='cc3' word-id="w03">기쁘다</li>
-        <li class='cc4' word-id="w04">기운차다</li>
-        <li class='cc5' word-id="w05">기운이없다</li>
-        <li class='cc6' word-id="w06">우울하다</li>
-        <li class='cc7' word-id="w07">만족스럽다</li>
-        <li class='cc0' word-id="w08">걱정된다</li>
-        <li class='cc1' word-id="w09">삶이힘들다</li>
-        <li class='cc2' word-id="w10">초조하다</li>
-        <li class='cc3' word-id="w11">허전하다</li>
-        <li class='cc4' word-id="w12">무섭다</li>
-        <li class='cc8' word-id="w13">두렵다</li>
-        <li class='cc9' word-id="w14">열등감느낀다</li>
+        <% for(var wid in gW){ %>
+          <li class='fs_link' style='background-color:<%= gW[wid].c %>' word-id="<%= wid %>"><%=gW[wid].w%></li>
+        <% } %>
       </ul>
       <div class='content0-input'>
         <div><textarea id='new_feeling_content' placeholder="What is your Feeling now?"></textarea></div>
@@ -132,8 +116,8 @@
       <div style='text-align:center'>
         <h2 style='color:#fe005f;'>실시간 느낌</h2>
       </div>
-      <div id='fs_header_live_feelings'>
-      </div>
+      <ul id='fs_header_live_feelings' class='wordcloud'>
+      </ul>
 
       <div style='text-align:center;overflow:hidden;'>
         <h2 style='color:#9472b0;'>비슷한 성향의 사람들</h2>
@@ -155,7 +139,7 @@
   <div class='_pad10'>
     <i class='icon-user icon-white'></i> <strong class='_rspc'><%= user_id %></strong>
     <h6 class='_rspc'>공감도 <%= similarity %></h6>
-    <span class='_r'><%= word_id %></span>
+    <span class='_r'><%= gW[word_id].w %></span>
   </div>
 </script>
 
@@ -168,23 +152,23 @@
 </script>
 
 <script type='text/template' id='tpl_received_feeling'>
-<div class='inner' style='background-color:#44F9B8;color:#333333;'>
+  <div class='inner' style='background-color:<%= gW[word_id].c %>;color:#333333;'>
   <div class='header' style='border-bottom:1px solid #333333'>
     <h3><strong class='_rspc' style=''>OCT 13</strong></h3>
     <h5 style=''>10:10</h5>
     <span class='_r'><%=user_id%></span>
   </div>
   <div class='content'>
-    <h4><strong class='_rspc10' style=''><%= word_id %></strong></h4>
+    <h4><strong class='_rspc10' style=''><%= gW[word_id].w %></strong></h4>
     <span><%= content %></span>
   </div>
 </div>
-<div class='comments' style='background-color:#45474c;color:#44F9B8'>
+<div class='comments' style='background-color:#45474c;color:<%= gW[word_id].c%>'>
   <div class='content'>
     <span class='_r'>
-      <span class='icon-heart icon-trans _rspc fs_link' style='background-color:#cccccc'></span>
-      <span class='icon-comment icon-trans _rspc fs_link' style='background-color:#cccccc'></span>
-      <span class='icon-share-alt icon-trans fs_link' style='background-color:#cccccc'></span>
+      <span class='icon-heart icon-trans _rspc fs_link' style='background-color:<%= gW[word_id].c%>'></span>
+      <span class='icon-comment icon-trans _rspc fs_link' style='background-color:<%= gW[word_id].c%>'></span>
+      <span class='icon-share-alt icon-trans fs_link' style='background-color:<%= gW[word_id].c%>'></span>
     </span>
   </div>
   <div class='inputarea'>
@@ -209,27 +193,27 @@
 
 <script type='text/template' id='tpl_arrived_feeling'>
 <div id='flipcard'>
-  <div>새 느낌이 도착했습니다.</div>
-  <div><span class='icon-heart icon-trans' style='background-color:#c6aae2'></span></div>
+  <div style='color:<%= gW[word_id].c %>'>새 느낌이 도착했습니다.</div>
+  <div><span class='icon-heart icon-trans' style='background-color:<%= gW[word_id].c %>'></span></div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_my_feeling'>
-<div class='inner fs_link' style='background-color:#44F9B8;color:#333333;'>
+<div class='inner fs_link' style='background-color:<%= gW[word_id].c %>;color:#333333;'>
   <div class='header' style='border-bottom:1px solid #333333'>
     <h3><strong class='_rspc' style=''>OCT 13</strong></h3>
     <h5 style=''><%= time %></h5>
   </div>
   <div class='content'>
-    <h4><strong class='_rspc10' style=''><%= word_id %></strong></h4>
+    <h4><strong class='_rspc10' style=''><%= gW[word_id].w %></strong></h4>
     <span><%= content %></span>
   </div>
 </div>
-<div class='comments fs_link' style='background-color:#45474c;color:#44F9B8'>
+<div class='comments fs_link' style='background-color:#45474c;color:<%= gW[word_id].c %>'>
   <div class='content'>
     <span class='_r'>
-      <span class='icon-heart icon-trans fs_link' style='background-color:#44f9b8'></span> <span class='_rspc'><%=n_hearts%></span>
-      <span class='icon-comment icon-trans fs_link' style='background-color:#44f9b8'></span> <span><%=n_comments%></span>
+      <span class='icon-heart icon-trans fs_link' style='background-color:<%= gW[word_id].c %>'></span> <span class='_rspc'><%=n_hearts%></span>
+      <span class='icon-comment icon-trans fs_link' style='background-color:<%= gW[word_id].c %>'></span> <span><%=n_comments%></span>
     </span>
   </div>
 </div>

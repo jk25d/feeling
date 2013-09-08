@@ -58,17 +58,10 @@ _daily_words = {}
 _float_feelings = {}
 _float_feeling_cur = 0
 _float_feeling_queue = []
-_words =
-  'w00': {desc: '외롭다', color: '#c6aae2'}
-  'w01': {desc: '쓸쓸하다', color: '#ffc6e2'}
-  'w02': {desc: '기쁘다', color: '#aaaae2'}
-  'w03': {desc: '기운차다', color: '#8daae2'}
-  'w04': {desc: '만족스럽다', color: '#ffff8d'}
-  'w05': {desc: '삶이힘들다', color: '#336699'}
-  'w06': {desc: '두렵다', color: '#ffc6c6'}
-  'w07': {desc: '초조하다', color: '#c6ffff'}
 
 _my_time=0
+_my_id=0
+_rcv_id=0
 
 
 #### ROUTES ####
@@ -80,15 +73,15 @@ app.get '/api/me', (req,res) ->
 
 app.get '/api/live_feelings', (req,res) ->
   res.json \
-    {'w03': 10, 'w04': 3, 'w07': 2, 'w01': 8}
+    {'w0': 10, 'w10': 3, 'w20': 2, 'w29': 8}
 
 app.get '/api/associates', (req,res) ->
   res.json \
-    [ {user_id: 'uuuuu', similarity: 1.7, word_id: 'w02'},
-      {user_id: 'ppp', similarity: 2.7, word_id: 'w03'},
-      {user_id: 'asdfef', similarity: 3.7, word_id: 'w04'},
-      {user_id: 'f73ur', similarity: 2.1, word_id: 'w06'},
-      {user_id: 'myidififi', similarity: 4.7, word_id: 'w02'}
+    [ {user_id: 'uuuuu', similarity: 1.7, word_id: rw()},
+      {user_id: 'ppp', similarity: 2.7, word_id: rw()},
+      {user_id: 'asdfef', similarity: 3.7, word_id: rw()},
+      {user_id: 'f73ur', similarity: 2.1, word_id: rw()},
+      {user_id: 'myidififi', similarity: 4.7, word_id: rw()}
     ]
 
 app.get '/api/my_feelings', (req,res) ->
@@ -96,7 +89,25 @@ app.get '/api/my_feelings', (req,res) ->
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    [ { id: 0, time: _my_time++, user_id: 'uuuuu', word_id: 'w03',\
+    [ { id: _my_id++, time: _my_time++, user_id: 'uuuuu', word_id: rw(),\
+        content: 'aefe aefef fa',\
+        comments: [
+          { type: 'heart', content: '블블블',\ 
+            user_id: 'asdf', time: 0, like: true},
+          { type: 'comment', content: '블블블asdf',\ 
+            user_id: 'qwer', time: 0, like: false}
+        ]
+      },
+      { id: _my_id++, time: _my_time++, user_id: 'uuuuu', word_id: rw(),\
+        content: 'aefe aefef fa',\
+        comments: [
+          { type: 'heart', content: '블블블',\ 
+            user_id: 'asdf', time: 0, like: true},
+          { type: 'comment', content: '블블블asdf',\ 
+            user_id: 'qwer', time: 0, like: false}
+        ]
+      },
+      { id: _my_id++, time: _my_time++, user_id: 'uuuuu', word_id: rw(),\
         content: 'aefe aefef fa',\
         comments: [
           { type: 'heart', content: '블블블',\ 
@@ -113,7 +124,7 @@ app.get '/api/my_feelings/:id', (req,res) ->
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    { id: 0, time: 0, user_id: 'uuuuu', word_id: 'w03',\
+    { id: _my_id++, time: 0, user_id: 'uuuuu', word_id: rw(),\
       content: 'aefe aefef fa',\
       comments: [
         { type: 'heart', content: '블블블',\ 
@@ -128,7 +139,17 @@ app.get '/api/received_feelings', (req,res) ->
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    [ { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+    [ { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
+        content: '블라블라블라',\
+        comment: { id: 0, type: 'heart', content: '블블블',\ 
+            user_id: 'asdf', time: 0, liked: 1}\
+      },
+      { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
+        content: '블라블라블라',\
+        comment: { id: 0, type: 'heart', content: '블블블',\ 
+            user_id: 'asdf', time: 0, liked: 1}\
+      },
+      { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
         content: '블라블라블라',\
         comment: { id: 0, type: 'heart', content: '블블블',\ 
             user_id: 'asdf', time: 0, liked: 1}\
@@ -141,7 +162,7 @@ app.get '/api/received_feelings/:id', (req,res) ->
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+    { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
       content: '블라블라블라',\
       comment: { id: 0, type: 'heart', content: '블블블',\ 
           user_id: 'asdf', time: 0, liked: 1}
@@ -153,7 +174,7 @@ app.get '/api/new_arrived_feelings', (req,res) ->
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    [ { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+    [ { id: 1, time: 0, user_id: 'f23rf', word_id: rw(),\
         content: '블라블라블라'
       }\
     ]
@@ -162,7 +183,7 @@ app.put '/api/new_arrived_feelings/:id', (req,res) ->
   id = req.params.id
   user = req.session.user
   res.json \
-    { id: 1, time: 0, user_id: 'f23rf', word_id: 'w03',\
+    { id: 1, time: 0, user_id: 'f23rf', word_id: rw(),\
       content: '블라블라블라',\
       comment: { id: 0, type: 'heart', content: '블블블',\ 
           user_id: 'asdf', time: 0, liked: 1}\
@@ -194,6 +215,7 @@ app.put '/api/my_feelings/:id/comments/:comment_id', (req,res) ->
 
 
 #### UTILS ####
+rw = -> "w#{Math.floor(Math.random()*29)}"
 
 remove = (arr, x) -> arr.filter (a) -> a != x
 between = (x, min, max) -> x >= min && x <= max

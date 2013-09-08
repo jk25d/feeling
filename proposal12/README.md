@@ -772,3 +772,11 @@ class Parent
 classs Child extends Parent
   constructor: -> @x.push 1
 parent.x=[1]
+
+set model in render()
+
+parent.html @$el in render()
+
+####
+
+      console.log $._data @$el.get(0), 'events'
