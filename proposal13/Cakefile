@@ -1,0 +1,34 @@
+{spawn,exec} = require 'child_process'
+try
+  which = require('which').sync
+catch err
+  if process.platform.match(/^win/)?
+    console.log 'WARNING: the which module is required for windows\ntry: npm install which'
+  which = null
+
+task 'build', 'compile source', -> build()
+
+task 'build-front', 'compile frontend coffee script', -> build_front()
+
+task 'run', 'compile front and back then run', -> 
+  build_front ->
+    build ->
+      launch 'node',['app'], ->
+        console.log ':)'
+
+build = (callback) ->
+  launch 'coffee', ['-o','.','-c','src'], ->
+    callback?()
+    console.log ':)'
+
+build_front = (callback) ->
+    launch 'coffee', ['-o','public/js','-c','src-front'], ->
+    callback?()
+    console.log ':)'
+
+launch = (cmd, options=[], callback) ->
+  cmd = which(cmd) if which
+  app = spawn cmd, options
+  app.stdout.pipe(process.stdout)
+  app.stderr.pipe(process.stderr)
+  app.on 'exit', (status) -> callback?() if status is 0
