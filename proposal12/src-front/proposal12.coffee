@@ -292,6 +292,10 @@ $ ->
     on_select_word: (e) ->
       @$el.find('#wordselect').find('.active').removeClass 'active'
       $(e.target).toggleClass 'active'
+      unless @expanded
+        @$el.find('.content0-input').css('display', 'block')
+        @expanded = true
+        router.layout.body.current_view.wookmark.apply()
     on_submit: ->
       $.ajax
         url: '../api/my_feelings'

@@ -746,7 +746,12 @@
 
       NewFeelingView.prototype.on_select_word = function(e) {
         this.$el.find('#wordselect').find('.active').removeClass('active');
-        return $(e.target).toggleClass('active');
+        $(e.target).toggleClass('active');
+        if (!this.expanded) {
+          this.$el.find('.content0-input').css('display', 'block');
+          this.expanded = true;
+          return router.layout.body.current_view.wookmark.apply();
+        }
       };
 
       NewFeelingView.prototype.on_submit = function() {
