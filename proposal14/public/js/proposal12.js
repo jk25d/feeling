@@ -144,8 +144,8 @@
           align: 'left',
           autoResize: true,
           container: $("#" + this.id),
-          offset: 16,
-          itemWidth: 226
+          offset: 12,
+          itemWidth: 260
         });
       };
 
