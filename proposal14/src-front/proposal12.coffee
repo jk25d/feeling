@@ -41,7 +41,7 @@ $ ->
         align: 'left'
         autoResize: true
         container: $("##{@id}")
-        offset: 12
+        offset: 16
         itemWidth: 260
 
   class Router extends Backbone.Router
@@ -85,6 +85,7 @@ $ ->
         success: (data) -> window.location = '/'
     my_feelings: ->
       @layout.header.show new NewFeelingView
+        me: @models.me
       @layout.body.show new MyFeelingsView(model: @models.my)
 
       #@models.app.fetch()
@@ -92,17 +93,15 @@ $ ->
 
       @models.my.fetch_more() if @models.my.length == 0
     received_feelings: ->
-      @layout.header.show new LiveStatusView
+      @layout.header.show new LiveFeelingsView
         me: @models.me
-        live_feelings: @models.live_feelings
-        associates: @models.associates      
+        model: @models.live_feelings
       @layout.body.show new ReceivedFeelingsView(model: @models.received)
       #@models.app.fetch()
       @models.app.set {menu: '#menu_received'}
 
       @models.me.fetch()
       @models.live_feelings.fetch()
-      @models.associates.fetch()
       @models.received.fetch_more() if @models.received.length == 0
       
   tpl_json = (model) ->
@@ -119,9 +118,12 @@ $ ->
     url: '../sessions'  
   class Me extends Backbone.Model
     defaults:
+      user_id: ''
       n_available_feelings: 0
     url: '../api/me'
-  class LiveFeelings extends Backbone.Model
+  class LiveFeeling extends Backbone.Model
+  class LiveFeelings extends Backbone.Collection
+    model: LiveFeeling
     url: '../api/live_feelings'
   class Associate extends Backbone.Model
   class Associates extends Backbone.Collection
@@ -250,49 +252,52 @@ $ ->
     on_submit: ->
       console.log 'signup submit'
 
-  class LiveStatusView extends FsView
-    template: _.template $('#tpl_live_status').html()
-    me_template: _.template $('#tpl_me').html()
-    associates_template: _.template $('#tpl_associates').html()
+  class MeView extends FsView
+    template: _.template $('#tpl_me').html()
     initialize: ->
-      @me = @options.me
-      @live_feelings = @options.live_feelings
-      @associates = @options.associates
-      @me.on 'sync', @render_me, @
-      @live_feelings.on 'sync', @render_live_feelings, @
-      @associates.on 'sync', @render_associates, @
+      @model.on 'sync', @render, @
     render: ->
       super()
-      @$el.html @template(tpl_json())
-    render_me: ->
-      console.log 'render_me'
-      @$el.find('#fs_header_me').html @me_template(@me.toJSON())
-    render_live_feelings: ->
-      console.log 'render_live_feelings'
-      el = @$el.find('#fs_header_live_feelings')
-      el.empty()
-      for word, n of @live_feelings.attributes
-        el.append "<li>#{gW[word].w}</li>"
-    render_associates: ->
-      console.log 'render_associates'
-      el = @$el.find('#fs_header_associates')
-      el.empty()
-      for m in @associates.models
-        el.append @associates_template(tpl_json(m))
+      @$el.html @template(@model.toJSON())    
     close: ->
       super()
-      @me.off 'sync', @render_me
-      @live_feelings.off 'sync', @render_live_feelings
-      @associates.off 'sync', @render_associates
+      @model.off 'sync', @render
+
+  class LiveFeelingView extends FsView
+    tagName: 'li'
+    template: _.template $('#tpl_live_feeling').html()
+    render: ->
+      super()
+      @$el.html @template(tpl_json(@model))
+
+  class LiveFeelingsView extends FsView
+    tagName: 'div'
+    template: _.template $('#tpl_live_status').html()
+    initialize: ->
+      @me = @options.me
+      @model.on 'sync', @render, @
+    render: ->
+      super()
+      @$el.html @template()
+      holder = @$el.find('#live_holder')
+      for m in @model.models
+        holder.append @attach(new LiveFeelingView(model: m)).el
+      @$el.find('.me_holder').html @attach(new MeView(model: @me)).el
+    close: ->
+      super()
+      @model.off 'sync', @render
 
   class NewFeelingView extends FsView
     events:
       'click .fs_submit': 'on_submit'
       'click #wordselect>li': 'on_select_word'
     template: _.template $('#tpl_new_feeling').html()
+    initialize: ->
+      @me = @options.me
     render: ->
       super()
       @$el.html @template(tpl_json())
+      @$el.find('.me_holder').html @attach(new MeView(model: @me)).el
     on_select_word: (e) ->
       @$el.find('#wordselect').find('.active').removeClass 'active'
       $(e.target).toggleClass 'active'
@@ -396,21 +401,10 @@ $ ->
       @model.off 'concat', @on_concat
       $(window).off 'scroll', @on_scroll
 
-  class FeelingsHolderView extends FsView
-    events:
-      'click .fs_more': 'on_more'
-    template: _.template $('#tpl_feelings').html()
-    render: ->
-      super()
-      @$el.html @template()
-      $('#fs_body').html @$el
-    on_more: (event) ->
-      @model.fetch_more()
-
   class NewCommentView extends FsView
     className: 'new_comment'
     events:
-      'click .fs_submit': 'on_submit'
+      'click .fs_link': 'on_submit'
     template: _.template $('#tpl_new_comment').html()
     render: ->
       super()

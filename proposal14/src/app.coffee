@@ -73,7 +73,20 @@ app.get '/api/me', (req,res) ->
 
 app.get '/api/live_feelings', (req,res) ->
   res.json \
-    {'w0': 10, 'w10': 3, 'w20': 2, 'w29': 8}
+    [ {user_id: 'uuuuu', similarity: 1.7, word_id: rw()},
+      {user_id: 'ppp', similarity: 2.7, word_id: rw()},
+      {user_id: 'myidififi', similarity: 4.7, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'asdfef', similarity: 3.7, word_id: rw()},
+      {user_id: 'f73ur', similarity: 2.1, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()}
+    ]
 
 app.get '/api/associates', (req,res) ->
   res.json \
