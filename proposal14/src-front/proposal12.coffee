@@ -130,6 +130,7 @@ $ ->
     url: '../api/associates'
 
   class Comment extends Backbone.Model
+  class Comments extends Backbone.Model
   class MyFeeling extends Backbone.Model
   class MyFeelings extends Backbone.Collection
     model: MyFeeling
@@ -335,41 +336,50 @@ $ ->
       super()
       @model.off 'change', @render
 
-  class MyFeelingView extends FsView
-    tagName: 'li'
-    events:
-      'click .inner': 'on_expand'
-      'click .comments': 'on_expand'
-    template: _.template $('#tpl_my_feeling').html()
+  class CommentsView extends FsView
+    template: _.template $('#tpl_comments').html()
     initialize: ->
       @model.on 'change', @render, @
     render: ->
       super()
-      @set_comments_count()
+      @$el.html @template(@model.toJSON())
+    close: ->
+      super()
+      @model.off 'change', @render
+
+  class MyFeelingView extends FsView
+    tagName: 'li'
+    events:
+      'click .inner': 'on_expand'
+    template: _.template $('#tpl_my_feeling').html()
+    initialize: ->
+      @model.on 'change', @render, @
+      @expand = false
+    render: ->
+      super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
       @$el.html @template(tpl_json(@model))
       if @expand
         console.log 'render comments'
-        holder = @$el.find('.comments')
+        console.log @model
+        holder = @$el.find('.talks')
         holder.empty()
-        for m in @model.get('comments')
-          console.log m
-          holder.append @attach(new CommentView(model: new Comment(m))).el
-        unless @expanded
-          @$el.trigger 'refreshWookmark'
-        @expanded = true
-    set_comments_count: ->
-      n_comments = n_hearts = 0
-      for c in @model.get('comments')
-        n_hearts++ if c.type == 'heart'
-        n_comments++ if c.type == 'comment'
-      @model.off 'change', @render
-      @model.set {n_comments: n_comments, n_hearts: n_hearts}
-      @model.on 'change', @render, @
+        for u,comments of @model.get('talks')
+          console.log "#{u}: #{comments}"
+          m =
+            me: router.models.me.user_id
+            shared: true
+            user_id: u
+            comments: comments
+          holder.append @attach(new CommentsView(model: new Comments(m))).el
+
+      if @on_expand_triggered
+        @$el.trigger 'refreshWookmark'
+      @on_expand_triggered = false
     on_expand: (event) ->
-      return if @expand
-      @expand = true
+      @on_expand_triggered = true
+      @expand = not @expand
       @render()
     close: ->
       super()
@@ -416,41 +426,36 @@ $ ->
   class ReceivedFeelingView extends FsView
     tagName: 'li'
     events:
-      'click .icon-comment': 'on_comment'
-      'click .icon-heart': 'on_like'
-      'click .icon-share-alt': 'on_forward'
+      'click .inner': 'on_expand'
     template: _.template $('#tpl_received_feeling').html()
     initialize: ->
       @model.on 'change', @render, @
+      @expand = false
     render: ->
       super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
       @$el.html @template(tpl_json(@model))
 
-      type = @model.get 'type'
-      if type
-        @$el.find('.icon-trans').css 'background-color', '#cccccc'
-        if type == 'comment'
-          @$el.find('.icon-comment').css 'background-color', '#44f9b8'
-        if type == 'like'
-          @$el.find('.icon-heart').css 'background-color', '#44f9b8'
-        if type == 'forward'
-          @$el.find('.icon-share-alt').css 'background-color', '#44f9b8'
-        @$el.find('.inputarea').html @attach(new NewCommentView).el
-        unless @expanded
-          @$el.trigger 'refreshWookmark'
-        @expanded = true
-      @
-    on_comment: (event) ->
-      console.log 'on_comment'
-      @model.set 'type', 'comment'
-    on_like: (event) ->
-      console.log 'on_comment'
-      @model.set 'type', 'like'
-    on_forward: (event) ->
-      console.log 'on_comment'
-      @model.set 'type', 'forward'
+      if @expand
+        console.log 'render comments'
+        holder = @$el.find('.talks')
+        holder.empty()
+        for u,comments of @model.get('talks')
+          m =
+            me: router.models.me.user_id
+            shared: true
+            user_id: u
+            comments: comments
+          holder.append @attach(new CommentsView(model: new Comments(m))).el
+
+      if @on_expand_triggered
+        @$el.trigger 'refreshWookmark'
+      @on_expand_triggered = false
+    on_expand: (event) ->
+      @on_expand_triggered = true
+      @expand = not @expand
+      @render()
     close: ->
       super()
       @model.off 'change', @render

@@ -70,6 +70,7 @@ app.get '/api/me', (req,res) ->
   res.json
     user_id: req.session.user
     n_available_feelings: 3
+    n_hearts: 100
 
 app.get '/api/live_feelings', (req,res) ->
   res.json \
@@ -81,6 +82,23 @@ app.get '/api/live_feelings', (req,res) ->
       {user_id: 'myidififi', similarity: 0, word_id: rw()},
       {user_id: 'asdfef', similarity: 3.7, word_id: rw()},
       {user_id: 'f73ur', similarity: 2.1, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'ppp', similarity: 2.7, word_id: rw()},
+      {user_id: 'myidififi', similarity: 4.7, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'asdfef', similarity: 3.7, word_id: rw()},
+      {user_id: 'f73ur', similarity: 2.1, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
+      {user_id: 'myidififi', similarity: 0, word_id: rw()},
       {user_id: 'myidififi', similarity: 0, word_id: rw()},
       {user_id: 'myidififi', similarity: 0, word_id: rw()},
       {user_id: 'myidififi', similarity: 0, word_id: rw()},
@@ -98,76 +116,122 @@ app.get '/api/associates', (req,res) ->
     ]
 
 app.get '/api/my_feelings', (req,res) ->
-  user = req.session.user
+  me = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    [ { id: _my_id++, time: _my_time++, user_id: 'uuuuu', word_id: rw(),\
+    [ { id: _my_id++,\
+        time: _my_time++,\
+        user_id: 'uuuuu',\
+        word_id: rw(),\
         content: 'aefe aefef fa',\
-        comments: [
-          { type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, like: true},
-          { type: 'comment', content: '블블블asdf',\ 
-            user_id: 'qwer', time: 0, like: false}
-        ]
+        like: 'asdf',\
+        talks:
+          'asdf' : [
+            { user_id: 'asdf', content: '블블블', time: 0},
+            { user_id: me, content: '블블블', time: 0},
+          ],
+          'qwer' : [
+            { user_id: 'qwer', content: '블블블', time: 0},
+            { user_id: me, content: '블블블', time: 0},
+          ]
       },
-      { id: _my_id++, time: _my_time++, user_id: 'uuuuu', word_id: rw(),\
+      { id: _my_id++,\
+        time: _my_time++,\
+        user_id: 'uuuuu',\
+        word_id: rw(),\
         content: 'aefe aefef fa',\
-        comments: [
-          { type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, like: true},
-          { type: 'comment', content: '블블블asdf',\ 
-            user_id: 'qwer', time: 0, like: false}
-        ]
+        talks:
+          'asdf' : [
+            { user_id: 'asdf', content: '블블블', time: 0},
+            { user_id: me, content: '블블블', time: 0},
+          ],
+          'qwer' : [
+            { user_id: 'qwer', content: '블블블', time: 0},
+            { user_id: me, content: '블블블', time: 0},
+          ]
       },
-      { id: _my_id++, time: _my_time++, user_id: 'uuuuu', word_id: rw(),\
+      { id: _my_id++,\
+        time: _my_time++,\
+        user_id: 'uuuuu',\
+        word_id: rw(),\
         content: 'aefe aefef fa',\
-        comments: [
-          { type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, like: true},
-          { type: 'comment', content: '블블블asdf',\ 
-            user_id: 'qwer', time: 0, like: false}
-        ]
+        talks:
+          'asdf' : [
+            { user_id: 'asdf', content: '블블블', time: 0},
+            { user_id: me, content: '블블블', time: 0},
+          ],
+          'qwer' : [
+            { user_id: 'qwer', content: '블블블', time: 0},
+            { user_id: me, content: '블블블', time: 0},
+          ]
       }
     ]
 
 app.get '/api/my_feelings/:id', (req,res) ->
   id = req.params.id
-  user = req.session.user
+  me = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    { id: _my_id++, time: 0, user_id: 'uuuuu', word_id: rw(),\
-      content: 'aefe aefef fa',\
-      comments: [
-        { type: 'heart', content: '블블블',\ 
-          user_id: 'asdf', time: 0, like: true},
-        { type: 'comment', content: '블블블asdf',\ 
-          user_id: 'qwer', time: 0, like: false}
+    id: _my_id++,\
+    time: _my_time++,\
+    user_id: 'uuuuu',\
+    word_id: rw(),\
+    content: 'aefe aefef fa',\
+    like: 'qwer',\
+    talks:
+      'asdf' : [
+        { user_id: 'asdf', content: '블블블', time: 0},
+        { user_id: me, content: '블블블', time: 0}
+      ],
+      'qwer' : [
+        { user_id: 'qwer', content: '블블블', time: 0},
+        { user_id: me, content: '블블블', time: 0}
       ]
-    }
 
 app.get '/api/received_feelings', (req,res) ->
-  user = req.session.user
+  me = req.session.user
   mon = req.params.skip || 0
   n = req.params.n || 3
+  f0 = 
+    id: _rcv_id++
+    time: 0
+    user_id: 'f23rf'
+    word_id: rw()
+    content: '블라블라블라'
+    like: me
+    talks: {}
+  f0['talks'][me] = [
+    { user_id: 'asdf', content: '블블블', time: 0},
+    { user_id: me, content: '블블블', time: 0}
+  ]
+  f1 = 
+    id: _rcv_id++
+    time: 0
+    user_id: 'f23rf'
+    word_id: rw()
+    content: '블라블라블라'
+    like: me
+    talks: {}
+  f1['talks'][me] = [
+    { user_id: 'asdf', content: '블블블', time: 0},
+    { user_id: me, content: '블블블', time: 0}
+  ]
+  f2 = 
+    id: _rcv_id++
+    time: 0
+    user_id: 'f23rf'
+    word_id: rw()
+    content: '블라블라블라'
+    like: me
+    talks: {}
+  f2['talks'][me] = [
+    { user_id: 'asdf', content: '블블블', time: 0},
+    { user_id: me, content: '블블블', time: 0}
+  ]
   res.json \
-    [ { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
-        content: '블라블라블라',\
-        comment: { id: 0, type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, liked: 1}\
-      },
-      { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
-        content: '블라블라블라',\
-        comment: { id: 0, type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, liked: 1}\
-      },
-      { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
-        content: '블라블라블라',\
-        comment: { id: 0, type: 'heart', content: '블블블',\ 
-            user_id: 'asdf', time: 0, liked: 1}\
-      }\
-    ]
+    [ f0, f1, f2 ]
 
 app.get '/api/received_feelings/:id', (req,res) ->
   id = req.params.id
@@ -175,10 +239,11 @@ app.get '/api/received_feelings/:id', (req,res) ->
   mon = req.params.skip || 0
   n = req.params.n || 3
   res.json \
-    { id: _rcv_id++, time: 0, user_id: 'f23rf', word_id: rw(),\
-      content: '블라블라블라',\
-      comment: { id: 0, type: 'heart', content: '블블블',\ 
-          user_id: 'asdf', time: 0, liked: 1}
+    { id: _rcv_id++,\
+      time: 0,\
+      user_id: 'f23rf',\
+      word_id: rw(),\
+      content: '블라블라블라'
     }
 
 app.get '/api/new_arrived_feelings', (req,res) ->
@@ -209,6 +274,7 @@ app.post '/api/my_feelings', (req,res) ->
   console.log "word_id: #{word_id}, content: #{content}"
   res.json {}
 
+# send
 app.post '/api/received_feelings/:id/comments', (req,res) ->
   id = req.params.id
   user = req.session.user
@@ -217,12 +283,23 @@ app.post '/api/received_feelings/:id/comments', (req,res) ->
   console.log "id: #{id}, type: #{type}, content: #{content}"
   res.json {}
 
-app.put '/api/my_feelings/:id/comments/:comment_id', (req,res) ->
+# my reply
+app.post '/api/my_feelings/:id/talks/:user/comments', (req,res) ->
   id = req.params.id
-  comment_id = req.params.comment_id
-  user = req.session.user
+  me = req.session.user
+  user = req.params.user
+  type = req.body.type        # like, comment, forward
+  content = req.body.content
+  console.log "id: #{id}, type: #{type}, content: #{content}"
+  res.json {}
+
+# last like
+app.put '/api/my_feelings/:id/talks/:user', (req,res) ->
+  id = req.params.id
+  user = req.params.user
+  me = req.session.user
   like = req.body.like
-  console.log "id: #{id}, comment_id: #{comment_id}, like: #{like}"
+  console.log "id: #{id}, user: #{user}, like: #{like}"
   res.json {}
 
 

@@ -5,14 +5,14 @@
   width: device-width;
 }
 @media (max-width: 320px) {
-  #wordselect > .what {width:300px;margin:0 auto;}
+  .what_spc {margin:0 auto;}
   .fs_container {width: 300px;margin:0 auto}
 }
 @media (min-width: 468px){
   .fs_container {width: 468px;margin:0 auto}
 }
 @media (min-width: 710px) {
-  #wordselect > .what {width:300px;margin:0 45px 0 15px;}
+  .what_spc {margin:0 45px 0 15px;}
   .fs_container {width: 710px;margin:0 auto}
 }
 @media (min-width: 952px) {
@@ -38,7 +38,7 @@
 /* common */
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color:#cfcfe8;padding:40px 0;margin:0;font-size:13px;
+  background-color:#cdcceb;padding:40px 0;margin:0;font-size:13px;
   }
 a {text-decoration: none;color:#ffffff;}
 textarea {background-color:#f9f9f9;color:#aaaaaa;font-size:12px;width:100%;box-sizing:border-box;resize:none;margin-bottom:6px;}
@@ -83,7 +83,9 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
   left: 0;
   z-index: 1030;
   margin-bottom: 0;
-  background-color:#2c2d38
+  background-color:#636380;
+  /*background-color:#2c2d38;
+  border-bottom:1px solid #6a6b7d;*/
 }
 .fs_menu {
   width:160px;
@@ -164,33 +166,21 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 .card>.comments>.content{line-height:18px;padding:16px 20px 20px 20px;font-size:13px;overflow:hidden;}
 .card>.comments2>.content{border-top:1px solid #dddddd;padding-top:10px;}
 
-#wordselect {
-  overflow:hidden;font-size:12px;padding:14px 0;
-}
-#wordselect>li {
-  box-sizing:border-box;cursor:pointer;font-size:11px;line-height:14px;
-}
-#wordselect > .ww {
-  color:#ffffff;
-}
-#wordselect > li.active > .ww,
-#wordselect > li:hover > .ww{
-  font-weight:bold;
-}
+.what{width:300px}
 .feeling{
-  margin:4px;overflow:hidden;color:#ffffff;float:left;
+  margin:4px;overflow:hidden;color:rgba(0,0,0,0.5);float:left;
 }
 .feeling > .wc {
   float:left;box-sizing:border-box;width:34px;height:34px;line-height:34px;overflow:hidden;
 }
 .feeling > .ww {
-  float:left;width:114px;padding-left:9px;line-height:34px;overflow:hidden;
+  float:left;width:114px;padding-left:9px;line-height:34px;overflow:hidden;font-size:12px;
 }
 .live_wc{
   float:left;box-sizing:border-box;width:40px;height:40px;line-height:40px;overflow:hidden;
 }
 .live_ww{
-  float:left;width:114px;padding:2px 0 0 9px;line-height:18px;overflow:hidden;font-size:12px;
+  float:left;box-sizing:border-box;width:92px;padding:4px 0 0 9px;line-height:16px;overflow:hidden;font-size:12px;
 }
 .me_holder{
   height:30px;background-color:#9097a6;overflow:hidden;padding-left:30px;

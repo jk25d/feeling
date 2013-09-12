@@ -91,7 +91,8 @@
   app.get('/api/me', function(req, res) {
     return res.json({
       user_id: req.session.user,
-      n_available_feelings: 3
+      n_available_feelings: 3,
+      n_hearts: 100
     });
   });
 
@@ -149,6 +150,74 @@
         user_id: 'myidififi',
         similarity: 0,
         word_id: rw()
+      }, {
+        user_id: 'ppp',
+        similarity: 2.7,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 4.7,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'asdfef',
+        similarity: 3.7,
+        word_id: rw()
+      }, {
+        user_id: 'f73ur',
+        similarity: 2.1,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
+      }, {
+        user_id: 'myidififi',
+        similarity: 0,
+        word_id: rw()
       }
     ]);
   });
@@ -180,8 +249,8 @@
   });
 
   app.get('/api/my_feelings', function(req, res) {
-    var mon, n, user;
-    user = req.session.user;
+    var me, mon, n;
+    me = req.session.user;
     mon = req.params.skip || 0;
     n = req.params.n || 3;
     return res.json([
@@ -191,147 +260,201 @@
         user_id: 'uuuuu',
         word_id: rw(),
         content: 'aefe aefef fa',
-        comments: [
-          {
-            type: 'heart',
-            content: '블블블',
-            user_id: 'asdf',
-            time: 0,
-            like: true
-          }, {
-            type: 'comment',
-            content: '블블블asdf',
-            user_id: 'qwer',
-            time: 0,
-            like: false
-          }
-        ]
+        like: 'asdf',
+        talks: {
+          'asdf': [
+            {
+              user_id: 'asdf',
+              content: '블블블',
+              time: 0
+            }, {
+              user_id: me,
+              content: '블블블',
+              time: 0
+            }
+          ],
+          'qwer': [
+            {
+              user_id: 'qwer',
+              content: '블블블',
+              time: 0
+            }, {
+              user_id: me,
+              content: '블블블',
+              time: 0
+            }
+          ]
+        }
       }, {
         id: _my_id++,
         time: _my_time++,
         user_id: 'uuuuu',
         word_id: rw(),
         content: 'aefe aefef fa',
-        comments: [
-          {
-            type: 'heart',
-            content: '블블블',
-            user_id: 'asdf',
-            time: 0,
-            like: true
-          }, {
-            type: 'comment',
-            content: '블블블asdf',
-            user_id: 'qwer',
-            time: 0,
-            like: false
-          }
-        ]
+        talks: {
+          'asdf': [
+            {
+              user_id: 'asdf',
+              content: '블블블',
+              time: 0
+            }, {
+              user_id: me,
+              content: '블블블',
+              time: 0
+            }
+          ],
+          'qwer': [
+            {
+              user_id: 'qwer',
+              content: '블블블',
+              time: 0
+            }, {
+              user_id: me,
+              content: '블블블',
+              time: 0
+            }
+          ]
+        }
       }, {
         id: _my_id++,
         time: _my_time++,
         user_id: 'uuuuu',
         word_id: rw(),
         content: 'aefe aefef fa',
-        comments: [
-          {
-            type: 'heart',
-            content: '블블블',
-            user_id: 'asdf',
-            time: 0,
-            like: true
-          }, {
-            type: 'comment',
-            content: '블블블asdf',
-            user_id: 'qwer',
-            time: 0,
-            like: false
-          }
-        ]
+        talks: {
+          'asdf': [
+            {
+              user_id: 'asdf',
+              content: '블블블',
+              time: 0
+            }, {
+              user_id: me,
+              content: '블블블',
+              time: 0
+            }
+          ],
+          'qwer': [
+            {
+              user_id: 'qwer',
+              content: '블블블',
+              time: 0
+            }, {
+              user_id: me,
+              content: '블블블',
+              time: 0
+            }
+          ]
+        }
       }
     ]);
   });
 
   app.get('/api/my_feelings/:id', function(req, res) {
-    var id, mon, n, user;
+    var id, me, mon, n;
     id = req.params.id;
-    user = req.session.user;
+    me = req.session.user;
     mon = req.params.skip || 0;
     n = req.params.n || 3;
     return res.json({
       id: _my_id++,
-      time: 0,
+      time: _my_time++,
       user_id: 'uuuuu',
       word_id: rw(),
       content: 'aefe aefef fa',
-      comments: [
-        {
-          type: 'heart',
-          content: '블블블',
-          user_id: 'asdf',
-          time: 0,
-          like: true
-        }, {
-          type: 'comment',
-          content: '블블블asdf',
-          user_id: 'qwer',
-          time: 0,
-          like: false
-        }
-      ]
+      like: 'qwer',
+      talks: {
+        'asdf': [
+          {
+            user_id: 'asdf',
+            content: '블블블',
+            time: 0
+          }, {
+            user_id: me,
+            content: '블블블',
+            time: 0
+          }
+        ],
+        'qwer': [
+          {
+            user_id: 'qwer',
+            content: '블블블',
+            time: 0
+          }, {
+            user_id: me,
+            content: '블블블',
+            time: 0
+          }
+        ]
+      }
     });
   });
 
   app.get('/api/received_feelings', function(req, res) {
-    var mon, n, user;
-    user = req.session.user;
+    var f0, f1, f2, me, mon, n;
+    me = req.session.user;
     mon = req.params.skip || 0;
     n = req.params.n || 3;
-    return res.json([
+    f0 = {
+      id: _rcv_id++,
+      time: 0,
+      user_id: 'f23rf',
+      word_id: rw(),
+      content: '블라블라블라',
+      like: me,
+      talks: {}
+    };
+    f0['talks'][me] = [
       {
-        id: _rcv_id++,
-        time: 0,
-        user_id: 'f23rf',
-        word_id: rw(),
-        content: '블라블라블라',
-        comment: {
-          id: 0,
-          type: 'heart',
-          content: '블블블',
-          user_id: 'asdf',
-          time: 0,
-          liked: 1
-        }
+        user_id: 'asdf',
+        content: '블블블',
+        time: 0
       }, {
-        id: _rcv_id++,
-        time: 0,
-        user_id: 'f23rf',
-        word_id: rw(),
-        content: '블라블라블라',
-        comment: {
-          id: 0,
-          type: 'heart',
-          content: '블블블',
-          user_id: 'asdf',
-          time: 0,
-          liked: 1
-        }
-      }, {
-        id: _rcv_id++,
-        time: 0,
-        user_id: 'f23rf',
-        word_id: rw(),
-        content: '블라블라블라',
-        comment: {
-          id: 0,
-          type: 'heart',
-          content: '블블블',
-          user_id: 'asdf',
-          time: 0,
-          liked: 1
-        }
+        user_id: me,
+        content: '블블블',
+        time: 0
       }
-    ]);
+    ];
+    f1 = {
+      id: _rcv_id++,
+      time: 0,
+      user_id: 'f23rf',
+      word_id: rw(),
+      content: '블라블라블라',
+      like: me,
+      talks: {}
+    };
+    f1['talks'][me] = [
+      {
+        user_id: 'asdf',
+        content: '블블블',
+        time: 0
+      }, {
+        user_id: me,
+        content: '블블블',
+        time: 0
+      }
+    ];
+    f2 = {
+      id: _rcv_id++,
+      time: 0,
+      user_id: 'f23rf',
+      word_id: rw(),
+      content: '블라블라블라',
+      like: me,
+      talks: {}
+    };
+    f2['talks'][me] = [
+      {
+        user_id: 'asdf',
+        content: '블블블',
+        time: 0
+      }, {
+        user_id: me,
+        content: '블블블',
+        time: 0
+      }
+    ];
+    return res.json([f0, f1, f2]);
   });
 
   app.get('/api/received_feelings/:id', function(req, res) {
@@ -345,15 +468,7 @@
       time: 0,
       user_id: 'f23rf',
       word_id: rw(),
-      content: '블라블라블라',
-      comment: {
-        id: 0,
-        type: 'heart',
-        content: '블블블',
-        user_id: 'asdf',
-        time: 0,
-        liked: 1
-      }
+      content: '블라블라블라'
     });
   });
 
@@ -414,13 +529,24 @@
     return res.json({});
   });
 
-  app.put('/api/my_feelings/:id/comments/:comment_id', function(req, res) {
-    var comment_id, id, like, user;
+  app.post('/api/my_feelings/:id/talks/:user/comments', function(req, res) {
+    var content, id, me, type, user;
     id = req.params.id;
-    comment_id = req.params.comment_id;
-    user = req.session.user;
+    me = req.session.user;
+    user = req.params.user;
+    type = req.body.type;
+    content = req.body.content;
+    console.log("id: " + id + ", type: " + type + ", content: " + content);
+    return res.json({});
+  });
+
+  app.put('/api/my_feelings/:id/talks/:user', function(req, res) {
+    var id, like, me, user;
+    id = req.params.id;
+    user = req.params.user;
+    me = req.session.user;
     like = req.body.like;
-    console.log("id: " + id + ", comment_id: " + comment_id + ", like: " + like);
+    console.log("id: " + id + ", user: " + user + ", like: " + like);
     return res.json({});
   });
 
