@@ -35,7 +35,10 @@
 
 
 /* common */
-
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color:#cdcceb;padding:40px 0;margin:0;font-size:13px;
+  }
 a {text-decoration: none;color:#ffffff;}
 textarea {background-color:#f9f9f9;color:#aaaaaa;font-size:12px;width:100%;box-sizing:border-box;resize:none;margin-bottom:6px;}
 input[type="text"], input[type='password'] {background-color:#f9f9f9;border: 1px solid #cccccc;font-size:12px;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;}
@@ -72,6 +75,17 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 
 /* common classes */
 
+.fs_navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+  margin-bottom: 0;
+  background-color:#636380;
+  /*background-color:#2c2d38;
+  border-bottom:1px solid #6a6b7d;*/
+}
 .fs_menu {
   width:160px;
   text-align:center;
@@ -82,7 +96,10 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 }
 
 .rd6 {
-
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
 }
 .rd10 {
   -moz-border-radius: 10px;
@@ -125,43 +142,16 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 	-moz-box-shadow:    7px 7px 7px rgba(50, 50, 50, 1);
 	box-shadow:         7px 7px 7px rgba(50, 50, 50, 1);
 }
-._sd1 {
+._sd0 {
 	-webkit-box-shadow: 0px 3px 7px 2px rgba(150,151,168,0.77);
 	-moz-box-shadow: 0px 3px 7px 2px rgba(150,151,168,0.77);
 	box-shadow: 0px 3px 7px 2px rgba(150,151,168,0.77);
 }
-._sd0 {
-	-webkit-box-shadow: 0px 3px 7px 2px rgba(96,103,105,0.77);
-	-moz-box-shadow: 0px 3px 7px 2px rgba(96,103,105,0.77);
-	box-shadow: 0px 3px 7px 2px rgba(96,103,105,0.77);
-}
 
 /* layout */
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  padding:40px 0;margin:0;font-size:13px;
-  background-color:#afafcc;
-  /*background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;*/
-  }
-#fs_navbar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 1030;
-  margin-bottom: 0;
-  background-color:#cdcceb;
-  /*background-color:#2c2d38;
-  border-bottom:1px solid #6a6b7d;*/
-}
-#fs_header{
-  background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;
-  border-bottom:3px solid #83839c
-}
-#fs_body {
-  padding:30px 10px;box-sizing:border-box;
-}
-.me_holder {height:0px;background-color:#606769;overflow:hidden;padding-left:30px;}
+/*#fs_header{background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;}*/
+#fs_body {padding:15px 10px;box-sizing:border-box;}
+.me_holder {height:40px;background-color:#72728f;border-bottom:2px solid #adadc7;overflow:hidden;padding-left:30px;}
 .fs_tiles {position:relative;}
 .card {width:260px;overflow:hidden;}
 .main>.header0 {padding:12px 10px 10px 10px;}
@@ -178,7 +168,7 @@ body {
 .card>.comments>.content{line-height:18px;padding:16px 20px 20px 20px;font-size:13px;overflow:hidden;}
 .card>.comments2>.content{border-top:1px solid #dddddd;padding-top:10px;}
 
-.talks {line-height:20px;padding:15px 10px;}
+.talks {line-height:20px;padding:15px 0;}
 
 .what{width:300px}
 .feeling{
@@ -189,9 +179,6 @@ body {
 }
 .feeling > .ww {
   float:left;width:114px;padding-left:9px;line-height:34px;overflow:hidden;font-size:12px;
-}
-.feeling .active{
-  background-color:rgba(0,0,0,0.5);
 }
 .live_wc{
   float:left;box-sizing:border-box;width:40px;height:40px;line-height:40px;overflow:hidden;

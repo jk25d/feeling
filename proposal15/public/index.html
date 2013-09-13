@@ -21,10 +21,9 @@
 <body>
 
 <!--div style='background-color:#8c8f98'-->
-<!--div style='background-color:#636380'-->
-<div>
+<div style='background-color:#636380'>
   <div id='fs_navbar'></div>
-  <div id='fs_header'></div>
+  <div id='fs_header''></div>
 </div>
 
 <div id='fs_body' class='fs_container' >
@@ -101,8 +100,8 @@
     </li>
 
     <% for(var wid in gW){ %>
-      <li class='fs_link feeling rd10' style='color:<%=gW[wid].c%>;background-color:rgba(0,0,0,0.3)' word-id="<%= wid %>">
-        <!--div class='wc' style='background-color:rgba(0,0,0,0.2);text-align:center'><i class='icon-heart icon-white'/></div-->
+      <li class='fs_link feeling' style='background-color:<%=gW[wid].c%>;' word-id="<%= wid %>">
+        <div class='wc' style='background-color:rgba(0,0,0,0.2);text-align:center'><i class='icon-heart icon-white'/></div>
         <div class='ww'><%=gW[wid].w%></div>
       </li>
     <% } %>
@@ -201,7 +200,7 @@
     <span><%= content %></span>
   </div>
 </div>
-<div style='background-color:<%= gW[word_id].c %>;color:rgba(0,0,0,0.4)'>
+<div style='background-color:<%= gW[word_id].c %>;color:#ffffff'>
   <div class='talks' style='background-color:rgba(0,0,0,0.2)'>
     <% for(var u in talks){ %>
     <span class='_rspc'><%=u%>: <%=talks[u].length%></span>
