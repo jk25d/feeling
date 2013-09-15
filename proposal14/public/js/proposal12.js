@@ -5,128 +5,99 @@
 
   $(function() {
     var App, AppView, ArrivedFeeling, ArrivedFeelingView, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, Feeling, FeelingView, FsView, HeaderLayout, Layout, LiveFeeling, LiveFeelingView, LiveFeelings, LiveFeelingsView, LoginView, Me, MyFeeling, MyFeelingView, MyFeelings, MyFeelingsView, MyStatusView, NavLayout, NewComment, NewCommentView, NewFeelingView, ReceivedFeeling, ReceivedFeelings, ReceivedFeelingsView, Router, SharedFeelings, SharedFeelingsView, SignupView, StatusLayout, Talk, TalkView, Tpl, Wookmark, gW, router, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref36, _ref37, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
-    gW = {
-      w0: {
+    gW = [
+      {
         w: '두렵다',
         c: '#556270'
-      },
-      w1: {
+      }, {
         w: '무섭다',
         c: '#556270'
-      },
-      w2: {
+      }, {
         w: '우울하다',
         c: '#7f94b0'
-      },
-      w3: {
+      }, {
         w: '기운이없다',
         c: '#938172'
-      },
-      w4: {
+      }, {
         w: '무기력하다',
         c: '#938172'
-      },
-      w5: {
+      }, {
         w: '의욕이없다',
         c: '#938172'
-      },
-      w6: {
+      }, {
         w: '불안하다',
         c: '#77cca4'
-      },
-      w7: {
+      }, {
         w: '외롭다',
         c: '#c3ff68'
-      },
-      w8: {
+      }, {
         w: '걱정된다',
         c: '#14b0d9'
-      },
-      w9: {
+      }, {
         w: '허전하다',
         c: '#14d925'
-      },
-      w10: {
+      }, {
         w: '삶이힘들다',
         c: '#e177b3'
-      },
-      w11: {
+      }, {
         w: '한심하다',
         c: '#ffc6e2'
-      },
-      w12: {
+      }, {
         w: '짜증난다',
         c: '#c6aae2'
-      },
-      w13: {
+      }, {
         w: '슬프다',
         c: '#77cca4'
-      },
-      w14: {
+      }, {
         w: '절망스럽다',
         c: '#d9cbb8'
-      },
-      w15: {
+      }, {
         w: '화난다',
         c: '#594944'
-      },
-      w16: {
+      }, {
         w: '쓸쓸하다',
         c: '#758fe6'
-      },
-      w17: {
+      }, {
         w: '초조하다',
         c: '#b5242e'
-      },
-      w18: {
+      }, {
         w: '마음아프다',
         c: '#29a9b3'
-      },
-      w19: {
+      }, {
         w: '열등감느낀다',
         c: '#e8175d'
-      },
-      w20: {
+      }, {
         w: '사랑스럽다',
         c: '#14b0d9'
-      },
-      w21: {
+      }, {
         w: '소중하다',
         c: '#c3ff68'
-      },
-      w22: {
+      }, {
         w: '설레다',
         c: '#14d925'
-      },
-      w23: {
+      }, {
         w: '즐겁다',
         c: '#e177b3'
-      },
-      w24: {
+      }, {
         w: '기쁘다',
         c: '#ffc6e2'
-      },
-      w25: {
+      }, {
         w: '뿌듯하다',
         c: '#c6aae2'
-      },
-      w26: {
+      }, {
         w: '만족스럽다',
         c: '#77cca4'
-      },
-      w27: {
+      }, {
         w: '가슴벅차다',
         c: '#d9cbb8'
-      },
-      w28: {
+      }, {
         w: '자신있다',
         c: '#f0ba3c'
-      },
-      w29: {
+      }, {
         w: '기운차다',
         c: '#c47147'
       }
-    };
+    ];
     Wookmark = (function() {
       function Wookmark(id) {
         this.id = id;
@@ -852,7 +823,7 @@
       LiveFeelingView.prototype.render = function() {
         LiveFeelingView.__super__.render.call(this);
         return this.$el.html(this.template(_.extend(this.model.toJSON(), {
-          gw: gW
+          gW: gW
         })));
       };
 
@@ -1005,7 +976,7 @@
         this.$el.removeClass('rd6').removeClass('_sd0').removeClass('card');
         this.$el.addClass('rd6').addClass('_sd0').addClass('card');
         this.$el.html(this.template(_.extend(this.model.toJSON(), {
-          gw: gW
+          gW: gW
         })));
         if (this.expand) {
           holder = this.$el.find('.talks');
@@ -1164,7 +1135,7 @@
         this.$el.removeClass('rd6').removeClass('_sd0').removeClass('card');
         this.$el.addClass('rd6').addClass('_sd0').addClass('card');
         this.$el.html(this.template(_.extend(this.model.toJSON(), {
-          gw: gW
+          gW: gW
         })));
         if (this.expand) {
           holder = this.$el.find('.talks');
@@ -1177,7 +1148,7 @@
               mine: this.model.get('own'),
               talk_user_id: u,
               comments: talk,
-              user: talk_user
+              user: this.model.get('talk_user')
             };
             holder.append(this.attach(new TalkView({
               model: new Talk(m)
@@ -1191,13 +1162,9 @@
       };
 
       FeelingView.prototype.on_expand = function(event) {
-        return this.model.fetch({
-          success: function() {
-            this.on_expand_triggered = true;
-            this.expand = !this.expand;
-            return this.render();
-          }
-        });
+        this.on_expand_triggered = true;
+        this.expand = !this.expand;
+        return this.model.fetch();
       };
 
       FeelingView.prototype.close = function() {
@@ -1317,7 +1284,7 @@
         if (this.model.length > 0) {
           this.$el.addClass('rd6').addClass('_sd0').addClass('card');
           this.$el.html(this.template(_.extend(this.model.at(0).toJSON(), {
-            gw: gW
+            gW: gW
           })));
         } else {
           this.$el.addClass('rd6').addClass('card');

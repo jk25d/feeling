@@ -1,35 +1,36 @@
 $ ->
-  gW =
-    w0: { w: '두렵다', c: '#556270' }
-    w1: { w: '무섭다', c: '#556270' }
-    w2: { w: '우울하다', c: '#7f94b0' }
-    w3: { w: '기운이없다', c: '#938172' }
-    w4: { w: '무기력하다', c: '#938172' }
-    w5: { w: '의욕이없다', c: '#938172' }
-    w6: { w: '불안하다', c: '#77cca4' }
-    w7: { w: '외롭다', c: '#c3ff68' }
-    w8: { w: '걱정된다', c: '#14b0d9' }
-    w9: { w: '허전하다', c: '#14d925' }
-    w10: { w: '삶이힘들다', c: '#e177b3' }
-    w11: { w: '한심하다', c: '#ffc6e2' }
-    w12: { w: '짜증난다', c: '#c6aae2' }
-    w13: { w: '슬프다', c: '#77cca4' }
-    w14: { w: '절망스럽다', c: '#d9cbb8' }
-    w15: { w: '화난다', c: '#594944' }
-    w16: { w: '쓸쓸하다', c: '#758fe6' }
-    w17: { w: '초조하다', c: '#b5242e' }
-    w18: { w: '마음아프다', c: '#29a9b3' }
-    w19: { w: '열등감느낀다', c: '#e8175d' }
-    w20: { w: '사랑스럽다', c: '#14b0d9' }
-    w21: { w: '소중하다', c: '#c3ff68' }
-    w22: { w: '설레다', c: '#14d925' }
-    w23: { w: '즐겁다', c: '#e177b3' }
-    w24: { w: '기쁘다', c: '#ffc6e2' }
-    w25: { w: '뿌듯하다', c: '#c6aae2' }
-    w26: { w: '만족스럽다', c: '#77cca4' }
-    w27: { w: '가슴벅차다', c: '#d9cbb8' }
-    w28: { w: '자신있다', c: '#f0ba3c' }
-    w29: { w: '기운차다', c: '#c47147' }
+  gW = [
+    { w: '두렵다', c: '#556270' },
+    { w: '무섭다', c: '#556270' },
+    { w: '우울하다', c: '#7f94b0' },
+    { w: '기운이없다', c: '#938172' },
+    { w: '무기력하다', c: '#938172' },
+    { w: '의욕이없다', c: '#938172' },
+    { w: '불안하다', c: '#77cca4' },
+    { w: '외롭다', c: '#c3ff68' },
+    { w: '걱정된다', c: '#14b0d9' },
+    { w: '허전하다', c: '#14d925' },
+    { w: '삶이힘들다', c: '#e177b3' },
+    { w: '한심하다', c: '#ffc6e2' },
+    { w: '짜증난다', c: '#c6aae2' },
+    { w: '슬프다', c: '#77cca4' },
+    { w: '절망스럽다', c: '#d9cbb8' },
+    { w: '화난다', c: '#594944' },
+    { w: '쓸쓸하다', c: '#758fe6' },
+    { w: '초조하다', c: '#b5242e' },
+    { w: '마음아프다', c: '#29a9b3' },
+    { w: '열등감느낀다', c: '#e8175d' },
+    { w: '사랑스럽다', c: '#14b0d9' },
+    { w: '소중하다', c: '#c3ff68' },
+    { w: '설레다', c: '#14d925' },
+    { w: '즐겁다', c: '#e177b3' },
+    { w: '기쁘다', c: '#ffc6e2' },
+    { w: '뿌듯하다', c: '#c6aae2' },
+    { w: '만족스럽다', c: '#77cca4' },
+    { w: '가슴벅차다', c: '#d9cbb8' },
+    { w: '자신있다', c: '#f0ba3c' },
+    { w: '기운차다', c: '#c47147' }
+  ]
 
 
   class Wookmark
@@ -312,7 +313,7 @@ $ ->
     template: Tpl.live_feeling
     render: ->
       super()
-      @$el.html @template(_.extend(@model.toJSON(), {gw: gW}))
+      @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
 
   class LiveFeelingsView extends FsView
     tagName: 'div'
@@ -381,7 +382,7 @@ $ ->
       super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
-      @$el.html @template(_.extend(@model.toJSON(), {gw: gW}))
+      @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
       if @expand
         holder = @$el.find('.talks')
         holder.empty()
@@ -453,7 +454,7 @@ $ ->
       super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
-      @$el.html @template(_.extend(@model.toJSON(), {gw: gW}))
+      @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
 
       if @expand
         holder = @$el.find('.talks')
@@ -464,18 +465,16 @@ $ ->
             mine: @model.get('own')
             talk_user_id: u
             comments: talk
-            user: talk_user
+            user: @model.get('talk_user')
           holder.append @attach(new TalkView(model: new Talk(m))).el
 
       if @on_expand_triggered
         @$el.trigger 'refreshWookmark'
       @on_expand_triggered = false
     on_expand: (event) ->
-      @model.fetch
-        success: ->
-          @on_expand_triggered = true
-          @expand = not @expand
-          @render()
+      @on_expand_triggered = true
+      @expand = not @expand
+      @model.fetch()
     close: ->
       super()
       @model.off 'change', @render
@@ -530,7 +529,7 @@ $ ->
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       if @model.length > 0
         @$el.addClass('rd6').addClass('_sd0').addClass('card')
-        @$el.html @template(_.extend(@model.at(0).toJSON(), {gw: gW}))
+        @$el.html @template(_.extend(@model.at(0).toJSON(), {gW: gW}))
       else
         @$el.addClass('rd6').addClass('card')
         @$el.html @holder_template(router.models.me.toJSON())

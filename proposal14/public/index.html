@@ -115,7 +115,7 @@
 </script>
 
 <script type='text/template' id='tpl_live_feeling'>
-<div class='feeling' style='background-color:<%=gW[word_id].c%>;margin:3px;'>
+<div class='feeling' style='background-color:<%=gW[word].c%>;margin:3px;'>
   <div class='live_wc'>
     <img class='transparent' src='../img/profile.jpg' style='max-width: 100%;min-width:100%;min-height:100%;display:block;'></img>
   </div>
@@ -149,7 +149,7 @@
   <div class='_pad10'>
     <i class='icon-user icon-white'></i> <strong class='_rspc'><%= user_id %></strong>
     <h6 class='_rspc'>공감도 <%= similarity %></h6>
-    <span class='_r'><%= gW[word_id].w %></span>
+    <span class='_r'><%= gW[word].w %></span>
   </div>
 </script>
 
@@ -164,29 +164,29 @@
 
 <script type='text/template' id='tpl_arrived_holder'>
 <div id='receive_arrived'>
-  <div class='fs_link rd10' style='border:6px solid #6a6b7d;color:#6a6b7d;height:214px;line-height:214px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
+  <div class='fs_link rd10' style='border:6px solid #6a6b7d;color:#6a6b7d;height:210px;line-height:210px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_arrived_feeling'>
-<div id='flipcard' style='color:#ffffff;background-color:<%= gW[word_id].c %>'>
+<div id='flipcard' style='color:#ffffff;background-color:<%= gW[word].c %>'>
   <div>새 느낌이 도착했습니다.</div>
   <div><span class='icon-heart icon-white'></span></div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_my_feeling'>
-<div class='inner fs_link' style='background-color:<%= gW[word_id].c %>;color:#ffffff;'>
+<div class='inner fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
   <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
     <h3><strong class='_rspc' style=''>OCT 13</strong></h3>
     <h5 style=''><%= time %></h5>
   </div>
   <div class='content'>
-    <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word_id].w %></strong></h4>
+    <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word].w %></strong></h4>
     <span><%= content %></span>
   </div>
 </div>
-<div style='background-color:<%= gW[word_id].c %>;color:rgba(0,0,0,0.4)'>
+<div style='background-color:<%= gW[word].c %>;color:rgba(0,0,0,0.4)'>
   <div class='talks' style='background-color:rgba(0,0,0,0.2)'>
     <% for(var u in talks){ %>
     <span class='_rspc'><%=u%>: <%=talks[u].length%></span>
@@ -196,20 +196,20 @@
 </script>
 
 <script type='text/template' id='tpl_feeling'>
-  <div class='inner fs_link' style='background-color:<%= gW[word_id].c %>;color:#ffffff;'>
+  <div class='inner fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
   <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
     <h3><strong class='_rspc' style=''><%= time %></strong></h3>
     <span class='_r'><%=user.name%></span>
   </div>
   <div class='content'>
-    <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word_id].w %></strong></h4>
+    <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word].w %></strong></h4>
     <span><%= blah %></span>
   </div>
 </div>
-<div style='background-color:<%= gW[word_id].c %>;color:#ffffff'>
+<div style='background-color:<%= gW[word].c %>;color:#ffffff'>
   <ul class='talks' style='background-color:rgba(0,0,0,0.2)'>
-    <li>human-icon <%= n_talk_users%></li>
-    <li>msg-icon <%= n_talk_msgs%></li>
+    <li><i class='icon-user icon-white'/> <%= n_talk_users%></li>
+    <li><i class='icon-comment icon-white'/> <%= n_talk_msgs%></li>
   </ul>
 </div>
 </script>
@@ -217,7 +217,7 @@
 <script type='text/template' id='tpl_talk'>
 <div style='border-bottom:1px solid rgba(0,0,0,0.3)'>
   <div>
-    <img class='transparent' src='<%=user[talk_user_id].img%>' style='max-width: 100%;min-width:100%;min-height:100%;display:block;'></img>
+    <i class='profile' style='background-image:url(<%=user[talk_user_id].img%>)'></i>
     <span><%=user[talk_user_id].name%></span>
     <% if(mine && share) { %>
     <i class='icon-heart icon-white fs_link'></i>

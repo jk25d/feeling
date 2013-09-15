@@ -127,6 +127,7 @@ class Feeling
     x = @extend(user_id)
     unless @has_own_perm(user_id)
       x.talks[user_id] = @talks[user_id]
+    u = g_users[user_id]
     x.talk_user = {}
     x.talk_user[u.id] = {name: u.name, img: u.img}
     for tuid, comments of x.talks
@@ -147,7 +148,8 @@ class Feeling
     @talks = {}
 
 class Dispatcher
-  @WAIT_TIME: 30000
+  @WAIT_TIME: 5000
+  @INTERVAL: 5000
   user_que: []
   item_que: []
   constructor: ->
@@ -155,37 +157,60 @@ class Dispatcher
       register u if u.arrived_feelings.length == 0
     @user_que.sort (a,b) -> a.wait_time - b.wait_time
   schedule: ->
-    console.log '## schedule started'
-    for u in g_dispatcher.user_que
-      break if now() - u.wait_time < Dispatcher.WAIT_TIME
-      item = g_dispatcher.select_item(u)
-      if item
-        u.arrived_feelings.push item
-        g_dispatcher.user_que.unshift()
-    setTimeout g_dispatcher.schedule, 10000
-    console.log '## schedule done'
-  select_item: (user) ->
-    candidates = []
-    for i in [0..29]
-      fid = @item_que.unshift()
-      break unless fid
-      item = g_feelings[fid]
-      unless item && item.sharable()
-        i--
+    console.log 'start schedule'
+    console.log 'start schedule'
+    hungry_users = []
+    while g_dispatcher.user_que.length > 0
+      uid = g_dispatcher.user_que.shift()
+      u = g_users[uid]
+      continue unless u
+      if now() - u.wait_time < Dispatcher.WAIT_TIME
+        hungry_users.push uid
+        break
+      item = g_dispatcher.select_item(uid)
+      unless item
+        hungry_users.push uid
         continue
-      @item_que.push item
-      if item.has_group_perm(user)
-        continue 
-        i--
-      for n in [0..item.weight(user)]
+      u.arrived_feelings.push item.id
+    while hungry_users.length > 0
+      g_dispatcher.user_que.unshift hungry_users.pop()
+    setTimeout g_dispatcher.schedule, Dispatcher.INTERVAL
+    g_dispatcher.log()
+  select_item: (uid) ->
+    candidates = []
+    n_candi = 0
+    reusable = []
+    while @item_que.length > 0 && n_candi < 30
+      fid = @item_que.shift()
+      item = g_feelings[fid]
+      continue unless item && item.sharable()
+      reusable.push fid
+      continue if item.has_group_perm(uid)
+      for n in [0..item.weight(uid)]
         candidates.push item
+      n_candi++
+    while reusable.length > 0
+      @item_que.push reusable.shift()
     return if candidates.length == 0 then null else \
-      candidates[Math.random()*candidates.length]
+      candidates[rand(0,candidates.length-1)]
   register_item: (item) ->
-    @item_que.push item
+    @item_que.push item.id
   register: (user) ->
     @user_que.push user.id
     user.wait_time = now()
+  log: ->
+    console.log "name, hearts, arrived, my, rcv"
+    for uid, u of g_users
+      console.log "#{u.name}, #{u.n_hearts}, #{u.arrived_feelings.length}, #{u.my_feelings.length}, #{u.rcv_feelings.length}"
+    users = []
+    for uid in g_dispatcher.user_que
+      users.push JSON.stringify(g_users[uid].name)
+    console.log "userQ: #{users.join()}"
+    items = []
+    for fid in g_dispatcher.item_que
+      items.push fid
+    console.log "itemQ: #{items.join()}"
+
 
 class User
   constructor: (@name, @img, @email, @password) ->
@@ -208,11 +233,9 @@ class User
       u.rcv_shared = @rcv_shared().length
     u
   arrived_to_rcv: (id) ->
-    fid = @arrived_feelings[0]
-    return false unless fid != id
+    fid = @arrived_feelings.pop()
     @arrived_feelings = []
     g_dispatcher.register @
-    true
   my_shared: ->
     r = []
     for fid in @my_feelings
@@ -374,7 +397,7 @@ app.put '/api/arrived_feelings/:id', (req,res) ->
     res.send 406, "This feeling is no longer sharable."
     return
   f.add_to_group(me)
-  res.json {}
+  res.json f.extend_full me.id
 
 
 # UTILS
@@ -387,6 +410,8 @@ min = (a,b) ->
 remove_item = (arr, i) ->
   arr.splice(i, 1) if i > -1
 now = -> new Date().getTime()
+rand = (s,e) ->
+  Math.round(Math.random()*e)+s
 
 g_dispatcher = new Dispatcher()
 g_dispatcher.schedule()
@@ -400,15 +425,16 @@ g_users[u2.id] = u2
 
 auto_feeling= ->
   console.log '## auto fill started'
-  word = Math.random*30
+  word = rand(0,29)
   a = []
-  for n in [0..Math.random*10]
-    a.push 'blah '
-  f = new Feeling(u0, true, word, a.join())
+  for n in [0..rand(0,9)]
+    a.push 'blah'
+  f = new Feeling(u0, true, word, a.join(''))
   g_feelings[f.id] = f  
   setTimeout auto_feeling, 10000
   console.log '## auto fill done'
 auto_feeling()
+
 app.listen '3333'
 console.log 'listening on 3333'
 
