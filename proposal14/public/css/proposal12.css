@@ -6,23 +6,20 @@
 }
 @media (max-width: 320px) {
   .what_spc {margin:0 auto;}
-  .fs_container {width: 280px;margin:0 auto}
+  .fs_container {width: 292px;margin:0 auto}
 }
-@media (min-width: 576px) {
+@media (min-width: 588px) {
   .what_spc {margin:0 45px 0 15px;}
-  .fs_container {width: 556px;margin:0 auto}
+  .fs_container {width: 568px;margin:0 auto}
 }
-@media (min-width: 862px) {
-  .fs_container {width: 842px;margin:0 auto}
+@media (min-width: 864px) {
+  .fs_container {width: 844px;margin:0 auto}
 }
-@media (min-width: 1128px) {
-  .fs_container {width: 1108px;margin:0 auto}
+@media (min-width: 1140px) {
+  .fs_container {width: 1120px;margin:0 auto}
 }
-@media (min-width: 1404px) {
-  .fs_container {width: 1384px;margin:0 auto}
-}
-@media (min-width: 1680px) {
-  .fs_container {width: 1660px;margin:0 auto}
+@media (min-width: 1416px) {
+  .fs_container {width: 1396px;margin:0 auto}
 }
 
 
@@ -78,7 +75,7 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
   display:inline-block;
 }
 .fs_menu.active {
-  background-color:#545470
+  background-color:#0b0d09;
 }
 
 .rd6 {
@@ -114,7 +111,7 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
   line-height: 20px;
   color: #ffffff;
   text-align: center;
-  background-color:#2c2d38;
+  background-color:#161711;
     -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   -khtml-border-radius: 5px;
@@ -131,9 +128,9 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 	box-shadow: 0px 3px 7px 2px rgba(150,151,168,0.77);
 }
 ._sd0 {
-	-webkit-box-shadow: 0px 3px 7px 2px rgba(96,103,105,0.77);
-	-moz-box-shadow: 0px 3px 7px 2px rgba(96,103,105,0.77);
-	box-shadow: 0px 3px 7px 2px rgba(96,103,105,0.77);
+	-webkit-box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);
+	-moz-box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);
+	box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);
 }
 
 /* layout */
@@ -142,6 +139,7 @@ body {
   padding:40px 0;margin:0;font-size:13px;
   background-color:#afafcc;
   /*background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;*/
+  background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-attachment:fixed;background-position:left top;background-size:cover;
   }
 #fs_navbar {
   position: fixed;
@@ -150,18 +148,28 @@ body {
   left: 0;
   z-index: 1030;
   margin-bottom: 0;
-  background-color:#cdcceb;
+  background-color:#020303;
+  /*background-color:#2c2d38;*/
   /*background-color:#2c2d38;
   border-bottom:1px solid #6a6b7d;*/
 }
 #fs_header{
-  background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;
-  border-bottom:3px solid #83839c
+  /*background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;*/
+  /*border-bottom:3px solid #83839c*/
+}
+#fs_status{
+background-color:rgba(0,0,0,0.4)
 }
 #fs_body {
-  padding:30px 10px;box-sizing:border-box;
+  padding:16px;margin-top:20px;box-sizing:border-box;
+  background-color:rgba(0,0,0,0.4);
+  /*background-color:#141105;*/
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -khtml-border-radius: 8px;
+  border-radius: 8px;
 }
-.me_holder {height:0px;background-color:#606769;overflow:hidden;padding-left:30px;}
+.me_holder {height:40px;overflow:hidden;padding-left:30px;}
 .fs_tiles {position:relative;}
 .card {width:260px;overflow:hidden;}
 .main>.header0 {padding:12px 10px 10px 10px;}
@@ -182,7 +190,7 @@ body {
 
 .what{width:300px}
 .feeling{
-  margin:4px;overflow:hidden;color:rgba(0,0,0,0.5);float:left;
+  margin:4px;overflow:hidden;float:left;
 }
 .feeling > .wc {
   float:left;box-sizing:border-box;width:34px;height:34px;line-height:34px;overflow:hidden;
@@ -198,6 +206,22 @@ body {
 }
 .live_ww{
   float:left;box-sizing:border-box;width:92px;padding:4px 0 0 9px;line-height:16px;overflow:hidden;font-size:12px;
+}
+.profile{
+  width:30px;height:30px;
+  display:inline-block;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+}
+.myprofile{
+  background-image:url(../img/profile.jpg);
+  background-size:30px 30px;
+  background-repeat:no-repeat;
+  background-color:#020303;
+}
+.otherprofile{
 }
 img.transparent {
     filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");

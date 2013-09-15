@@ -20,13 +20,9 @@
 
 <body>
 
-<!--div style='background-color:#8c8f98'-->
-<!--div style='background-color:#636380'-->
-<div>
-  <div id='fs_navbar'></div>
-  <div id='fs_header'></div>
-</div>
-
+<div id='fs_navbar'></div>
+<div id='fs_header'></div>
+<div id='fs_status'></div>
 <div id='fs_body' class='fs_container' >
 </div>
 
@@ -46,7 +42,8 @@
     <div style='float:left;width:160px;' ><a href='#'>FEELING SHARE</a></div>
     <div style='float:left'>
       <ul>
-      <% if(user){ %>
+      <% if(menu != '#menu_signup'){ %>
+        <li id='menu_share' class='fs_menu'><a href='#shared_feelings'>SHARED FEELINGS</a></li>
         <li id='menu_my' class='fs_menu'><a href='#my_feelings'>MY FEELINGS</a></li>
         <li id='menu_received' class='fs_menu'><a href='#received_feelings'>RECEIVED</a></li>
         <li class="dropdown _r" style='display:inline-block'>
@@ -68,7 +65,7 @@
 <script type='text/template' id='tpl_login'>
 <div style='width:300px;margin:0 auto'>
 <div style='padding:10px;'>
-  <input id='user_id' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
+  <input id='email' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
 </div>
 <div style='padding:0 10px 0 10px;'>
   <input id='password' type="password" placeholder="PASSWORD" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;font-size:12px;'></input>
@@ -97,11 +94,11 @@
 
   <ul id='wordselect'>
     <li class='what what_spc' style='text-align:left;float:left;height:auto;color:#9996a8;border:none;margin-left:20px;'>
-      <h1><strong>What is your Feeling now?</strong></h1>
+      <h1><strong>How are you Feeling now?</strong></h1>
     </li>
 
     <% for(var wid in gW){ %>
-      <li class='fs_link feeling rd10' style='color:<%=gW[wid].c%>;background-color:rgba(0,0,0,0.3)' word-id="<%= wid %>">
+      <li class='fs_link feeling rd10' style='color:<%=gW[wid].c%>;background-color:rgba(0,0,0,0.4);' word-id="<%= wid %>">
         <!--div class='wc' style='background-color:rgba(0,0,0,0.2);text-align:center'><i class='icon-heart icon-white'/></div-->
         <div class='ww'><%=gW[wid].w%></div>
       </li>
@@ -111,11 +108,10 @@
   <div class='content0-input' style='display:none;padding:0 20px;'>
     <div><textarea id='new_feeling_content' placeholder="What is your Feeling now?"></textarea></div>
     <div class='_ofh' style='text-align:center'>
-      <a id='new_feeling_submit' class='btn fs_submit' href='#myModal' data-toggle='modal'>작성하기</a>
+      <a id='new_feeling_submit' class='btn fs_submit' data-toggle='modal'>작성하기</a>
     </div>
   </div>
 </div>
-<div class='me_holder'></div>
 </script>
 
 <script type='text/template' id='tpl_live_feeling'>
@@ -139,10 +135,14 @@
 <div class='me_holder'></div>
 </script>
 
-<script type='text/template' id='tpl_me'>
-  <div style='float:left;color:#ffffff;line-height:30px;'>
-    <span><%= user_id %></span>
-  </div>
+<script type='text/template' id='tpl_my_status'>
+<ul style='overflow:hidden;color:#83839c;padding-left:30px;'>
+  <li style='float:left;margin:10px;'><i class='profile myprofile'></i></li>
+  <li style='float:left;margin:10px;'><%= name %></li>
+  <li style='float:left;margin:10px;'>HEART: <%= n_hearts %></li>
+  <li style='float:left;margin:10px;'>내가 공유한 느낌: <%= my_shared %></li>
+  <li style='float:left;margin:10px;'>나에게 온 느낌: <%= rcv_shared %></li>
+</ul>
 </script>
 
 <script type='text/template' id='tpl_associates'>
@@ -151,14 +151,6 @@
     <h6 class='_rspc'>공감도 <%= similarity %></h6>
     <span class='_r'><%= gW[word_id].w %></span>
   </div>
-</script>
-
-<script type='text/template' id='tpl_feelings'>
-<div id='fs_holder'>
-</div>
-<div style='background-color:rgba(0,0,0,0.7)'>
-  <a class='fs_more fs_link'>more</a>
-</div>
 </script>
 
 <script type='text/template' id='tpl_new_comment'>
@@ -175,13 +167,6 @@
   <div class='fs_link rd10' style='border:6px solid #6a6b7d;color:#6a6b7d;height:214px;line-height:214px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
 </div>
 </script>
-
-<!--script type='text/template' id='tpl_arrived_feeling'>
-<div id='flipcard'>
-  <div style='color:<%= gW[word_id].c %>'>새 느낌이 도착했습니다.</div>
-  <div><span class='icon-heart icon-trans' style='background-color:<%= gW[word_id].c %>'></span></div>
-</div>
-</script-->
 
 <script type='text/template' id='tpl_arrived_feeling'>
 <div id='flipcard' style='color:#ffffff;background-color:<%= gW[word_id].c %>'>
@@ -210,41 +195,56 @@
 </div>
 </script>
 
-<script type='text/template' id='tpl_received_feeling'>
+<script type='text/template' id='tpl_feeling'>
   <div class='inner fs_link' style='background-color:<%= gW[word_id].c %>;color:#ffffff;'>
   <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
-    <h3><strong class='_rspc' style=''>OCT 13</strong></h3>
-    <h5 style=''>10:10</h5>
-    <span class='_r'><%=user_id%></span>
+    <h3><strong class='_rspc' style=''><%= time %></strong></h3>
+    <span class='_r'><%=user.name%></span>
   </div>
   <div class='content'>
     <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word_id].w %></strong></h4>
-    <span><%= content %></span>
+    <span><%= blah %></span>
   </div>
 </div>
 <div style='background-color:<%= gW[word_id].c %>;color:#ffffff'>
-  <div class='talks' style='background-color:rgba(0,0,0,0.2)'>
-    <% for(var u in talks){ %>
-    <span class='_rspc'><%=u%>: <%=talks[u].length%></span>
-    <% } %>
-  </div>
+  <ul class='talks' style='background-color:rgba(0,0,0,0.2)'>
+    <li>human-icon <%= n_talk_users%></li>
+    <li>msg-icon <%= n_talk_msgs%></li>
+  </ul>
 </div>
 </script>
 
-<script type='text/template' id='tpl_comments'>
+<script type='text/template' id='tpl_talk'>
 <div style='border-bottom:1px solid rgba(0,0,0,0.3)'>
   <div>
-    <span><%=user_id%></span>
+    <img class='transparent' src='<%=user[talk_user_id].img%>' style='max-width: 100%;min-width:100%;min-height:100%;display:block;'></img>
+    <span><%=user[talk_user_id].name%></span>
+    <% if(mine && share) { %>
     <i class='icon-heart icon-white fs_link'></i>
+    <% } %>
   </div>
   <ul class='comments'>
     <% for(var i=0; i<comments.length; i++){ %>
       <li>
-        <h6 class='_rspc'><%=comments[i].user_id%></h6>
-        <h6 class='_rspc'><%=comments[i].content%></h6>
+        <h6 class='_rspc'><%=user[comments[i].user_id].name %></h6>
+        <h6 class='_rspc'><%=comments[i].blah %></h6>
         <h6><%=comments[i].time%></h6>
       </li>
-      <% if(i == comments.length-1 && shared && me != comments[i].user_id){ %>
+      <% if(shared && i == comments.length-1) { %>
+        <% if(mine && talk_user_id == comments[i].user_id){ %>
+          <li>
+            <div style='padding:10px;overflow:hidden'>
+              <input type="text" placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
+            </div>
+            <div style='overflow:hidden'>
+              <a class='btn _r fs_link'>작성하기</a>
+            </div>
+          </li>
+        <% } %>
+      <% } %>
+    <% } %>
+
+    <% if(comments.length == 0 && shared && !mine) {%>
       <li>
         <div style='padding:10px;overflow:hidden'>
           <input type="text" placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
@@ -253,32 +253,11 @@
           <a class='btn _r fs_link'>작성하기</a>
         </div>
       </li>
-      <% } %>
-    <% } %>
+    <% }%>
   </ul>
 </div>
 </script>
 
-<script type='text/template' id='tpl_comment'>
-<div style='border-bottom:1px solid #e2e2e2;padding:10px'>
-  <div>
-    <strong class='_rspc'><%=type%></strong>
-    <span><%=content%></span>
-  </div>
-  <div style='overflow:hidden'>
-    <h6 class='_rspc'><%=user_id%></h6>
-    <h6 class='_rspc'><%=time%></h6>
-    <span class='_r'>
-    <% if(like){ %>
-      <span class='icon-heart'></span>
-    <% }else{ %>
-      <span class='icon-heart icon-white fs_link _rspc2'></span>
-      <span href='#' class='icon-remove fs_link'></span>
-    <% } %>
-    </span>
-  </div>
-</div>
-</script>
 </body>
 </html>
 

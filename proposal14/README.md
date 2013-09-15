@@ -780,3 +780,192 @@ parent.html @$el in render()
 ####
 
       console.log $._data @$el.get(0), 'events'
+
+
+
+============ 0914 ============
+
+user
+  arrived_feeling:
+  my_feelings:
+  rcv_feelings:
+
+
+Feeling
+  id
+  status: 공개-쉐어/공개-종료/비공개/삭제
+  time
+  feeling
+  blah
+  talks
+    id:
+    comments: [
+      {id: '', blah: '', time: ''}
+    ]
+
+class Feeling
+  ..
+  talks: []
+class Talk
+  id
+  comments: []
+class Comment
+  id, blah, time
+
+class FeelingView
+  events
+    'click .card'   
+    'click .public'  --> PUT /feelings/:id
+    'click .del'     --> DEL /feelings/:id
+class TalkView
+  events
+    'click .like'    --> PUT /feelings/:id/like
+    'click .repl'    
+    'click .send'    --> POST /feelings/:id/talks/:user/comments
+    
+랜덤으로 느낌 받는거면.. 계속 공유안되는 느낌이 생길수도..
+  오래된 느낌도 가중치..
+
+
+GET /feelings?type=[my,rcv,share]
+
+
+my feeling
+  talks
+    'uid'
+      last comment.uid == talks.uid  --> input
+
+rcv fee
+  talks
+    'uid'
+      no comment --> input
+      last comment.uid != talks.uid --> input
+
+
+card-rcv
+
+----------
+
+  plsa  id           비공개*  <-- 나중에 비공개로 전환되었다면
+                      10:10
+
+  혼란스러움  OLD LOVE??
+  무슨뜻이지?? 
+  ------
+  my-plsa 3
+  --->
+  .....                       <-- 하트주는거 없음..
+
+
+card-my
+
+  plsa  id      [비공개][삭제]  <-- 클릭해서 공개 전환 가능
+                OCT 10 10:10
+
+  혼란스러움  OLD LOVE??
+  무슨뜻이지?? 
+
+  ------
+  a-plsa 3  p-plsa 1 ...
+
+  --->
+
+  a-plsa  id          [like]
+  a-plsa blahbalh
+  my-plsa blahblah
+  a-plsa blahblah     [repl]
+  ------
+  b-plsa  id
+  b-plsa blahblah
+
+  tarea
+                      [send]
+
+
+
+Card
+  id
+  time
+
+  Talks
+
+============ 0914 ============
+
+TODO
+----
+
+# session store ... 무시
+
+# sign up .. 무시
+
+# /api/live_feelings ..무시
+
+# /api/associates.. 무시
+
+
+REST
+----
+
+# GET /api/me
+
+# GET /api/feelings
+  skip, n, type
+
+# POST /api/feelings
+  word, blah
+
+# GET /api/feelings/:id
+
+# PUT /api/feelings/:id
+  is_public
+
+# PUT /api/feelings/:id/like
+  email
+
+# DEL /api/feelings/:id
+
+# POST /api/feelings/:id/talks/:user_id/comments
+  blah
+
+# GET /api/arrived_feelings
+
+
+DATA
+----
+
+# g_users =
+    id: <user>
+
+# g_feelings =
+    id: <feeling>
+
+# g_feelings_q =   # ordered. latest last
+    [ <share_feeling_id>, ... ]
+
+# g_feelings_seq
+# g_feelings_seq
+# g_users_seq
+
+# <user>
+    id:
+    name:
+    email:
+    img:
+    n_hearts:
+    n_availables:
+    wait_time:
+    arrived_feelings: []
+    my_feelings: []     # ordered. latest first
+    rcv_feelings: []    # ordered. latest first
+
+# <feeling>
+    id
+    user_id
+    status: public/private/removed
+    time
+    word
+    blah
+    talks
+      user_id: [
+          {user_id: '', blah: '', time: ''}  # ordered. latest last
+        ]

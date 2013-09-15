@@ -50,8 +50,8 @@ $ ->
       'login': 'index'
       'logout': 'logout'
       'my_feelings': 'my_feelings'
+      'shared_feelings': 'shared_feelings'
       'received_feelings': 'received_feelings'
-    views: {}
     layout: {}
     models: {}
     initialize: ->
@@ -60,66 +60,75 @@ $ ->
       @models.associates = new Associates
       @models.my = new MyFeelings
       @models.received = new ReceivedFeelings
+      @models.shared = new SharedFeelings
       @models.app = new App
 
       @layout.nav = new NavLayout
       @layout.header = new HeaderLayout
+      @layout.status = new StatusLayout
       @layout.body = new BodyLayout
 
       @layout.nav.show new AppView(model: @models.app)
 
       _.bindAll @, 'index', 'logout', 'my_feelings', 'received_feelings'
     index: ->
-      if @models.app.get 'user'
-        @navigate 'received_feelings', {trigger: true}
+      # to show login page, do winindow.location='/'
+      if @models.app.logged_in
+        @navigate 'shared_feelings', {trigger: true}
       else
-        @models.app.set {user: null, menu: '#menu_signup'}
+        @models.app.set {menu: '#menu_signup'}
         @layout.header.show new LoginView
+        @layout.status.show()
         @layout.body.show()
     logout: ->
       $.ajax
         url: '../sessions'
         type: 'DELETE'
         dataType: 'json'
-        context: @
         success: (data) -> window.location = '/'
-    my_feelings: ->
+    shared_feelings: ->
+      @models.app.set {menu: '#menu_share'}
+      @models.me.fetch()
+      @models.shared.fetch()
       @layout.header.show new NewFeelingView
-        me: @models.me
-      @layout.body.show new MyFeelingsView(model: @models.my)
-
-      #@models.app.fetch()
+      @layout.status.show new MyStatusView(model: @models.me)
+      @layout.body.show new SharedFeelingsView(model: @models.shared)
+    my_feelings: ->
       @models.app.set {menu: '#menu_my'}
-
-      @models.my.fetch_more() if @models.my.length == 0
+      @models.me.fetch()
+      @models.my.fetch_more()
+      @layout.header.show new NewFeelingView
+      @layout.status.show new MyStatusView(model: @models.me)
+      @layout.body.show new MyFeelingsView(model: @models.my)
     received_feelings: ->
-      @layout.header.show new LiveFeelingsView
-        me: @models.me
-        model: @models.live_feelings
-      @layout.body.show new ReceivedFeelingsView(model: @models.received)
-      #@models.app.fetch()
       @models.app.set {menu: '#menu_received'}
-
       @models.me.fetch()
       @models.live_feelings.fetch()
-      @models.received.fetch_more() if @models.received.length == 0
+      @models.received.fetch_more()
+      @layout.header.show new LiveFeelingsView
+        model: @models.live_feelings
+      @layout.status.show new MyStatusView(model: @models.me)
+      @layout.body.show new ReceivedFeelingsView(model: @models.received)
       
-  tpl_json = (model) ->
-    obj = model?.toJSON() || {}
-    obj['gW'] = gW
-    obj
 
   #--- MODELS ---#
 
   class App extends Backbone.Model
     defaults:
-      user: null
       menu: '#menu_signup'
-    url: '../sessions'  
   class Me extends Backbone.Model
     defaults:
-      user_id: ''
+      id: -1
+      name: ''
+      email: ''
+      img: ''
+      n_hearts: 0
       n_available_feelings: 0
+      arrived_feelings: 0
+      my_feelings: 0
+      rcv_feelings: 0
+      my_shared: 0
+      rcv_shared: 0
     url: '../api/me'
   class LiveFeeling extends Backbone.Model
   class LiveFeelings extends Backbone.Collection
@@ -130,14 +139,16 @@ $ ->
     url: '../api/associates'
 
   class Comment extends Backbone.Model
-  class Comments extends Backbone.Model
+  class Talk extends Backbone.Model
   class MyFeeling extends Backbone.Model
   class MyFeelings extends Backbone.Collection
+    defaults: { type: 'my' }
     model: MyFeeling
     url: '../api/my_feelings'
     fetch_more: ->
       new MyFeelings().fetch
         data:
+          type: @get('type')
           skip: @models?.length || 0
           n: 10
         success: (model, res) ->
@@ -147,18 +158,15 @@ $ ->
           if router.models.my.length > len
             router.models.my.trigger 'concat', model.models
 
-  class ArrivedFeeling extends Backbone.Model
-  class ArrivedFeelings extends Backbone.Collection
-    model: ArrivedFeeling
-    url: '../api/new_arrived_feelings'
-  class NewComment extends Backbone.Model      
   class ReceivedFeeling extends Backbone.Model
   class ReceivedFeelings extends Backbone.Collection
+    defaults: { type: 'rcv' }
     model: ReceivedFeeling
     url: '../api/received_feelings'
     fetch_more: ->
       new ReceivedFeelings().fetch
         data:
+          type: @get('type')
           skip: @models?.length || 0
           n: 10
         success: (model, res) ->
@@ -168,12 +176,27 @@ $ ->
           if router.models.received.length > len
             router.models.received.trigger 'concat', model.models
 
+  class ArrivedFeeling extends Backbone.Model
+  class ArrivedFeelings extends Backbone.Collection
+    model: ArrivedFeeling
+    url: '../api/arrived_feelings'
+  class NewComment extends Backbone.Model      
+  class Feeling extends Backbone.Model
+    url: '../api/feelings'
+  class SharedFeelings extends Backbone.Collection
+    defaults: { type: 'share' }
+    model: Feeling
+    url: '../api/feelings'
+    fetch: ->
+      super {data: {type: @get('type')} }
+
+
   #--- Layout ---#
 
   class Layout
     show: (view) ->  
       @current_view.close() if @current_view
-      return $("##{@id}").html() unless view
+      return $("##{@id}").empty() unless view
       @current_view = view
       @current_view.render()
       $("##{@id}").html @current_view.el
@@ -184,6 +207,9 @@ $ ->
 
   class HeaderLayout extends Layout
     id: 'fs_header'
+
+  class StatusLayout extends Layout
+    id: 'fs_status'
 
   class BodyLayout extends Layout
     id: 'fs_body'
@@ -210,10 +236,25 @@ $ ->
       @remove()
       @off()
 
+  class Tpl
+    @navbar:       _.template $('#tpl_navbar').html()
+    @login:        _.template $('#tpl_login').html()
+    @signup:       _.template $('#tpl_signup').html()
+    @my_status:    _.template $('#tpl_my_status').html()
+    @live_feeling: _.template $('#tpl_live_feeling').html()
+    @live_status:  _.template $('#tpl_live_status').html()
+    @new_feeling:  _.template $('#tpl_new_feeling').html()
+    @talk:         _.template $('#tpl_talk').html()
+    @my_feeling:   _.template $('#tpl_my_feeling').html()
+    @new_comment:  _.template $('#tpl_new_comment').html()
+    @feeling:      _.template $('#tpl_feeling').html()
+    @arrived:      _.template $('#tpl_arrived_feeling').html()
+    @arrived_holder: _.template $('#tpl_arrived_holder').html()
+
   class AppView extends FsView
-    template: _.template $('#tpl_navbar').html()
+    template: Tpl.navbar
     initialize: ->
-      @model.on 'change', @render, @
+      @model.on 'change:menu', @render, @
     render: ->
       super()
       @$el.html @template(@model.toJSON())
@@ -221,12 +262,12 @@ $ ->
       $(@model.get('menu')).addClass 'active'
     close: ->
       super()
-      @model.off 'change', @render
+      @model.off 'change:menu', @render
 
   class LoginView extends FsView
     events:
       'click .fs_submit': 'on_submit'
-    template: _.template $('#tpl_login').html()
+    template: Tpl.login
     render: ->
       super()
       @$el.html @template()
@@ -237,24 +278,26 @@ $ ->
         dataType: 'json'
         context: @
         data:
-          user_id: $('#user_id').val()
+          email: $('#email').val()
           password: $('#password').val()
         success: (data) ->
-          router.models.app.set 'user', data.user
-          router.navigate 'received_feelings', {trigger: true}
+          router.models.app.set {'logged_in': true}
+          router.navigate 'shared_feelings', {trigger: true}
+        fail: ->
+          window.location = '/'
 
   class SignupView extends FsView
     events:
       'click .fs_submit': 'on_submit'
-    template: _.template $('#tpl_signup').html()
+    template: Tpl.signup
     render: ->
       super()
       @$el.html @template()
     on_submit: ->
       console.log 'signup submit'
 
-  class MeView extends FsView
-    template: _.template $('#tpl_me').html()
+  class MyStatusView extends FsView
+    template: Tpl.my_status
     initialize: ->
       @model.on 'sync', @render, @
     render: ->
@@ -266,16 +309,15 @@ $ ->
 
   class LiveFeelingView extends FsView
     tagName: 'li'
-    template: _.template $('#tpl_live_feeling').html()
+    template: Tpl.live_feeling
     render: ->
       super()
-      @$el.html @template(tpl_json(@model))
+      @$el.html @template(_.extend(@model.toJSON(), {gw: gW}))
 
   class LiveFeelingsView extends FsView
     tagName: 'div'
-    template: _.template $('#tpl_live_status').html()
+    template: Tpl.live_status
     initialize: ->
-      @me = @options.me
       @model.on 'sync', @render, @
     render: ->
       super()
@@ -283,7 +325,6 @@ $ ->
       holder = @$el.find('#live_holder')
       for m in @model.models
         holder.append @attach(new LiveFeelingView(model: m)).el
-      @$el.find('.me_holder').html @attach(new MeView(model: @me)).el
     close: ->
       super()
       @model.off 'sync', @render
@@ -292,13 +333,10 @@ $ ->
     events:
       'click .fs_submit': 'on_submit'
       'click #wordselect>li': 'on_select_word'
-    template: _.template $('#tpl_new_feeling').html()
-    initialize: ->
-      @me = @options.me
+    template: Tpl.new_feeling
     render: ->
       super()
-      @$el.html @template(tpl_json())
-      @$el.find('.me_holder').html @attach(new MeView(model: @me)).el
+      @$el.html @template({gW: gW})
     on_select_word: (e) ->
       @$el.find('#wordselect').find('.active').removeClass 'active'
       $(e.target).toggleClass 'active'
@@ -308,36 +346,20 @@ $ ->
         router.layout.body.current_view.wookmark.apply()
     on_submit: ->
       $.ajax
-        url: '../api/my_feelings'
+        url: '../api/feelings'
         type: 'POST'
         dataType: 'json'
         context: @
         data:
-          word_id: @$el.find('#wordselect').find('.active').attr('word-id')
-          content: @$el.find('#new_feeling_content').val()
+          word: @$el.find('#wordselect').find('.active').attr('word-id')
+          blah: @$el.find('#new_feeling_content').val()
+          is_public: true
         success: (data) ->
-          router.navigate 'my_feelings', true
+          #router.navigate 'shared_feelings', {trigger: true}
+          router.shared_feelings()
 
-  class CommentView extends FsView
-    events:
-      'click .icon-remove': 'on_remove'
-      'click .icon-heart': 'on_like'
-    template: _.template $('#tpl_comment').html()
-    initialize: ->
-      @model.on 'change', @render, @
-    render: ->
-      super()
-      @$el.html @template(@model.toJSON())      
-    on_remove: -> 
-      alert 'not implemented'
-    on_like: -> 
-      alert 'not implemented'
-    close: ->
-      super()
-      @model.off 'change', @render
-
-  class CommentsView extends FsView
-    template: _.template $('#tpl_comments').html()
+  class TalkView extends FsView
+    template: Tpl.talk
     initialize: ->
       @model.on 'change', @render, @
     render: ->
@@ -351,7 +373,7 @@ $ ->
     tagName: 'li'
     events:
       'click .inner': 'on_expand'
-    template: _.template $('#tpl_my_feeling').html()
+    template: Tpl.my_feeling
     initialize: ->
       @model.on 'change', @render, @
       @expand = false
@@ -359,20 +381,16 @@ $ ->
       super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
-      @$el.html @template(tpl_json(@model))
+      @$el.html @template(_.extend(@model.toJSON(), {gw: gW}))
       if @expand
-        console.log 'render comments'
-        console.log @model
         holder = @$el.find('.talks')
         holder.empty()
-        for u,comments of @model.get('talks')
-          console.log "#{u}: #{comments}"
+        for u,talk of @model.get('talks')
           m =
-            me: router.models.me.user_id
-            shared: true
+            shared: @model.get('share')
             user_id: u
-            comments: comments
-          holder.append @attach(new CommentsView(model: new Comments(m))).el
+            comments: talk
+          holder.append @attach(new TalkView(model: new Talk(m))).el
 
       if @on_expand_triggered
         @$el.trigger 'refreshWookmark'
@@ -415,7 +433,7 @@ $ ->
     className: 'new_comment'
     events:
       'click .fs_link': 'on_submit'
-    template: _.template $('#tpl_new_comment').html()
+    template: Tpl.new_comment
     render: ->
       super()
       @$el.html @template()
@@ -423,39 +441,41 @@ $ ->
     on_submit: (event) -> 
       alert 'not implemented'
 
-  class ReceivedFeelingView extends FsView
+  class FeelingView extends FsView
     tagName: 'li'
     events:
       'click .inner': 'on_expand'
-    template: _.template $('#tpl_received_feeling').html()
+    template: Tpl.feeling
     initialize: ->
-      @model.on 'change', @render, @
+      @model.on 'sync', @render, @
       @expand = false
     render: ->
       super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
-      @$el.html @template(tpl_json(@model))
+      @$el.html @template(_.extend(@model.toJSON(), {gw: gW}))
 
       if @expand
-        console.log 'render comments'
         holder = @$el.find('.talks')
         holder.empty()
-        for u,comments of @model.get('talks')
+        for u,talk of @model.get('talks')
           m =
-            me: router.models.me.user_id
-            shared: true
-            user_id: u
-            comments: comments
-          holder.append @attach(new CommentsView(model: new Comments(m))).el
+            shared: @model.get('share')
+            mine: @model.get('own')
+            talk_user_id: u
+            comments: talk
+            user: talk_user
+          holder.append @attach(new TalkView(model: new Talk(m))).el
 
       if @on_expand_triggered
         @$el.trigger 'refreshWookmark'
       @on_expand_triggered = false
     on_expand: (event) ->
-      @on_expand_triggered = true
-      @expand = not @expand
-      @render()
+      @model.fetch
+        success: ->
+          @on_expand_triggered = true
+          @expand = not @expand
+          @render()
     close: ->
       super()
       @model.off 'change', @render
@@ -464,9 +484,6 @@ $ ->
     tagName: 'ul'
     id: 'received_feelings_holder'
     className: 'fs_tiles'
-    events:
-      'click .fs_more': 'on_more'
-    template: _.template $('#tpl_feelings').html()
     initialize: ->
       @wookmark = new Wookmark(@id)
       @model.on 'prepend', @on_prepend, @
@@ -476,23 +493,20 @@ $ ->
       super()
       @$el.append @attach(new ArrivedFeelingView).el
       for m in @model.models
-        @$el.append @attach(new ReceivedFeelingView(model: m)).el
+        @$el.append @attach(new FeelingView(model: m)).el
     on_rendered: ->
-      console.log 'wook'
       @wookmark.apply()
     on_scroll: ->
       router.models.received.fetch_more() if $(window).scrollTop() + $(window).height() >  $(document).height() - 100
     on_concat: (list) ->
       console.log 'concat'
       for m in list
-        @$el.append @attach(new ReceivedFeelingView(model: m)).el
+        @$el.append @attach(new FeelingView(model: m)).el
       @wookmark.apply()
     on_prepend: (model) ->
       @model.models.unshift model
-      @$el.find('#arrived_feeling').after @attach(new ReceivedFeelingView(model: model)).el
+      @$el.find('.arrived_feeling').after @attach(new FeelingView(model: model)).el
       @wookmark.apply()
-    on_more: (event) ->
-      @model.fetch_more()
     close: ->
       super()
       @model.off 'concat', @on_concat
@@ -501,12 +515,12 @@ $ ->
 
   class ArrivedFeelingView extends FsView
     tagName: 'li'
-    id: 'arrived_feeling'
+    className: 'arrived_feeling'
     events:
       'click #receive_arrived': 'on_receive'
       'click #flipcard': 'on_flip'
-    template: _.template $('#tpl_arrived_feeling').html()
-    holder_template: _.template $('#tpl_arrived_holder').html()
+    template: Tpl.arrived
+    holder_template: Tpl.arrived_holder
     initialize: ->
       @model = new ArrivedFeelings
       @model.on 'sync', @render, @
@@ -516,7 +530,7 @@ $ ->
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       if @model.length > 0
         @$el.addClass('rd6').addClass('_sd0').addClass('card')
-        @$el.html @template(tpl_json(@model.at(0)))
+        @$el.html @template(_.extend(@model.at(0).toJSON(), {gw: gW}))
       else
         @$el.addClass('rd6').addClass('card')
         @$el.html @holder_template(router.models.me.toJSON())
@@ -528,22 +542,44 @@ $ ->
       console.log 'on_flip'
       model = @model.at 0
       $.ajax
-        url: "../api/new_arrived_feelings/#{model.get('id')}"
+        url: "../api/arrived_feelings/#{model.get('id')}"
         type: 'PUT'
         dataType: 'json'
         context: @
         success: (data) ->
           @model.reset()
           @model.trigger 'sync'
-          router.models.received.trigger 'prepend', new ReceivedFeeling(data)
+          router.models.shared.trigger 'prepend', new Feeling(data)
     close: ->
       super()
       @model.off 'sync', @render
       router.models.me.off 'sync', @render
     
-  router = new Router
+  class SharedFeelingsView extends FsView
+    tagName: 'ul'
+    id: 'shared_feelings_holder'
+    className: 'fs_tiles'
+    initialize: ->
+      @wookmark = new Wookmark(@id)
+      @model.on 'prepend', @on_prepend, @
+    render: ->
+      super()
+      @$el.append @attach(new ArrivedFeelingView).el
+      for m in @model.models
+        @$el.append @attach(new FeelingView(model: m)).el
+    on_rendered: ->
+      @wookmark.apply()
+    on_prepend: (model) ->
+      @model.models.unshift model
+      @$el.find('.arrived_feeling').after @attach(new FeelingView(model: model)).el
+      @wookmark.apply()
+    close: ->
+      super()
+      @model.off 'prepend', @on_prepend
+
   $.ajaxSetup
     statusCode:
-      401: -> window.location = '/'
-      403: -> window.location = '/'
+      401: -> console.log '401'; window.location = '/'
+      403: -> console.log '401'; window.location = '/'
+  router = new Router
   Backbone.history.start()
