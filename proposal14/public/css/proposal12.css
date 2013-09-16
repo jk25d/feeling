@@ -1,16 +1,18 @@
 @charset "UTF-8";
 
 /* responsive */
-@-ms-viewport {
-  width: device-width;
-}
+
 @media (max-width: 320px) {
+  .what{width:260px}
   .what_spc {margin:0 auto;}
   .fs_container {width: 292px;margin:0 auto}
+  h1 {font-size:44px;line-height:60px;}
 }
 @media (min-width: 588px) {
+  .what{width:355px}
   .what_spc {margin:0 45px 0 15px;}
   .fs_container {width: 568px;margin:0 auto}
+  h1 {font-size:60px;line-height:60px;}
 }
 @media (min-width: 864px) {
   .fs_container {width: 844px;margin:0 auto}
@@ -40,7 +42,6 @@ ul {list-style:none;margin:0;padding:0;}
 li{display:inline-block;}
 div {box-sizing:border-box;}
 
-h1 {font-size:48px;line-height:60px;}
 h2 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:20px;line-height:24px;}
 h3 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:25px;line-height:30px;}
 h4 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:16px;line-height:24px;}
@@ -79,7 +80,10 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 }
 
 .rd6 {
-
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
 }
 .rd10 {
   -moz-border-radius: 10px;
@@ -139,7 +143,7 @@ body {
   padding:40px 0;margin:0;font-size:13px;
   background-color:#afafcc;
   /*background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;*/
-  background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-attachment:fixed;background-position:left top;background-size:cover;
+  background-image:url(../img/back-billiard-blur2.jpg);background-repeat:no-repeat;background-attachment:fixed;background-position:left top;background-size:cover;
   }
 #fs_navbar {
   position: fixed;
@@ -188,15 +192,14 @@ background-color:rgba(0,0,0,0.4)
 
 .talks {line-height:20px;padding:15px 10px;}
 
-.what{width:300px}
 .feeling{
-  margin:4px;overflow:hidden;float:left;
+  margin:5px;overflow:hidden;float:left;background-color:rgba(0,0,0,0.3);
 }
 .feeling > .wc {
   float:left;box-sizing:border-box;width:34px;height:34px;line-height:34px;overflow:hidden;
 }
 .feeling > .ww {
-  float:left;width:114px;padding-left:9px;line-height:34px;overflow:hidden;font-size:12px;
+  float:left;width:130px;padding-left:9px;line-height:34px;overflow:hidden;font-size:12px;
 }
 .feeling .active{
   background-color:rgba(0,0,0,0.5);

@@ -73,14 +73,19 @@ $ ->
 
       _.bindAll @, 'index', 'logout', 'my_feelings', 'received_feelings'
     index: ->
-      # to show login page, do winindow.location='/'
-      if @models.app.logged_in
-        @navigate 'shared_feelings', {trigger: true}
-      else
-        @models.app.set {menu: '#menu_signup'}
-        @layout.header.show new LoginView
-        @layout.status.show()
-        @layout.body.show()
+      $.ajax
+        url: '../sessions'
+        statusCode:
+          401: ->
+          403: ->
+        context: @
+        success: -> @navigate 'shared_feelings', {trigger: true}
+        error: -> @login_view()
+    login_view: ->
+      @models.app.set {menu: '#menu_signup'}
+      @layout.header.show new LoginView
+      @layout.status.show()
+      @layout.body.show()
     logout: ->
       $.ajax
         url: '../sessions'
@@ -89,26 +94,34 @@ $ ->
         success: (data) -> window.location = '/'
     shared_feelings: ->
       @models.app.set {menu: '#menu_share'}
-      @models.me.fetch()
-      @models.shared.fetch()
+      @models.me.fetch
+        context: @
+        complete: ->
+          @layout.status.show new MyStatusView(model: @models.me)
+      @models.shared.fetch
+        context: @
+        complete: ->
+          @layout.body.show new SharedFeelingsView(model: @models.shared)
       @layout.header.show new NewFeelingView
-      @layout.status.show new MyStatusView(model: @models.me)
-      @layout.body.show new SharedFeelingsView(model: @models.shared)
     my_feelings: ->
       @models.app.set {menu: '#menu_my'}
-      @models.me.fetch()
+      @models.me.fetch
+        context: @
+        complete: ->
+          @layout.status.show new MyStatusView(model: @models.me)
       @models.my.fetch_more()
       @layout.header.show new NewFeelingView
-      @layout.status.show new MyStatusView(model: @models.me)
       @layout.body.show new MyFeelingsView(model: @models.my)
     received_feelings: ->
       @models.app.set {menu: '#menu_received'}
-      @models.me.fetch()
+      @models.me.fetch
+        context: @
+        complete: ->
+          @layout.status.show new MyStatusView(model: @models.me)
       @models.live_feelings.fetch()
       @models.received.fetch_more()
       @layout.header.show new LiveFeelingsView
         model: @models.live_feelings
-      @layout.status.show new MyStatusView(model: @models.me)
       @layout.body.show new ReceivedFeelingsView(model: @models.received)
       
 
@@ -188,8 +201,9 @@ $ ->
     defaults: { type: 'share' }
     model: Feeling
     url: '../api/feelings'
-    fetch: ->
-      super {data: {type: @get('type')} }
+    fetch: (options={}) ->
+      options.data = {type: @get('type')}
+      super options
 
 
   #--- Layout ---#
@@ -333,14 +347,14 @@ $ ->
   class NewFeelingView extends FsView
     events:
       'click .fs_submit': 'on_submit'
-      'click #wordselect>li': 'on_select_word'
+      'click #wordselect .ww': 'on_select_word'
     template: Tpl.new_feeling
     render: ->
       super()
       @$el.html @template({gW: gW})
     on_select_word: (e) ->
       @$el.find('#wordselect').find('.active').removeClass 'active'
-      $(e.target).toggleClass 'active'
+      $(e.currentTarget).addClass 'active'
       unless @expanded
         @$el.find('.content0-input').css('display', 'block')
         @expanded = true
@@ -576,9 +590,10 @@ $ ->
       super()
       @model.off 'prepend', @on_prepend
 
+
+  router = new Router
   $.ajaxSetup
     statusCode:
-      401: -> console.log '401'; window.location = '/'
-      403: -> console.log '401'; window.location = '/'
-  router = new Router
+      401: -> window.location = '/'
+      403: -> window.location = '/'
   Backbone.history.start()

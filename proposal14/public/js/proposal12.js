@@ -163,18 +163,31 @@
       };
 
       Router.prototype.index = function() {
-        if (this.models.app.logged_in) {
-          return this.navigate('shared_feelings', {
-            trigger: true
-          });
-        } else {
-          this.models.app.set({
-            menu: '#menu_signup'
-          });
-          this.layout.header.show(new LoginView);
-          this.layout.status.show();
-          return this.layout.body.show();
-        }
+        return $.ajax({
+          url: '../sessions',
+          statusCode: {
+            401: function() {},
+            403: function() {}
+          },
+          context: this,
+          success: function() {
+            return this.navigate('shared_feelings', {
+              trigger: true
+            });
+          },
+          error: function() {
+            return this.login_view();
+          }
+        });
+      };
+
+      Router.prototype.login_view = function() {
+        this.models.app.set({
+          menu: '#menu_signup'
+        });
+        this.layout.header.show(new LoginView);
+        this.layout.status.show();
+        return this.layout.body.show();
       };
 
       Router.prototype.logout = function() {
@@ -192,27 +205,39 @@
         this.models.app.set({
           menu: '#menu_share'
         });
-        this.models.me.fetch();
-        this.models.shared.fetch();
-        this.layout.header.show(new NewFeelingView);
-        this.layout.status.show(new MyStatusView({
-          model: this.models.me
-        }));
-        return this.layout.body.show(new SharedFeelingsView({
-          model: this.models.shared
-        }));
+        this.models.me.fetch({
+          context: this,
+          complete: function() {
+            return this.layout.status.show(new MyStatusView({
+              model: this.models.me
+            }));
+          }
+        });
+        this.models.shared.fetch({
+          context: this,
+          complete: function() {
+            return this.layout.body.show(new SharedFeelingsView({
+              model: this.models.shared
+            }));
+          }
+        });
+        return this.layout.header.show(new NewFeelingView);
       };
 
       Router.prototype.my_feelings = function() {
         this.models.app.set({
           menu: '#menu_my'
         });
-        this.models.me.fetch();
+        this.models.me.fetch({
+          context: this,
+          complete: function() {
+            return this.layout.status.show(new MyStatusView({
+              model: this.models.me
+            }));
+          }
+        });
         this.models.my.fetch_more();
         this.layout.header.show(new NewFeelingView);
-        this.layout.status.show(new MyStatusView({
-          model: this.models.me
-        }));
         return this.layout.body.show(new MyFeelingsView({
           model: this.models.my
         }));
@@ -222,14 +247,18 @@
         this.models.app.set({
           menu: '#menu_received'
         });
-        this.models.me.fetch();
+        this.models.me.fetch({
+          context: this,
+          complete: function() {
+            return this.layout.status.show(new MyStatusView({
+              model: this.models.me
+            }));
+          }
+        });
         this.models.live_feelings.fetch();
         this.models.received.fetch_more();
         this.layout.header.show(new LiveFeelingsView({
           model: this.models.live_feelings
-        }));
-        this.layout.status.show(new MyStatusView({
-          model: this.models.me
         }));
         return this.layout.body.show(new ReceivedFeelingsView({
           model: this.models.received
@@ -525,12 +554,14 @@
 
       SharedFeelings.prototype.url = '../api/feelings';
 
-      SharedFeelings.prototype.fetch = function() {
-        return SharedFeelings.__super__.fetch.call(this, {
-          data: {
-            type: this.get('type')
-          }
-        });
+      SharedFeelings.prototype.fetch = function(options) {
+        if (options == null) {
+          options = {};
+        }
+        options.data = {
+          type: this.get('type')
+        };
+        return SharedFeelings.__super__.fetch.call(this, options);
       };
 
       return SharedFeelings;
@@ -880,7 +911,7 @@
 
       NewFeelingView.prototype.events = {
         'click .fs_submit': 'on_submit',
-        'click #wordselect>li': 'on_select_word'
+        'click #wordselect .ww': 'on_select_word'
       };
 
       NewFeelingView.prototype.template = Tpl.new_feeling;
@@ -894,7 +925,7 @@
 
       NewFeelingView.prototype.on_select_word = function(e) {
         this.$el.find('#wordselect').find('.active').removeClass('active');
-        $(e.target).toggleClass('active');
+        $(e.currentTarget).addClass('active');
         if (!this.expanded) {
           this.$el.find('.content0-input').css('display', 'block');
           this.expanded = true;
@@ -1378,19 +1409,17 @@
       return SharedFeelingsView;
 
     })(FsView);
+    router = new Router;
     $.ajaxSetup({
       statusCode: {
         401: function() {
-          console.log('401');
           return window.location = '/';
         },
         403: function() {
-          console.log('401');
           return window.location = '/';
         }
       }
     });
-    router = new Router;
     return Backbone.history.start();
   });
 

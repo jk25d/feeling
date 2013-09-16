@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, minimum-scale=
+1.0, maximum-scale=1.0">
   <title>NANAV</title>
   <link rel="stylesheet" href="bootstrap/css/bootstrap.css" media='screen'>
   <style>
@@ -98,9 +99,8 @@
     </li>
 
     <% for(var wid in gW){ %>
-      <li class='fs_link feeling rd10' style='color:<%=gW[wid].c%>;background-color:rgba(0,0,0,0.4);' word-id="<%= wid %>">
-        <!--div class='wc' style='background-color:rgba(0,0,0,0.2);text-align:center'><i class='icon-heart icon-white'/></div-->
-        <div class='ww'><%=gW[wid].w%></div>
+      <li class='fs_link feeling rd10' style='color:<%=gW[wid].c%>;'>
+        <div class='ww' word-id="<%= wid %>"><%=gW[wid].w%></div>
       </li>
     <% } %>
   </ul>

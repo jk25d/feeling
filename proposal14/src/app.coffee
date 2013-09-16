@@ -92,7 +92,7 @@ class Feeling
     @time = now()
     @talks = {}
 
-    me.my_feelings.unshift @
+    me.my_feelings.unshift @id
     g_dispatcher.register_item @ if is_public
   sharable_time: ->
     now() - @time < Feeling.SHARE_DUR
@@ -118,7 +118,7 @@ class Feeling
       x.n_talk_msgs = @talks[user_id].length
     else
       x.own = true
-      x.n_talk_users = x.talks.length
+      x.n_talk_users = Object.keys(x.talks).length
       x.n_talk_msgs = 0
       for tuid, comments of x.talks
         x.n_talk_msgs += @talks[tuid].length
@@ -157,8 +157,6 @@ class Dispatcher
       register u if u.arrived_feelings.length == 0
     @user_que.sort (a,b) -> a.wait_time - b.wait_time
   schedule: ->
-    console.log 'start schedule'
-    console.log 'start schedule'
     hungry_users = []
     while g_dispatcher.user_que.length > 0
       uid = g_dispatcher.user_que.shift()
@@ -242,7 +240,7 @@ class User
       f = g_feelings[fid]
       continue unless f
       break unless f.sharable_time()
-      r.push fid
+      r.push fid if f.sharable()
     r
   rcv_shared: ->
     r = []
@@ -250,7 +248,7 @@ class User
       f = g_feelings[fid]
       continue unless f
       break unless f.sharable_time()
-      r.push fid
+      r.push fid if f.sharable()
     r
 
 app.post '/users', (req,res) ->
@@ -285,6 +283,8 @@ app.get '/api/feelings', (req,res) ->
       f = g_feelings[fid]
       r.push f.extend(me.id) if f
   else
+    a = me.my_shared()
+    b = me.rcv_shared()
     for fid in me.my_shared()
       f = g_feelings[fid]
       r.push f.extend me.id
@@ -297,7 +297,10 @@ app.post '/api/feelings', (req,res) ->
   me = g_users[req.session.user_id]
   word = req.body.word
   blah = req.body.blah
-  is_public = req.body.is_public
+  is_public = req.body.is_public || true
+  unless word && blah && is_public
+    res.send 400, "Invalid Parameters"
+    return
 
   f = new Feeling(me, is_public, word, blah)
   g_feelings[f.id] = f
@@ -412,6 +415,27 @@ remove_item = (arr, i) ->
 now = -> new Date().getTime()
 rand = (s,e) ->
   Math.round(Math.random()*e)+s
+concat = (a,b) ->
+  a.push x for x in b
+merge_feelings = (a,b) ->
+  r = []
+  i = j = 0
+  loop
+    if a.length == i
+      concat r, b.slice(j,b.length)
+      return r
+    if b.length == j
+      concat r, a.slice(i,a.length)
+      return r
+    af = g_feelings[a[i]]
+    bf = g_feelings[b[j]]
+    if af.time > bf.time
+      r.push af
+      i++
+    else
+      r.push bf
+      j++
+  r
 
 g_dispatcher = new Dispatcher()
 g_dispatcher.schedule()
