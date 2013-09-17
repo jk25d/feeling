@@ -88,6 +88,10 @@ http://www.colorzilla.com/gradient-editor/
 ## example backbone.js
 https://github.com/dangrossman/Bookmarkly/tree/master/public
 
+## phonegap build
+http://phonegap.com
+-  PhoneGap Build is a cloud-based service built on top of the PhoneGap framework
+
 Windows Development Setting
 ---------------------------
 
