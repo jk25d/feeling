@@ -167,7 +167,7 @@
   })();
 
   Session = (function() {
-    Session.EXPIRE_TIME = 60 * 1000;
+    Session.EXPIRE_TIME = 30 * 60 * 1000;
 
     Session.create = function(uid) {
       var s;
@@ -248,6 +248,17 @@
       };
     };
 
+    Feeling.prototype.anony_content = function() {
+      var u;
+      u = gDB.user(this.user_id);
+      return {
+        time: this.time,
+        img: u.img,
+        word: this.word,
+        blah: this.blah
+      };
+    };
+
     Feeling.prototype.extend = function(user_id) {
       var comments, tuid, u, x, _ref;
       x = clone(this);
@@ -325,7 +336,8 @@
   })();
 
   UserFeelings = (function() {
-    function UserFeelings() {
+    function UserFeelings(_uid) {
+      this._uid = _uid;
       this._actives = [];
       this._mines = [];
       this._rcvs = [];
@@ -353,26 +365,28 @@
       return this._mines.length + this._rcvs.length;
     };
 
-    UserFeelings.prototype.my_actives = function(uid) {
+    UserFeelings.prototype.my_actives = function() {
       var f, r, _i, _len, _ref;
       r = [];
+      console.log(this.actives());
       _ref = this.actives();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         f = _ref[_i];
-        if (f.has_own_perm(uid)) {
+        if (f.has_own_perm(this._uid)) {
           r.push;
         }
       }
       return r;
     };
 
-    UserFeelings.prototype.rcv_actives = function(uid) {
+    UserFeelings.prototype.rcv_actives = function() {
       var f, r, _i, _len, _ref;
       r = [];
+      console.log(this._uid);
       _ref = this.actives();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         f = _ref[_i];
-        if (!f.has_own_perm(uid)) {
+        if (!f.has_own_perm(this._uid)) {
           r.push;
         }
       }
@@ -435,7 +449,7 @@
       this.n_hearts = 0;
       this.n_availables = 0;
       this.arrived_feelings = [];
-      this.feelings = new UserFeelings();
+      this.feelings = new UserFeelings(this.id);
     }
 
     User.prototype.summary = function(extend) {
@@ -573,6 +587,12 @@
 
     Dispatcher.prototype.register_user = function(uid) {
       return this._user_que.push(new WaitItem(uid));
+    };
+
+    Dispatcher.prototype.latest_feelings = function(n) {
+      return this._item_que.slice(0, min(n, this._item_que.length)).map(function(wf) {
+        return wf.id;
+      });
     };
 
     Dispatcher.prototype.log = function() {
@@ -775,6 +795,16 @@
     return res.json(f.extend_full(me.id));
   });
 
+  app.get('/api/live_feelings', function(req, res) {
+    var me, n;
+    me = gDB.user(req.session.user_id);
+    n = req.params.n || 20;
+    return res.json(gDispatcher.latest_feelings(n).map(function(fid) {
+      var _ref;
+      return (_ref = gDB.feeling(fid)) != null ? _ref.anony_content() : void 0;
+    }));
+  });
+
   clone = function(obj) {
     return JSON.parse(JSON.stringify(obj));
   };
@@ -863,24 +893,24 @@
 
   u0 = User.create('sun', 'img/profile.jpg', 'sun@gmail.com', 'sun00');
 
-  u1 = User.create('moon', 'img/profile.jpg', 'moon@gmail.com', 'moon00');
+  u1 = User.create('moon', 'img/profile2.jpg', 'moon@gmail.com', 'moon00');
 
-  u2 = User.create('asdf', 'img/profile.jpg', 'asdf', 'asdf');
+  u2 = User.create('asdf', 'img/profile4.jpg', 'asdf', 'asdf');
 
-  auto_feeling = function() {
+  auto_feeling = function(user) {
     var a, n, word, _i, _ref;
-    console.log('## auto fill started');
     word = rand(0, 29);
     a = [];
     for (n = _i = 0, _ref = rand(0, 9); 0 <= _ref ? _i <= _ref : _i >= _ref; n = 0 <= _ref ? ++_i : --_i) {
       a.push('blah');
     }
-    Feeling.create(u0, true, word, a.join(''));
-    setTimeout(auto_feeling, 10000);
-    return console.log('## auto fill done');
+    Feeling.create(user, true, word, a.join(''));
+    return setTimeout(auto_feeling, 15000, user);
   };
 
-  auto_feeling();
+  auto_feeling(u0);
+
+  auto_feeling(u1);
 
   app.listen('3333');
 

@@ -22,8 +22,8 @@
 <body>
 
 <div id='fs_navbar'></div>
-<div id='fs_header'></div>
 <div id='fs_status'></div>
+<div id='fs_header'></div>
 <div id='fs_body' class='fs_container' >
 </div>
 
@@ -93,8 +93,8 @@
 <script type='text/template' id='tpl_new_feeling'>
 <div style='overflow:hidden;padding:20px;'>
 
-  <ul id='wordselect'>
-    <li class='what what_spc' style='text-align:left;float:left;height:auto;color:#9996a8;border:none;margin-left:20px;'>
+  <ul id='wordselect' class='real_area' style='display:none;'>
+    <li class='what what_spc' style='text-align:left;float:left;height:auto;border:none;margin-left:20px;'>
       <h1><strong>How are you Feeling now?</strong></h1>
     </li>
 
@@ -105,27 +105,31 @@
     <% } %>
   </ul>
 
-  <div class='content0-input' style='display:none;padding:0 20px;'>
-    <div><textarea id='new_feeling_content' placeholder="What is your Feeling now?"></textarea></div>
-    <div class='_ofh' style='text-align:center'>
-      <a id='new_feeling_submit' class='btn fs_submit' data-toggle='modal'>작성하기</a>
+  <div class='temp_area'>
+    <h3>실시간 느낌들</h3>
+    <ul id='live_feelings' class='rd10' style='overflow:hidden;background-color:rgba(255,255,255,0.3);padding:8px 4px;'>
+    </ul>
+  </div>
+
+  <div class='content0-input' style='padding:0 20px;'>
+    <div><textarea id='new_feeling_content' class='fake_area' placeholder="How are you Feeling now?"></textarea></div>
+    <div class='_ofh real_area' style='display:none;text-align:center'>
+      <a id='new_feeling_submit' class='btn fs_submit'>작성하기</a>
     </div>
   </div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_live_feeling'>
-<div class='feeling' style='background-color:<%=gW[word].c%>;margin:3px;'>
-  <div class='live_wc'>
-    <img class='transparent' src='../img/profile.jpg' style='max-width: 100%;min-width:100%;min-height:100%;display:block;'></img>
+<li class='feeling rd10' style='background-color:<%=gW[word].c%>;'>
+  <div class='live_feeling'>
+    <div style='float:left;background-image:url(<%=img%>)' class='profile'></div>
+    <div style='float:left;width:140px;padding-right:4px;box-sizing:border-box;overflow:hidden'>
+      <div style='color:rgba(0,0,0,0.3);font-weight:bold'><%=gW[word].w%></div>
+      <div style='color:#ffffff'><%=blah%></div>
+    </div>
   </div>
-  <% if(similarity>1) { %>
-  <div class='live_ww'>
-    <div style='color:#ffffff;font-size:14px'><%=user_id%></div>
-    <div style='font-size:10px;'>공감도 <%=similarity%></div>
-  </div>
-  <% } %>
-</div>
+</li>
 </script>
 
 <script type='text/template' id='tpl_live_status'>
@@ -136,12 +140,12 @@
 </script>
 
 <script type='text/template' id='tpl_my_status'>
-<ul style='overflow:hidden;color:#83839c;padding-left:30px;'>
-  <li style='float:left;margin:10px;'><i class='profile myprofile'></i></li>
-  <li style='float:left;margin:10px;'><%= name %></li>
-  <li style='float:left;margin:10px;'>HEART: <%= n_hearts %></li>
-  <li style='float:left;margin:10px;'>내가 공유한 느낌: <%= my_shared %></li>
-  <li style='float:left;margin:10px;'>나에게 온 느낌: <%= rcv_shared %></li>
+<ul style='overflow:hidden;color:#83839c;padding-left:30px;line-height:18px;'>
+  <li style='float:left;'><i class='profile' style='background-image:url(<%=img %>)'></i></li>
+  <li style='float:left;margin:2px;'><%= name %></li>
+  <li style='float:left;margin:2px;'>HEART: <%= n_hearts %></li>
+  <li style='float:left;margin:2px;'>내가 공유한 느낌: <%= my_shared %></li>
+  <li style='float:left;margin:2px;'>나에게 온 느낌: <%= rcv_shared %></li>
 </ul>
 </script>
 
@@ -164,7 +168,7 @@
 
 <script type='text/template' id='tpl_arrived_holder'>
 <div id='receive_arrived'>
-  <div class='fs_link rd10' style='border:6px solid #6a6b7d;color:#6a6b7d;height:210px;line-height:210px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
+  <div class='rd10' style='border:6px solid #6a6b7d;color:#6a6b7d;height:210px;line-height:210px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
 </div>
 </script>
 
@@ -198,8 +202,9 @@
 <script type='text/template' id='tpl_feeling'>
   <div class='inner fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
   <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
-    <h3><strong class='_rspc' style=''><%= time %></strong></h3>
-    <span class='_r'><%=user.name%></span>
+    <i class='profile' style='background-image:url(<%=user.img%>)'></i>
+    <span class='_rspc'><%=user.name%></span>
+    <span class='_r' style=''><%= datefmt(time) %></span>
   </div>
   <div class='content'>
     <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word].w %></strong></h4>

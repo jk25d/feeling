@@ -132,15 +132,19 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 	box-shadow: 0px 3px 7px 2px rgba(150,151,168,0.77);
 }
 ._sd0 {
-	-webkit-box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);
+	/*-webkit-box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);
 	-moz-box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);
-	box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);
+	box-shadow: 0px 3px 7px 2px rgba(0,0,0,0.5);*/
+  -webkit-box-shadow: 0px 3px 7px 2px rgba(255,255,255,0.5);
+	-moz-box-shadow: 0px 3px 7px 2px rgba(255,255,255,0.5);
+	box-shadow: 0px 3px 7px 2px rgba(255,255,255,0.5);
 }
 
 /* layout */
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding:40px 0;margin:0;font-size:13px;
+  color:#898696;
   background-color:#afafcc;
   /*background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;*/
   background-image:url(../img/back-billiard-blur2.jpg);background-repeat:no-repeat;background-attachment:fixed;background-position:left top;background-size:cover;
@@ -162,11 +166,11 @@ body {
   /*border-bottom:3px solid #83839c*/
 }
 #fs_status{
-background-color:rgba(0,0,0,0.4)
+background-color:rgba(255,255,255,0.3)
 }
 #fs_body {
   padding:16px;margin-top:20px;box-sizing:border-box;
-  background-color:rgba(0,0,0,0.4);
+  background-color:rgba(255,255,255,0.3);
   /*background-color:#141105;*/
   -moz-border-radius: 8px;
   -webkit-border-radius: 8px;
@@ -193,7 +197,7 @@ background-color:rgba(0,0,0,0.4)
 .talks {line-height:20px;padding:15px 10px;}
 
 .feeling{
-  margin:5px;overflow:hidden;float:left;background-color:rgba(0,0,0,0.3);
+  margin:5px;overflow:hidden;float:left;background-color:rgba(255,255,255,0.3);
 }
 .feeling > .wc {
   float:left;box-sizing:border-box;width:34px;height:34px;line-height:34px;overflow:hidden;
@@ -210,6 +214,9 @@ background-color:rgba(0,0,0,0.4)
 .live_ww{
   float:left;box-sizing:border-box;width:92px;padding:4px 0 0 9px;line-height:16px;overflow:hidden;font-size:12px;
 }
+.live_feeling {
+  padding:4px 9px;line-height:18px;overflow:hidden;font-size:13px;
+}
 .profile{
   width:30px;height:30px;
   display:inline-block;
@@ -219,16 +226,13 @@ background-color:rgba(0,0,0,0.4)
   border-radius: 4px;
   max-width: 100%;
   background-size:30px 30px;
-  background-repeat:no-repeat;
-  background-color:#020303;
+  margin:3px;
 }
 .myprofile{
   background-image:url(../img/profile.jpg);
   background-size:30px 30px;
   background-repeat:no-repeat;
   background-color:#020303;
-}
-.otherprofile{
 }
 img.transparent {
     filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");

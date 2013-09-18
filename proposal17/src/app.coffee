@@ -95,7 +95,7 @@ class DB
 
 
 class Session
-  @EXPIRE_TIME: 60 * 1000
+  @EXPIRE_TIME: 30 * 60 * 1000
   @create: (uid) ->
     s = new Session(uid)
     gDB.put_session uid, s
@@ -132,6 +132,9 @@ class Feeling
     @talks[uid] = []
   summary: ->    # can be access with no perm
     {id: @id, user_id: @user_id, time: @time, word: @word}
+  anony_content: ->
+    u = gDB.user @user_id
+    {time: @time, img: u.img, word: @word, blah: @blah}
   extend: (user_id) ->
     x = clone @
     u = gDB.user x.user_id
@@ -174,7 +177,7 @@ class Feeling
     @talks = {}
 
 class UserFeelings
-  constructor: ->
+  constructor: (@_uid) ->
     @_actives = [] # old one first
     @_mines = []   # new one first
     @_rcvs = []    # new one first
@@ -187,15 +190,17 @@ class UserFeelings
   mine_len: -> @_mines.length
   rcvs_len: -> @_rcvs.length
   total_len: -> @_mines.length + @_rcvs.length
-  my_actives: (uid) ->
+  my_actives: ->
     r = []
+    console.log @actives()
     for f in @actives()
-      r.push if f.has_own_perm uid
+      r.push if f.has_own_perm @_uid
     r
-  rcv_actives: (uid) ->
+  rcv_actives: ->
     r = []
+    console.log @_uid
     for f in @actives()
-      r.push unless f.has_own_perm uid
+      r.push unless f.has_own_perm @_uid
     r
   actives: ->
     @_filter_actives().map (fid) -> gDB.feeling fid
@@ -222,7 +227,7 @@ class User
     @n_hearts = 0
     @n_availables = 0
     @arrived_feelings = []
-    @feelings = new UserFeelings()
+    @feelings = new UserFeelings(@id)
   summary: (extend = false)->
     u = clone @
     delete u.password
@@ -297,6 +302,8 @@ class Dispatcher
     @_item_que.push new WaitItem id
   register_user: (uid) ->
     @_user_que.push new WaitItem uid
+  latest_feelings: (n) ->
+    @_item_que.slice(0, min(n, @_item_que.length)).map (wf) -> wf.id
   log: ->
     console.log "name, hearts, arrived, my, rcv"
     for uid, u of gDB.users()
@@ -450,6 +457,12 @@ app.put '/api/arrived_feelings/:id', (req,res) ->
   me.grab_feeling(id)
   res.json f.extend_full me.id
 
+app.get '/api/live_feelings', (req,res) ->
+  me = gDB.user req.session.user_id
+  n = req.params.n || 20
+  res.json gDispatcher.latest_feelings(n).map (fid) ->
+    gDB.feeling(fid)?.anony_content()
+
 
 # UTILS
 clone = (obj) ->
@@ -498,19 +511,18 @@ schedule = ->
 schedule()
 
 u0 = User.create('sun', 'img/profile.jpg', 'sun@gmail.com', 'sun00')
-u1 = User.create('moon', 'img/profile.jpg', 'moon@gmail.com', 'moon00')
-u2 = User.create('asdf', 'img/profile.jpg', 'asdf', 'asdf')
+u1 = User.create('moon', 'img/profile2.jpg', 'moon@gmail.com', 'moon00')
+u2 = User.create('asdf', 'img/profile4.jpg', 'asdf', 'asdf')
 
-auto_feeling= ->
-  console.log '## auto fill started'
+auto_feeling= (user) ->
   word = rand(0,29)
   a = []
   for n in [0..rand(0,9)]
     a.push 'blah'
-  Feeling.create(u0, true, word, a.join(''))
-  setTimeout auto_feeling, 10000
-  console.log '## auto fill done'
-auto_feeling()
+  Feeling.create(user, true, word, a.join(''))
+  setTimeout auto_feeling, 15000, user
+auto_feeling u0
+auto_feeling u1
 
 app.listen '3333'
 console.log 'listening on 3333'
