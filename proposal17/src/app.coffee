@@ -71,12 +71,13 @@ app.del '/sessions', (req,res) ->
 #### GLOBAL DATA ####
 
 class DB
-  _sessions: {}
-  _emails: {}
-  _users: {}
-  _feelings: {}
   feelings_seq: 1
   users_seq: 1
+  constructor: ->
+    @_sessions = {}
+    @_emails = {}
+    @_users = {}
+    @_feelings = {}
   session: (id) -> @_sessions[id]
   put_session: (id, data) -> @_sessions[id] = data
   del_session: (id) -> delete @_sessions[id]
@@ -99,20 +100,18 @@ class Session
     s = new Session(uid)
     gDB.put_session uid, s
     s
-  constructor: (@user_id) ->
-    @update()
-  update: ->
-    @time = now()
-  expired: ->
-    now() - @time > Session.EXPIRE_TIME
+  constructor: (@user_id) -> @update()
+  update: -> @time = now()
+  expired: -> now() - @time > Session.EXPIRE_TIME
 
 # before access, should be checked perm & sharable
 class Feeling
   @SHARE_DUR: 60 * 60 * 1000
+  @DETACHABLE_DUR: @SHARE_DUR /2
   @create: (me, is_public, word, blah) ->
     f = new Feeling(me, is_public, word, blah)
     gDB.put_feeling f
-    me.my_feelings.unshift f.id
+    me.feelings.push_mine f.id
     gDispatcher.register_item f.id if is_public
     f
   constructor: (me, is_public, @word, @blah) ->
@@ -141,6 +140,7 @@ class Feeling
     unless @has_own_perm(user_id)
       x.own = false
       x.n_talk_users = 1
+      console.log JSON.stringify @
       x.n_talk_msgs = @talks[user_id].length
     else
       x.own = true
@@ -172,6 +172,42 @@ class Feeling
     @status = 'removed'
     @blah = ''
     @talks = {}
+
+class UserFeelings
+  constructor: ->
+    @_actives = [] # old one first
+    @_mines = []   # new one first
+    @_rcvs = []    # new one first
+  push_mine: (id) ->
+    @_actives.push id
+    @_mines.unshift id
+  push_rcv: (id) ->
+    @_actives.push id
+    @_rcvs.unshift id
+  mine_len: -> @_mines.length
+  rcvs_len: -> @_rcvs.length
+  total_len: -> @_mines.length + @_rcvs.length
+  my_actives: (uid) ->
+    r = []
+    for f in @actives()
+      r.push if f.has_own_perm uid
+    r
+  rcv_actives: (uid) ->
+    r = []
+    for f in @actives()
+      r.push unless f.has_own_perm uid
+    r
+  actives: ->
+    @_filter_actives().map (fid) -> gDB.feeling fid
+  _filter_actives: ->
+    _now = now()
+    for fid in @_actives
+      f = gDB.feeling fid
+      break if f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
+      @actives.unshift()
+    @_actives
+  mine: (s,e) -> @_mine.slice(s,e).map (fid) -> gDB.feeling fid
+  rcvs: (s,e) -> @_rcvs.slice(s,e).map (fid) -> gDB.feeling fid
   
 
 class User
@@ -186,17 +222,16 @@ class User
     @n_hearts = 0
     @n_availables = 0
     @arrived_feelings = []
-    @my_feelings = []
-    @rcv_feelings = []
+    @feelings = new UserFeelings()
   summary: (extend = false)->
     u = clone @
     delete u.password
     u.arrived_feelings = @arrived_feelings.length
-    u.my_feelings = @my_feelings.length
-    u.rcv_feelings = @rcv_feelings.length
+    u.my_feelings = @feelings.mine_len()
+    u.rcv_feelings = @feelings.rcvs_len()
     if extend
-      u.my_shared = @my_shared().length
-      u.rcv_shared = @rcv_shared().length
+      u.my_shared = @feelings.my_actives().length
+      u.rcv_shared = @feelings.rcv_actives().length
     u
   valid_arrived_feeling: (id) ->
     @arrived_feelings.length > 0 && "#{@arrived_feelings[0]}" == id
@@ -205,23 +240,7 @@ class User
     @arrived_feelings = []
     gDispatcher.register_user @id
   grab_feeling: (fid) ->
-    @rcv_feelings.unshift fid
-  my_shared: ->
-    r = []
-    for fid in @my_feelings
-      f = gDB.feeling fid
-      continue unless f
-      break unless f.sharable_time()
-      r.push fid if f.sharable()
-    r
-  rcv_shared: ->
-    r = []
-    for fid in @rcv_feelings
-      f = gDB.feeling fid
-      continue unless f
-      break unless f.sharable_time()
-      r.push fid if f.sharable()
-    r
+    @feelings.push_rcv fid
 
 
 class WaitItem
@@ -230,19 +249,20 @@ class WaitItem
 class Dispatcher
   @MIN_USER_WAIT_TIME: 5000
   @INTERVAL: 5000
-  user_que: []
-  item_que: []
   constructor: ->
+    @_user_que = []
+    @_item_que = []
     for uid, u of gDB.users()
       register_user uid if u.arrived_feelings.length == 0
-    @user_que.sort (a,b) -> a.wait_time - b.wait_time
+    @_user_que.sort (a,b) -> a.wait_time - b.wait_time
   run: ->
     hungry_users = []
-    while @user_que.length > 0
-      wu = @user_que.shift()
+    _now = now()
+    while @_user_que.length > 0
+      wu = @_user_que.shift()
       u = gDB.user wu.id
       continue unless u
-      if now() - u.wait_time < Dispatcher.MIN_USER_WAIT_TIME
+      if _now - u.wait_time < Dispatcher.MIN_USER_WAIT_TIME
         hungry_users.push wu
         break
       fid = @select_item(wu)
@@ -251,38 +271,42 @@ class Dispatcher
         continue
       u.arrived_feelings.push fid
     while hungry_users.length > 0
-      @user_que.unshift hungry_users.pop()
+      @_user_que.unshift hungry_users.pop()
   select_item: (wu) ->
     candidates = []
     n_candi = 0
     reusable = []
-    while @item_que.length > 0 && n_candi < 30
-      wf = @item_que.shift()
+    while @_item_que.length > 0 && n_candi < 30
+      wf = @_item_que.shift()
       item = gDB.feeling wf.id
       continue unless item && item.sharable()
       reusable.push wf
-      continue if item.has_group_perm(wu)
+      continue if item.has_group_perm(wu.id)
       for n in [0..item.weight(wu.wait_time)]
-        candidates.push item.id
+        candidates.push wf
       n_candi++
+    selected = if candidates.length == 0 then null \
+      else candidates[rand(0,candidates.length-1)]
     while reusable.length > 0
-      @item_que.push reusable.shift()
-    return if candidates.length == 0 then null else \
-      candidates[rand(0,candidates.length-1)]
+      f = reusable.shift()
+      continue if selected && selected.id == f.id
+      @_item_que.push f
+    @_item_que.push selected if selected
+    selected?.id
   register_item: (id) ->
-    @item_que.push new WaitItem id
+    @_item_que.push new WaitItem id
   register_user: (uid) ->
-    @user_que.push new WaitItem uid
+    @_user_que.push new WaitItem uid
   log: ->
     console.log "name, hearts, arrived, my, rcv"
     for uid, u of gDB.users()
-      console.log "#{u.name}, #{u.n_hearts}, #{u.arrived_feelings.length}, #{u.my_feelings.length}, #{u.rcv_feelings.length}"
+      console.log "#{u.name}, #{u.n_hearts}, #{u.arrived_feelings.length}, #{u.feelings.mine_len()}, #{u.feelings.rcvs_len()}"
     users = []
-    for wu in @user_que
+    for wu in @_user_que
       users.push JSON.stringify(gDB.user(wu.id).name)
     console.log "userQ: #{users.join()}"
     items = []
-    for wf in @item_que
+    for wf in @_item_que
       items.push wf.id
     console.log "itemQ: #{items.join()}"
 
@@ -308,25 +332,12 @@ app.get '/api/feelings', (req,res) ->
   n = req.params.n || 30
   type = req.params.type
 
-  r = []
-  if type == 'my'
-    for fid in me.my_feelings.slice(max(0,skip),min(my_feelings.length,skip+n))
-      f = gDB.feeling fid
-      r.push f.extend(me.id) if f
+  res.json if type == 'my'
+    me.feelings.mine(max(0,skip), min(me.feelings.mine_len(),skip+n)).map (f) -> f.extend(me.id)
   else if type == 'rcv'
-    for fid in me.rcv_feelings.slice(max(0,skip),min(rcv_feelings.length,skip+n))
-      f = gDB.feeling fid
-      r.push f.extend(me.id) if f
+    me.feelings.rcvs(max(0,skip), min(me.feelings.rcvs_len(),skip+n)).map (f) -> f.extend(me.id)
   else
-    a = me.my_shared()
-    b = me.rcv_shared()
-    for fid in me.my_shared()
-      f = gDB.feeling fid
-      r.push f.extend me.id
-    for fid in me.rcv_shared()
-      f = gDB.feeling fid
-      r.push f.extend me.id
-  res.json r
+    me.feelings.actives().map (f) -> f.extend(me.id)
 
 app.post '/api/feelings', (req,res) ->
   me = gDB.user req.session.user_id

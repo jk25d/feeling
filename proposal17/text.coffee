@@ -1,4 +1,3 @@
-try
-  throw 'asdf'
-catch err
-  console.log err
+a = {id:1}
+console.log a && a.id
+console.log b?.id
