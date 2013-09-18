@@ -717,6 +717,10 @@
         return _ref23;
       }
 
+      AppView.prototype.events = {
+        'click .fs_menu': '_on_click_menu'
+      };
+
       AppView.prototype.template = Tpl.navbar;
 
       AppView.prototype.initialize = function() {
@@ -727,6 +731,19 @@
         this.$el.html(this.template(this.model.toJSON()));
         this.$el.find('.fs_menu').removeClass('active');
         return $(this.model.get('menu')).addClass('active');
+      };
+
+      AppView.prototype._on_click_menu = function(e) {
+        var current_hash, event_hash;
+        event_hash = $(e.currentTarget).find('a').attr('href');
+        current_hash = window.location.hash;
+        if (event_hash.charAt(0) === '#' && event_hash === current_hash) {
+          e.preventDefault();
+          Backbone.history.fragment = null;
+          return router.navigate(event_hash.substr(1), {
+            trigger: true
+          });
+        }
       };
 
       AppView.prototype.close = function() {
@@ -936,7 +953,10 @@
             is_public: true
           },
           success: function(data) {
-            return router.shared_feelings();
+            Backbone.history.fragment = null;
+            return router.navigate('shared_feelings', {
+              trigger: true
+            });
           }
         });
       };

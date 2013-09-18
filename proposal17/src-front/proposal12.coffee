@@ -265,6 +265,8 @@ $ ->
     @arrived_holder: _.template $('#tpl_arrived_holder').html()
 
   class AppView extends FsView
+    events:
+      'click .fs_menu': '_on_click_menu'
     template: Tpl.navbar
     initialize: ->
       @model.on 'change:menu', @show, @
@@ -272,6 +274,13 @@ $ ->
       @$el.html @template(@model.toJSON())
       @$el.find('.fs_menu').removeClass 'active'
       $(@model.get('menu')).addClass 'active'
+    _on_click_menu: (e) ->
+      event_hash = $(e.currentTarget).find('a').attr('href')
+      current_hash = window.location.hash
+      if event_hash.charAt(0) == '#' && event_hash == current_hash
+        e.preventDefault()
+        Backbone.history.fragment = null        
+        router.navigate event_hash.substr(1), {trigger: true}
     close: ->
       super()
       @model.off 'change:menu', @show
@@ -361,8 +370,8 @@ $ ->
           blah: @$el.find('#new_feeling_content').val()
           is_public: true
         success: (data) ->
-          #router.navigate 'shared_feelings', {trigger: true}
-          router.shared_feelings()
+          Backbone.history.fragment = null
+          router.navigate 'shared_feelings', {trigger: true}
 
   class TalkView extends FsView
     template: Tpl.talk

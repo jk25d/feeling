@@ -1,3 +1,5 @@
-a = {id:1}
-console.log a && a.id
-console.log b?.id
+foo = (op) ->
+  op.a
+
+console.log foo(a : 1)
+console.log foo {a:1}
