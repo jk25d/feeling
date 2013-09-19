@@ -5,14 +5,10 @@
   <meta name="viewport" content="width=device-width, minimum-scale=
 1.0, maximum-scale=1.0">
   <title>NANAV</title>
-  <link rel="stylesheet" href="bootstrap/css/bootstrap.css" media='screen'>
-  <style>
-    body {}
-  </style>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-icon.min.css" media='screen'>
   <link rel="stylesheet" href="css/proposal12.css" media='screen'>
   <script src="js/jquery-1.10.2.min.js"></script>
   <script src="js/jquery.wookmark.js"></script>
-  <script src="bootstrap/js/bootstrap.js"></script>
   <script src="js/json2.js"></script>
   <script src="js/underscore-1.5.1.js"></script>
   <script src="js/backbone-1.0.0.min.js"></script>
@@ -31,38 +27,24 @@
 <!-- TEMPLATES -->
 
 <script type='text/template' id='tpl_navbar'>
-<div class="fs_navbar">
-  <div class='fs_navbar-inner' style='overflow:hidden;height:40px;padding:0 20px;line-height:40px;color:#ffffff'>
-
-    <!--button type='button' class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
-      <span class='icon-bar'></span>
-      <span class='icon-bar'></span>
-      <span class='icon-bar'></span>
-    </button-->
-
-    <div style='float:left;width:160px;' ><a href='#'>FEELING SHARE</a></div>
-    <div style='float:left'>
-      <ul>
-      <% if(menu != '#menu_signup'){ %>
-        <li id='menu_share' class='fs_menu'><a href='#shared_feelings'>SHARED FEELINGS</a></li>
-        <li id='menu_my' class='fs_menu'><a href='#my_feelings'>MY FEELINGS</a></li>
-        <li id='menu_received' class='fs_menu'><a href='#received_feelings'>RECEIVED</a></li>
-        <li class="dropdown">
-          <a class="dropdown-toggle fs_link" data-toggle="dropdown">
-            <span class='icon-bar'></span>
-            <span class='icon-bar'></span>
-            <span class='icon-bar'></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href='#logout'>LOGOUT</a></li>
-          </ul>
-        </li-->
-      <% }else{ %>
-        <li id='menu_signup' class='fs_menu'><a href='#'>SIGN UP</a></li>
-      <% } %>
-      </ul>
-    </div>
-
+<div class='fs_navbar-inner' style='line-height:40px;color:#ffffff'>
+  <div style='float:left;margin:0 20px;'><a href='#'>FEELING SHARE</a></div>
+  <div style='float:right;'>
+    <a class="fs_nav_dropdown fs_link" data-toggle="dropdown">
+      <div class='icon-bar' style='display:block;margin-top:1px;width:18px;height:2px;background-color:#f5f5f5;'></div>
+      <div class='icon-bar' style='display:block;margin-top:1px;width:18px;height:2px;background-color:#f5f5f5;'></div>
+      <div class='icon-bar' style='display:block;margin-top:1px;width:18px;height:2px;background-color:#f5f5f5;'></div>
+    </a>
+  </div>
+  <div style=''>
+  <% if(menu != '#menu_signup'){ %>
+    <div id='menu_share' class='fs_menu'><a href='#shared_feelings'>SHARED FEELINGS</a></div>
+    <div id='menu_my' class='fs_menu'><a href='#my_feelings'>MY FEELINGS</a></div>
+    <div id='menu_received' class='fs_menu'><a href='#received_feelings'>RECEIVED</a></div>
+    <div class='fs_menu'><a href='#logout'>LOGOUT</a></div>
+  <% }else{ %>
+    <div id='menu_signup' class='fs_menu'><a href='#'>SIGN UP</a></div>
+  <% } %>
   </div>
 </div>
 </script>

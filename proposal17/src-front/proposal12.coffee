@@ -293,7 +293,7 @@ $ ->
 
   class AppView extends FsView
     events:
-      'click .dropdown-toggle': '_on_toggle_dropdown'
+      'click .fs_nav_dropdown': '_on_toggle_dropdown'
       'click .fs_menu': '_on_click_menu'
     template: Tpl.navbar
     initialize: ->
@@ -302,8 +302,9 @@ $ ->
       @$el.html @template(@model.toJSON())
       @$el.find('.fs_menu').removeClass 'active'
       $(@model.get('menu')).addClass 'active'
-    _on_toggle_dropdown: (e) ->
-      $(e.currentTarget).dropdown()
+    _on_toggle_dropdown: ->
+      console.log 'nav drop'
+      @$el.find('.fs_menu').toggleClass 'fs_menu_pop'
     _on_click_menu: (e) ->
       event_hash = $(e.currentTarget).find('a').attr('href')
       current_hash = window.location.hash

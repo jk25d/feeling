@@ -23,6 +23,14 @@
 @media (min-width: 1416px) {
   .fs_container {width: 1396px;margin:0 auto}
 }
+@media(max-width: 640px){
+.fs_menu { display:none;}
+.fs_nav_dropdown { display:inline-block }
+}
+@media(min-width: 641px){
+.fs_menu { display:inline-block;margin-right:20px;}
+.fs_nav_dropdown { display:none}
+}
 
 
 /* override */
@@ -49,31 +57,9 @@ h5 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;line-height:18px;color:#bbbbbb;}
 
 
-.icon-trans,
-.nav-pills > .active > a > [class^="icon-"],
-.nav-pills > .active > a > [class*=" icon-"],
-.nav-list > .active > a > [class^="icon-"],
-.nav-list > .active > a > [class*=" icon-"],
-.navbar-inverse .nav > .active > a > [class^="icon-"],
-.navbar-inverse .nav > .active > a > [class*=" icon-"],
-.dropdown-menu > li > a:hover > [class^="icon-"],
-.dropdown-menu > li > a:focus > [class^="icon-"],
-.dropdown-menu > li > a:hover > [class*=" icon-"],
-.dropdown-menu > li > a:focus > [class*=" icon-"],
-.dropdown-menu > .active > a > [class^="icon-"],
-.dropdown-menu > .active > a > [class*=" icon-"],
-.dropdown-submenu:hover > a > [class^="icon-"],
-.dropdown-submenu:focus > a > [class^="icon-"],
-.dropdown-submenu:hover > a > [class*=" icon-"],
-.dropdown-submenu:focus > a > [class*=" icon-"] {
-  background-image: url("../img/glyphicons-halflings-transparent.png");
-}
-
 /* common classes */
-
-.fs_menu {
-  width:160px;
-  text-align:center;
+.fs_menu_pop{
+  display:block;clear:both;
 }
 .fs_menu.active {
   background-color:#0b0d09;

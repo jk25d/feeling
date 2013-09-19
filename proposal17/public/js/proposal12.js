@@ -752,7 +752,7 @@
       }
 
       AppView.prototype.events = {
-        'click .dropdown-toggle': '_on_toggle_dropdown',
+        'click .fs_nav_dropdown': '_on_toggle_dropdown',
         'click .fs_menu': '_on_click_menu'
       };
 
@@ -768,8 +768,9 @@
         return $(this.model.get('menu')).addClass('active');
       };
 
-      AppView.prototype._on_toggle_dropdown = function(e) {
-        return $(e.currentTarget).dropdown();
+      AppView.prototype._on_toggle_dropdown = function() {
+        console.log('nav drop');
+        return this.$el.find('.fs_menu').toggleClass('fs_menu_pop');
       };
 
       AppView.prototype._on_click_menu = function(e) {
