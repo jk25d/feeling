@@ -213,7 +213,7 @@
       this.word = word;
       this.blah = blah;
       this.user_id = me.id;
-      this.id = gDB.feelings_seq++;
+      this.id = 'f' + gDB.feelings_seq++;
       this.status = is_public ? 'public' : 'private';
       this.time = now();
       this.talks = {};
@@ -263,7 +263,11 @@
       var comments, tuid, u, x, _ref;
       x = clone(this);
       u = gDB.user(x.user_id);
-      x.user = u.summary();
+      x.users = {};
+      x.users[u.id] = {
+        name: u.name,
+        img: u.img
+      };
       x.share = this.sharable();
       if (!this.has_own_perm(user_id)) {
         x.own = false;
@@ -284,22 +288,16 @@
     };
 
     Feeling.prototype.extend_full = function(user_id) {
-      var comments, tu, tuid, u, x, _ref;
+      var comments, tu, tuid, x, _ref;
       x = this.extend(user_id);
       if (!this.has_own_perm(user_id)) {
         x.talks[user_id] = this.talks[user_id];
       }
-      u = gDB.user(user_id);
-      x.talk_user = {};
-      x.talk_user[u.id] = {
-        name: u.name,
-        img: u.img
-      };
       _ref = x.talks;
       for (tuid in _ref) {
         comments = _ref[tuid];
         tu = gDB.user(tuid);
-        x.talk_user[tuid] = {
+        x.users[tuid] = {
           name: tu.name,
           img: tu.img
         };
@@ -353,7 +351,7 @@
       return this._rcvs.unshift(id);
     };
 
-    UserFeelings.prototype.mine_len = function() {
+    UserFeelings.prototype.mines_len = function() {
       return this._mines.length;
     };
 
@@ -368,12 +366,11 @@
     UserFeelings.prototype.my_actives = function() {
       var f, r, _i, _len, _ref;
       r = [];
-      console.log(this.actives());
       _ref = this.actives();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         f = _ref[_i];
         if (f.has_own_perm(this._uid)) {
-          r.push;
+          r.push(f);
         }
       }
       return r;
@@ -382,12 +379,11 @@
     UserFeelings.prototype.rcv_actives = function() {
       var f, r, _i, _len, _ref;
       r = [];
-      console.log(this._uid);
       _ref = this.actives();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         f = _ref[_i];
         if (!f.has_own_perm(this._uid)) {
-          r.push;
+          r.push(f);
         }
       }
       return r;
@@ -409,21 +405,49 @@
         if (f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR) {
           break;
         }
-        this.actives.unshift();
+        this._actives.unshift();
       }
       return this._actives;
     };
 
-    UserFeelings.prototype.mine = function(s, e) {
-      return this._mine.slice(s, e).map(function(fid) {
+    UserFeelings.prototype.mines = function(s, e) {
+      if (s === e) {
+        return [];
+      }
+      console.log("mines: " + (JSON.stringify(this._mines)) + " (" + s + ", " + e + ")");
+      return this._mines.slice(s, e).map(function(fid) {
         return gDB.feeling(fid);
       });
     };
 
     UserFeelings.prototype.rcvs = function(s, e) {
+      if (s === e) {
+        return [];
+      }
+      console.log("rcvs: " + (JSON.stringify(this._rcvs)) + " (" + s + ", " + e + ")");
       return this._rcvs.slice(s, e).map(function(fid) {
         return gDB.feeling(fid);
       });
+    };
+
+    UserFeelings.prototype.find_mine_idx = function(id) {
+      var i, _i, _ref;
+      for (i = _i = 0, _ref = this._mines.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        if (this._mines[i] === id) {
+          return i;
+        }
+      }
+      return 0;
+    };
+
+    UserFeelings.prototype.find_rcv_idx = function(id) {
+      var i, _i, _ref;
+      for (i = _i = 0, _ref = this._rcvs.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        if (this._rcvs[i] === id) {
+          return i;
+        }
+      }
+      return 0;
     };
 
     return UserFeelings;
@@ -445,7 +469,7 @@
       this.img = img;
       this.email = email;
       this.password = password;
-      this.id = gDB.users_seq++;
+      this.id = 'u' + gDB.users_seq++;
       this.n_hearts = 0;
       this.n_availables = 0;
       this.arrived_feelings = [];
@@ -460,7 +484,7 @@
       u = clone(this);
       delete u.password;
       u.arrived_feelings = this.arrived_feelings.length;
-      u.my_feelings = this.feelings.mine_len();
+      u.my_feelings = this.feelings.mines_len();
       u.rcv_feelings = this.feelings.rcvs_len();
       if (extend) {
         u.my_shared = this.feelings.my_actives().length;
@@ -470,7 +494,7 @@
     };
 
     User.prototype.valid_arrived_feeling = function(id) {
-      return this.arrived_feelings.length > 0 && ("" + this.arrived_feelings[0]) === id;
+      return this.arrived_feelings.length > 0 && this.arrived_feelings[0] === id;
     };
 
     User.prototype.pop_arrived_feeling = function() {
@@ -569,11 +593,11 @@
       }
       selected = candidates.length === 0 ? null : candidates[rand(0, candidates.length - 1)];
       while (reusable.length > 0) {
-        f = reusable.shift();
+        f = reusable.pop();
         if (selected && selected.id === f.id) {
           continue;
         }
-        this._item_que.push(f);
+        this._item_que.unshift(f);
       }
       if (selected) {
         this._item_que.push(selected);
@@ -601,7 +625,7 @@
       _ref = gDB.users();
       for (uid in _ref) {
         u = _ref[uid];
-        console.log("" + u.name + ", " + u.n_hearts + ", " + u.arrived_feelings.length + ", " + (u.feelings.mine_len()) + ", " + (u.feelings.rcvs_len()));
+        console.log("" + u.name + ", " + u.n_hearts + ", " + u.arrived_feelings.length + ", " + (u.feelings.mines_len()) + ", " + (u.feelings.rcvs_len()));
       }
       users = [];
       _ref1 = this._user_que;
@@ -643,16 +667,17 @@
   });
 
   app.get('/api/feelings', function(req, res) {
-    var me, n, skip, type;
+    var from, from_idx, me, n, skip, type;
     me = gDB.user(req.session.user_id);
-    skip = req.params.skip || 0;
-    n = req.params.n || 30;
-    type = req.params.type;
-    return res.json(type === 'my' ? me.feelings.mine(max(0, skip), min(me.feelings.mine_len(), skip + n)).map(function(f) {
+    skip = req.query.skip && parseInt(req.query.skip) || 0;
+    n = req.query.n && parseInt(req.query.n) || 30;
+    type = req.query.type;
+    from = req.query.from || 0;
+    return res.json(type === 'my' ? (from_idx = from === 0 ? 0 : me.feelings.find_mine_idx(from), console.log("from_idx: " + from_idx), console.log("" + (max(0, from_idx + skip)) + " to " + (min(me.feelings.mines_len(), from_idx + skip + n))), me.feelings.mines(max(0, from_idx + skip), min(me.feelings.mines_len(), from_idx + skip + n)).map(function(f) {
       return f.extend(me.id);
-    }) : type === 'rcv' ? me.feelings.rcvs(max(0, skip), min(me.feelings.rcvs_len(), skip + n)).map(function(f) {
+    })) : type === 'rcv' ? (from_idx = from === 0 ? 0 : me.feelings.find_rcv_idx(from), console.log("from_idx: " + from_idx), console.log("" + (max(0, from_idx + skip)) + " to " + (min(me.feelings.rcvs_len(), from_idx + skip + n))), me.feelings.rcvs(max(0, from_idx + skip), min(me.feelings.rcvs_len(), from_idx + skip + n)).map(function(f) {
       return f.extend(me.id);
-    }) : me.feelings.actives().map(function(f) {
+    })) : me.feelings.actives().map(function(f) {
       return f.extend(me.id);
     }));
   });
@@ -732,11 +757,12 @@
   });
 
   app.post('/api/feelings/:id/talks/:user_id/comments', function(req, res) {
-    var blah, f, id, me, user_id;
+    var blah, comment, f, id, me, user_id;
     me = gDB.user(req.session.user_id);
     id = req.params.id;
     user_id = req.params.user_id;
     blah = req.body.blah;
+    console.log("comment: " + blah);
     f = gDB.feeling(id);
     if (!(f && f.has_group_perm(me.id))) {
       res.send(406, "No permission to access this feeling: " + id);
@@ -746,18 +772,15 @@
       res.send(406, "This feeling is no longer sharable.");
       return;
     }
+    comment = {
+      user_id: me.id,
+      blah: blah,
+      time: now()
+    };
     if (f.has_own_perm(me.id)) {
-      f.talks[user_id].push({
-        user_id: user_id,
-        blah: blah,
-        time: now()
-      });
+      f.talks[user_id].push(comment);
     } else {
-      f.talks[me.id].push({
-        user_id: me.id,
-        blah: blah,
-        time: now()
-      });
+      f.talks[me.id].push(comment);
     }
     return res.json({});
   });
@@ -798,7 +821,7 @@
   app.get('/api/live_feelings', function(req, res) {
     var me, n;
     me = gDB.user(req.session.user_id);
-    n = req.params.n || 20;
+    n = req.query.n || 20;
     return res.json(gDispatcher.latest_feelings(n).map(function(fid) {
       var _ref;
       return (_ref = gDB.feeling(fid)) != null ? _ref.anony_content() : void 0;

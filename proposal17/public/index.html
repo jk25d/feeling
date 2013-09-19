@@ -47,12 +47,16 @@
         <li id='menu_share' class='fs_menu'><a href='#shared_feelings'>SHARED FEELINGS</a></li>
         <li id='menu_my' class='fs_menu'><a href='#my_feelings'>MY FEELINGS</a></li>
         <li id='menu_received' class='fs_menu'><a href='#received_feelings'>RECEIVED</a></li>
-        <li class="dropdown _r" style='display:inline-block'>
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i> <b class="caret"></b></a>
+        <li class="dropdown">
+          <a class="dropdown-toggle fs_link" data-toggle="dropdown">
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+          </a>
           <ul class="dropdown-menu">
             <li><a href='#logout'>LOGOUT</a></li>
           </ul>
-        </li>
+        </li-->
       <% }else{ %>
         <li id='menu_signup' class='fs_menu'><a href='#'>SIGN UP</a></li>
       <% } %>
@@ -202,9 +206,9 @@
 <script type='text/template' id='tpl_feeling'>
   <div class='inner fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
   <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
-    <i class='profile' style='background-image:url(<%=user.img%>)'></i>
-    <span class='_rspc'><%=user.name%></span>
-    <span class='_r' style=''><%= datefmt(time) %></span>
+    <i class='profile' style='background-image:url(<%=users[user_id].img%>)'></i>
+    <span class='_rspc'><%=users[user_id].name%></span>
+    <span class='_r' style=''><%= datefmt(time) %> 전</span>
   </div>
   <div class='content'>
     <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word].w %></strong></h4>
@@ -222,44 +226,34 @@
 <script type='text/template' id='tpl_talk'>
 <div style='border-bottom:1px solid rgba(0,0,0,0.3)'>
   <div>
-    <i class='profile' style='background-image:url(<%=user[talk_user_id].img%>)'></i>
-    <span><%=user[talk_user_id].name%></span>
-    <% if(mine && share) { %>
+    <i class='profile' style='background-image:url(<%=users[talk_user_id].img%>)'></i>
+    <span><%=users[talk_user_id].name%></span>
+    <% if(my_id == feeling_user_id && !like) { %>
     <i class='icon-heart icon-white fs_link'></i>
     <% } %>
   </div>
-  <ul class='comments'>
+  <div class='comments'>
+    <% var commentor_id = null %>
     <% for(var i=0; i<comments.length; i++){ %>
-      <li>
-        <h6 class='_rspc'><%=user[comments[i].user_id].name %></h6>
-        <h6 class='_rspc'><%=comments[i].blah %></h6>
-        <h6><%=comments[i].time%></h6>
-      </li>
-      <% if(shared && i == comments.length-1) { %>
-        <% if(mine && talk_user_id == comments[i].user_id){ %>
-          <li>
-            <div style='padding:10px;overflow:hidden'>
-              <input type="text" placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
-            </div>
-            <div style='overflow:hidden'>
-              <a class='btn _r fs_link'>작성하기</a>
-            </div>
-          </li>
-        <% } %>
-      <% } %>
+      <% commentor_id = comments[i].user_id %>
+      <div>
+        <h5 class='_rspc'><%=users[commentor_id].name %></h5>
+        <h5 class='_rspc'><%=comments[i].blah %></h5>
+        <h5><%=datefmt(comments[i].time)%></h5>
+      </div>
     <% } %>
 
-    <% if(comments.length == 0 && shared && !mine) {%>
-      <li>
+    <% if( (my_id == talk_user_id && commentor_id && commentor_id != my_id) || (my_id != talk_user_id && !commentor_id || commentor_id != my_id) ) { %>
+      <div>
         <div style='padding:10px;overflow:hidden'>
-          <input type="text" placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
+          <input type="text" class='talk_blah' placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
         </div>
         <div style='overflow:hidden'>
-          <a class='btn _r fs_link'>작성하기</a>
+          <a class='talk_submit _r fs_link'>작성하기</a>
         </div>
-      </li>
+      </div>
     <% }%>
-  </ul>
+  </div>
 </div>
 </script>
 

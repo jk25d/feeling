@@ -197,7 +197,7 @@ background-color:rgba(255,255,255,0.3)
 .talks {line-height:20px;padding:15px 10px;}
 
 .feeling{
-  margin:5px;overflow:hidden;float:left;background-color:rgba(255,255,255,0.3);
+  margin:5px;overflow:hidden;float:left;background-color:rgba(255,255,255,0.3);color:#ffffff;
 }
 .feeling > .wc {
   float:left;box-sizing:border-box;width:34px;height:34px;line-height:34px;overflow:hidden;
@@ -245,7 +245,7 @@ img.transparent {
 }
 
 #flipcard {
-  background-color:#45474c;height:224px;color:#c6aae2;text-align:center;padding-top:100px;
+  background-color:#45474c;height:224px;color:#c6aae2;text-align:center;padding-top:100px;box-sizing:border-box;
 }
 
 

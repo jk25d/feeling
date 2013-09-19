@@ -831,15 +831,13 @@ GET /feelings?type=[my,rcv,share]
 
 
 my feeling
-  talks
-    'uid'
-      last comment.uid == talks.uid  --> input
+  talk_last_uid != me
 
 rcv fee
-  talks
-    'uid'
-      no comment --> input
-      last comment.uid != talks.uid --> input
+  talk_last_uid == null || != me
+
+my_id == talk_user_id && commentor_id && commentor_id != my_id
+my_id != talk_user_id && !commentor_id || commentor_id != my_id
 
 
 card-rcv
@@ -973,22 +971,21 @@ DATA
 
 ============ 0918 ============
 디자인
+  * 네비바.. 모바일 화면
   * 회색 글씨.. 잘 안보임
   * 코멘트 화면
   * 글쓰기 텍스트에어리어
-  * 네비바.. 모바일 화면
   * 카드 디자인.. 내가 쓴거.. 받은거 구별가게
   * 글쓰기.. 사이즈 줄이기.. 처음엔 텍스트에어리어만.. 클릭하면 커지게..
   * 스테이터스바 내의 컨텐츠 배치
 
 기능
-  * 어라이브드 필링.. 폴링..
-  * 코멘트 테스트
-  * 스테이터스바 지금 제대로 동작안함
-  * 하트 보내기
-  * 내가 쓴 느낌 리스트 화면
-  * 내가 받은 느낌 리스트 화면
+  # 스테이터스바 지금 제대로 동작안함
+  # 하트 보내기
+  # 내가 쓴 느낌 리스트 화면
+  # 코멘트 테스트
   * 받은 느낌 삭제..
+  # 내가 받은 느낌 리스트 화면
   * 어라이브드 필링형태로 공지사항 보내려면??
 
 기타

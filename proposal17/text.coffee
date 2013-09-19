@@ -1,5 +1,3 @@
-foo = (op) ->
-  op.a
-
-console.log foo(a : 1)
-console.log foo {a:1}
+a = [1,2,3]
+for i in [0..a.length-1]
+  console.log a[i]
