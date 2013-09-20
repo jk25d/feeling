@@ -126,7 +126,6 @@ $ ->
       @models.me.fetch
         success: (model, res) ->
           router.layout.status.show new MyStatusView(model: model)
-      @models.my.reset()
       @models.my.fetch_more()
       @layout.header.show()
       @layout.body.show new MyFeelingsView(model: @models.my)
@@ -136,7 +135,6 @@ $ ->
       @models.me.fetch
         success: (model, res) ->
           router.layout.status.show new MyStatusView(model: model)
-      @models.received.reset()
       @models.received.fetch_more()
       @layout.header.show()
       @layout.body.show new ReceivedFeelingsView(model: @models.received)
@@ -381,6 +379,7 @@ $ ->
     close: ->
       super()
       @model.off 'sync', @show, @
+      @model.reset()
 
   class NewFeelingView extends FsView
     events:
@@ -528,8 +527,6 @@ $ ->
                 users: @model.get('users')
                 like: @model.get('like')
             holder.append @_attach(new TalkView(talk_model)).el
-          
-
       if @_on_expand_triggered
         @$el.trigger 'refreshWookmark'
       @_on_expand_triggered = false
@@ -560,6 +557,7 @@ $ ->
     close: ->
       super()
       @model.off 'concat', @_on_concat, @
+      @model.reset()
 
   class ReceivedFeelingsView extends FsView
     tagName: 'ul'
@@ -580,6 +578,7 @@ $ ->
     close: ->
       super()
       @model.off 'concat', @_on_concat, @
+      @model.reset()
 
   class ArrivedFeelingView extends FsView
     tagName: 'li'
@@ -647,6 +646,7 @@ $ ->
       super()
       @model.off 'refresh', @show, @
       @model.off 'prepend', @_on_prepend, @
+      @model.reset()
 
   bind_scroll_event = ->
     if not active_scroll && router.scrollable_model && $(window).scrollTop() + $(window).height() >  $(document).height() - 50

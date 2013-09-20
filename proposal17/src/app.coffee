@@ -182,9 +182,6 @@ class UserFeelings
   push_mine: (id) ->
     @_actives.unshift id
     @_mines.unshift id
-    console.log "##########"
-    console.log JSON.stringify @_actives
-    console.log id
   push_rcv: (id) ->
     @_actives.unshift id
     @_rcvs.unshift id

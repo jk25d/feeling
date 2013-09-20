@@ -266,7 +266,6 @@
             }));
           }
         });
-        this.models.my.reset();
         this.models.my.fetch_more();
         this.layout.header.show();
         return this.layout.body.show(new MyFeelingsView({
@@ -286,7 +285,6 @@
             }));
           }
         });
-        this.models.received.reset();
         this.models.received.fetch_more();
         this.layout.header.show();
         return this.layout.body.show(new ReceivedFeelingsView({
@@ -958,7 +956,8 @@
 
       LiveFeelingsView.prototype.close = function() {
         LiveFeelingsView.__super__.close.call(this);
-        return this.model.off('sync', this.show, this);
+        this.model.off('sync', this.show, this);
+        return this.model.reset();
       };
 
       return LiveFeelingsView;
@@ -1305,7 +1304,8 @@
 
       MyFeelingsView.prototype.close = function() {
         MyFeelingsView.__super__.close.call(this);
-        return this.model.off('concat', this._on_concat, this);
+        this.model.off('concat', this._on_concat, this);
+        return this.model.reset();
       };
 
       return MyFeelingsView;
@@ -1360,7 +1360,8 @@
 
       ReceivedFeelingsView.prototype.close = function() {
         ReceivedFeelingsView.__super__.close.call(this);
-        return this.model.off('concat', this._on_concat, this);
+        this.model.off('concat', this._on_concat, this);
+        return this.model.reset();
       };
 
       return ReceivedFeelingsView;
@@ -1488,7 +1489,8 @@
       SharedFeelingsView.prototype.close = function() {
         SharedFeelingsView.__super__.close.call(this);
         this.model.off('refresh', this.show, this);
-        return this.model.off('prepend', this._on_prepend, this);
+        this.model.off('prepend', this._on_prepend, this);
+        return this.model.reset();
       };
 
       return SharedFeelingsView;
@@ -1504,7 +1506,7 @@
     };
     router = new Router;
     active_scroll = false;
-    $(window).on('scroll', _.throttle(bind_scroll_event, 2000, {
+    $(window).on('scroll', _.throttle(bind_scroll_event, 500, {
       leading: false,
       trailing: false
     }));
