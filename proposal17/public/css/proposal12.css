@@ -143,21 +143,13 @@ body {
   z-index: 1030;
   margin-bottom: 0;
   background-color:#020303;
-  /*background-color:#2c2d38;*/
-  /*background-color:#2c2d38;
-  border-bottom:1px solid #6a6b7d;*/
 }
 #fs_header{
-  /*background-image:url(../img/back-billiard-blur.jpg);background-repeat:no-repeat;background-size:cover;*/
-  /*border-bottom:3px solid #83839c*/
 }
 #fs_status{
-background-color:rgba(255,255,255,0.3)
 }
 #fs_body {
   padding:16px;margin-top:20px;box-sizing:border-box;
-  background-color:rgba(255,255,255,0.3);
-  /*background-color:#141105;*/
   -moz-border-radius: 8px;
   -webkit-border-radius: 8px;
   -khtml-border-radius: 8px;
@@ -234,4 +226,12 @@ img.transparent {
   background-color:#45474c;height:224px;color:#c6aae2;text-align:center;padding-top:100px;box-sizing:border-box;
 }
 
+em{
+  content: "";
+  height: 0;
+  width: 0;
+  margin-top:10px;
+  border:8px solid transparent;
+  border-right-color: #ffffff;
+}
 

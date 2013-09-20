@@ -380,10 +380,6 @@ $ ->
     _on_select_word: (e) ->
       @$el.find('#wordselect').find('.active').removeClass 'active'
       $(e.currentTarget).addClass 'active'
-      #unless @_expanded
-      #  @$el.find('.content0-input').css('display', 'block')
-      #  @_expanded = true
-      #  router.layout.body.current_view.on_rendered()
     _on_area_click: ->
       @$el.find('.real_area').toggle()
       @$el.find('.temp_area').toggle()

@@ -106,7 +106,7 @@ class Session
 
 # before access, should be checked perm & sharable
 class Feeling
-  @SHARE_DUR: 60 * 60 * 1000
+  @SHARE_DUR: 30 * 1000
   @DETACHABLE_DUR: @SHARE_DUR /2
   @create: (me, is_public, word, blah) ->
     f = new Feeling(me, is_public, word, blah)
@@ -161,7 +161,7 @@ class Feeling
       tu = gDB.user tuid
       x.users[tuid] = {name: tu.name, img: tu.img}
     x
-  weight: (wait_time) -> 0
+  weight: (remain_time) -> remain_time / Feeling.SHARE_DUR * 10
   set_public: (is_public) ->
     return if @status == 'removed'
     if @status == 'private' && is_public
@@ -210,7 +210,7 @@ class UserFeelings
       # if this remains enough time, no need to filter next feelings
       break if f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
       @_actives.pop()
-      reusable.push fid if _now -f.time < Feeling.SHARE_DUR
+      reusable.push fid if (_now - f.time) < Feeling.SHARE_DUR
     while reusable.length > 0
       @_actives.push reusable.pop()
     @_actives
@@ -298,13 +298,14 @@ class Dispatcher
     candidates = []
     n_candi = 0
     reusable = []
+    _now = now()
     while @_item_que.length > 0 && n_candi < 30
       wf = @_item_que.shift()
       item = gDB.feeling wf.id
       continue unless item && item.sharable()
       reusable.push wf
       continue if item.has_group_perm(wu.id)
-      for n in [0..item.weight(wu.wait_time)]
+      for n in [0..item.weight(_now - wu.wait_time)]
         candidates.push wf
       n_candi++
     selected = if candidates.length == 0 then null \
@@ -359,13 +360,9 @@ app.get '/api/feelings', (req,res) ->
 
   res.json if type == 'my'
     from_idx = if from == 0 then 0 else me.feelings.find_mine_idx(from) 
-    console.log "from_idx: #{from_idx}"
-    console.log "#{max(0,from_idx+skip)} to #{min(me.feelings.mines_len(),from_idx+skip+n)}"
     me.feelings.mines(max(0,from_idx+skip), min(me.feelings.mines_len(),from_idx+skip+n)).map (f) -> f.extend(me.id)
   else if type == 'rcv'
     from_idx = if from == 0 then 0 else me.feelings.find_rcv_idx(from) 
-    console.log "from_idx: #{from_idx}"
-    console.log "#{max(0,from_idx+skip)} to #{min(me.feelings.rcvs_len(),from_idx+skip+n)}"
     me.feelings.rcvs(max(0,from_idx+skip), min(me.feelings.rcvs_len(),from_idx+skip+n)).map (f) -> f.extend(me.id)
   else
     me.feelings.actives().map (f) -> f.extend(me.id)
@@ -456,7 +453,9 @@ app.get '/api/arrived_feelings', (req,res) ->
   for fid in me.arrived_feelings
     f = gDB.feeling fid
     if f && f.sharable()
-      r.push f.summary()
+      r.push f.summary()         # keep arrived and send its summary
+    else
+      me.pop_arrived_feeling()   # throw away
   res.json r
 
 app.put '/api/arrived_feelings/:id', (req,res) ->
@@ -472,9 +471,9 @@ app.put '/api/arrived_feelings/:id', (req,res) ->
   f = gDB.feeling id
   unless f && f.sharable()
     throw "This feeling is no longer sharable."
-  f.grant_group_perm me.id
-
-  me.grab_feeling(id)
+  else
+    f.grant_group_perm me.id
+    me.grab_feeling(id)
   res.json f.extend_full me.id
 
 app.get '/api/live_feelings', (req,res) ->

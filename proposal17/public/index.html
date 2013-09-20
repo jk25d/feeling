@@ -77,7 +77,7 @@
 </script>
 
 <script type='text/template' id='tpl_new_feeling'>
-<div style='overflow:hidden;padding:20px;'>
+<div style='overflow:hidden;'>
 
   <ul id='wordselect' class='real_area' style='display:none;'>
     <li class='what what_spc toggle_area' style='text-align:left;float:left;height:auto;border:none;margin-left:20px;'>
@@ -92,8 +92,7 @@
   </ul>
 
   <div class='temp_area'>
-    <h4>실시간 느낌들</h4>
-    <ul id='live_feelings' class='rd10 toggle_area' style='overflow:hidden;background-color:rgba(255,255,255,0.3);padding:8px 4px;'>
+    <ul id='live_feelings' class='toggle_area' style='overflow:hidden;'>
     </ul>
     <div class='rd6 toggle_area' style='margin:10px;cursor:text;border:1px solid #767676;height:40px;line-height:40px;padding-left:20px;background-color:#ffffff;color:#aaaaaa;'>How are you Feeling now?</div>
   </div>
@@ -108,12 +107,20 @@
 </script>
 
 <script type='text/template' id='tpl_live_feeling'>
-<li class='feeling rd10' style='background-color:<%=gW[word].c%>;'>
-  <div class='live_feeling'>
+<li style='display:block;background-color:<%=gW[word].c%>'>
+  <!--div class='live_feeling'>
     <div style='float:left;background-image:url(../img/anonymous.png)' class='profile'></div>
-    <div style='float:left;width:140px;padding-right:4px;box-sizing:border-box;overflow:hidden'>
-      <div style='color:rgba(0,0,0,0.3);font-weight:bold'><%=gW[word].w%></div>
-      <div style='color:#ffffff;'><%=blah%></div>
+    <em style='float:left'></em>
+    <div class='rd6' style='background-color:#ffffff;float:left;width:140px;padding:0 10px;box-sizing:border-box;'>
+      <div style='color:<%=gW[word].c%>;font-weight:bold'><%=gW[word].w%></div>
+      <div style='overflow:hidden'><%=blah%></div>
+    </div>
+  </div-->
+  <div class='live_feeling'>
+    <div style='padding:0 10px;box-sizing:border-box;'>
+      <i class='icon-user icon-white'/>
+      <span style='color:rgba(0,0,0,0.3);font-weight:bold'><%=gW[word].w%></span>
+      <span style=''><%=blah%></span>
     </div>
   </div>
 </li>

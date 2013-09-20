@@ -194,7 +194,7 @@
   })();
 
   Feeling = (function() {
-    Feeling.SHARE_DUR = 60 * 60 * 1000;
+    Feeling.SHARE_DUR = 30 * 1000;
 
     Feeling.DETACHABLE_DUR = Feeling.SHARE_DUR / 2;
 
@@ -305,8 +305,8 @@
       return x;
     };
 
-    Feeling.prototype.weight = function(wait_time) {
-      return 0;
+    Feeling.prototype.weight = function(remain_time) {
+      return remain_time / Feeling.SHARE_DUR * 10;
     };
 
     Feeling.prototype.set_public = function(is_public) {
@@ -409,7 +409,7 @@
           break;
         }
         this._actives.pop();
-        if (_now(-f.time < Feeling.SHARE_DUR)) {
+        if ((_now - f.time) < Feeling.SHARE_DUR) {
           reusable.push(fid);
         }
       }
@@ -581,10 +581,11 @@
     };
 
     Dispatcher.prototype.select_item = function(wu) {
-      var candidates, f, item, n, n_candi, reusable, selected, wf, _i, _ref;
+      var candidates, f, item, n, n_candi, reusable, selected, wf, _i, _now, _ref;
       candidates = [];
       n_candi = 0;
       reusable = [];
+      _now = now();
       while (this._item_que.length > 0 && n_candi < 30) {
         wf = this._item_que.shift();
         item = gDB.feeling(wf.id);
@@ -595,7 +596,7 @@
         if (item.has_group_perm(wu.id)) {
           continue;
         }
-        for (n = _i = 0, _ref = item.weight(wu.wait_time); 0 <= _ref ? _i <= _ref : _i >= _ref; n = 0 <= _ref ? ++_i : --_i) {
+        for (n = _i = 0, _ref = item.weight(_now - wu.wait_time); 0 <= _ref ? _i <= _ref : _i >= _ref; n = 0 <= _ref ? ++_i : --_i) {
           candidates.push(wf);
         }
         n_candi++;
@@ -682,9 +683,9 @@
     n = req.query.n && parseInt(req.query.n) || 30;
     type = req.query.type;
     from = req.query.from || 0;
-    return res.json(type === 'my' ? (from_idx = from === 0 ? 0 : me.feelings.find_mine_idx(from), console.log("from_idx: " + from_idx), console.log("" + (max(0, from_idx + skip)) + " to " + (min(me.feelings.mines_len(), from_idx + skip + n))), me.feelings.mines(max(0, from_idx + skip), min(me.feelings.mines_len(), from_idx + skip + n)).map(function(f) {
+    return res.json(type === 'my' ? (from_idx = from === 0 ? 0 : me.feelings.find_mine_idx(from), me.feelings.mines(max(0, from_idx + skip), min(me.feelings.mines_len(), from_idx + skip + n)).map(function(f) {
       return f.extend(me.id);
-    })) : type === 'rcv' ? (from_idx = from === 0 ? 0 : me.feelings.find_rcv_idx(from), console.log("from_idx: " + from_idx), console.log("" + (max(0, from_idx + skip)) + " to " + (min(me.feelings.rcvs_len(), from_idx + skip + n))), me.feelings.rcvs(max(0, from_idx + skip), min(me.feelings.rcvs_len(), from_idx + skip + n)).map(function(f) {
+    })) : type === 'rcv' ? (from_idx = from === 0 ? 0 : me.feelings.find_rcv_idx(from), me.feelings.rcvs(max(0, from_idx + skip), min(me.feelings.rcvs_len(), from_idx + skip + n)).map(function(f) {
       return f.extend(me.id);
     })) : me.feelings.actives().map(function(f) {
       return f.extend(me.id);
@@ -804,6 +805,8 @@
       f = gDB.feeling(fid);
       if (f && f.sharable()) {
         r.push(f.summary());
+      } else {
+        me.pop_arrived_feeling();
       }
     }
     return res.json(r);
@@ -821,9 +824,10 @@
     f = gDB.feeling(id);
     if (!(f && f.sharable())) {
       throw "This feeling is no longer sharable.";
+    } else {
+      f.grant_group_perm(me.id);
+      me.grab_feeling(id);
     }
-    f.grant_group_perm(me.id);
-    me.grab_feeling(id);
     return res.json(f.extend_full(me.id));
   });
 
