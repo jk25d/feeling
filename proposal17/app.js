@@ -342,12 +342,15 @@
     }
 
     UserFeelings.prototype.push_mine = function(id) {
-      this._actives.push(id);
-      return this._mines.unshift(id);
+      this._actives.unshift(id);
+      this._mines.unshift(id);
+      console.log("##########");
+      console.log(JSON.stringify(this._actives));
+      return console.log(id);
     };
 
     UserFeelings.prototype.push_rcv = function(id) {
-      this._actives.push(id);
+      this._actives.unshift(id);
       return this._rcvs.unshift(id);
     };
 
@@ -396,16 +399,25 @@
     };
 
     UserFeelings.prototype._filter_actives = function() {
-      var f, fid, _i, _len, _now, _ref;
+      var f, fid, i, reusable, _i, _now, _ref;
+      if (this._actives.length === 0) {
+        return this._actives;
+      }
       _now = now();
-      _ref = this._actives;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        fid = _ref[_i];
+      reusable = [];
+      for (i = _i = _ref = this._actives.length - 1; _ref <= 0 ? _i <= 0 : _i >= 0; i = _ref <= 0 ? ++_i : --_i) {
+        fid = this._actives[i];
         f = gDB.feeling(fid);
         if (f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR) {
           break;
         }
-        this._actives.unshift();
+        this._actives.pop();
+        if (_now(-f.time < Feeling.SHARE_DUR)) {
+          reusable.push(fid);
+        }
+      }
+      while (reusable.length > 0) {
+        this._actives.push(reusable.pop());
       }
       return this._actives;
     };

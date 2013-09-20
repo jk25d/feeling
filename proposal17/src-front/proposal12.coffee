@@ -165,9 +165,15 @@ $ ->
   class LiveFeelings extends Backbone.Collection
     model: LiveFeeling
     url: '../api/live_feelings'
+    fetch: (options={}) ->
+      options.reset = true
+      super options
   class Associate extends Backbone.Model
   class Associates extends Backbone.Collection
     url: '../api/associates'
+    fetch: (options={}) ->
+      options.reset = true
+      super options
 
   class Comment extends Backbone.Model
   class Talk extends Backbone.Model
@@ -183,14 +189,13 @@ $ ->
           skip: @models?.length || 0
           n: 10
         success: (model, res) ->
-          len = router.models.my.length
-          for m in model.models
-            router.models.my.add m
-          if router.models.my.length > len
-            r = []
-            for i in [len..router.models.my.length-1]
-              r.push router.models.my.at(i)
-            router.models.my.trigger 'concat', r
+          my = router.models.my
+          old_len = my.length
+          my.add m for m in model.models
+          if my.length > old_len
+            my.trigger 'concat', my.models.slice(old_len, my.length)
+        complete:
+          active_scroll = false
 
   class ReceivedFeeling extends Backbone.Model
   class ReceivedFeelings extends Backbone.Collection
@@ -204,19 +209,19 @@ $ ->
           skip: @models?.length || 0
           n: 10
         success: (model, res) ->
-          len = router.models.received.length
-          for m in model.models
-            router.models.received.add m
-          if router.models.received.length > len
-            r = []
-            for i in [len..router.models.received.length-1]
-              r.push router.models.received.at(i)
-            router.models.received.trigger 'concat', r
+          rcv = router.models.received
+          old_len = rcv.length
+          rcv.add m for m in model.models
+          if rcv.length > old_len
+            rcv.trigger 'concat', rcv.models.slice(old_len, rcv.length)
+        complete:
+          active_scroll = false
 
   class ArrivedFeeling extends Backbone.Model
   class ArrivedFeelings extends Backbone.Collection
     model: ArrivedFeeling
     url: '../api/arrived_feelings'
+
   class NewComment extends Backbone.Model      
   class Feeling extends Backbone.Model
     urlRoot: '../api/feelings'
@@ -224,8 +229,9 @@ $ ->
     model: Feeling
     url: '../api/feelings'
     fetch: (options={}) ->
+      options.reset = true
       options.data = {type: 'share'}
-      options.success = -> router.models.shared.trigger 'refresh'
+      options.success = (model) -> console.log model;router.models.shared.trigger 'refresh'
       super options
 
 
@@ -628,6 +634,7 @@ $ ->
       @model.on 'prepend', @_on_prepend, @
     render: ->
       @$el.append @_attach(new ArrivedFeelingView).el
+      console.log @model
       for m in @model.models
         @$el.append @_attach(new FeelingView(model: m)).el
     on_rendered: ->
@@ -642,10 +649,14 @@ $ ->
       @model.off 'prepend', @_on_prepend, @
 
   bind_scroll_event = ->
-    router.scrollable_model.fetch_more() if router.scrollable_model && $(window).scrollTop() + $(window).height() >  $(document).height() - 50
+    if not active_scroll && router.scrollable_model && $(window).scrollTop() + $(window).height() >  $(document).height() - 50
+      console.log 'on_scroll'
+      router.scrollable_model.fetch_more()
+      active_scroll = true
 
   router = new Router
-  $(window).on 'scroll', bind_scroll_event
+  active_scroll = false
+  $(window).on 'scroll', _.throttle(bind_scroll_event, 500, {leading: false, trailing: false})
   $.ajaxSetup
     statusCode:
       401: -> window.location = '/'

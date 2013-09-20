@@ -176,14 +176,17 @@ class Feeling
 
 class UserFeelings
   constructor: (@_uid) ->
-    @_actives = [] # old one first
+    @_actives = [] # new one first
     @_mines = []   # new one first
     @_rcvs = []    # new one first
   push_mine: (id) ->
-    @_actives.push id
+    @_actives.unshift id
     @_mines.unshift id
+    console.log "##########"
+    console.log JSON.stringify @_actives
+    console.log id
   push_rcv: (id) ->
-    @_actives.push id
+    @_actives.unshift id
     @_rcvs.unshift id
   mines_len: -> @_mines.length
   rcvs_len: -> @_rcvs.length
@@ -201,11 +204,18 @@ class UserFeelings
   actives: ->
     @_filter_actives().map (fid) -> gDB.feeling fid
   _filter_actives: ->
+    return @_actives if @_actives.length == 0
     _now = now()
-    for fid in @_actives
+    reusable = []
+    for i in [@_actives.length-1..0]
+      fid = @_actives[i]
       f = gDB.feeling fid
+      # if this remains enough time, no need to filter next feelings
       break if f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
-      @_actives.unshift()
+      @_actives.pop()
+      reusable.push fid if _now -f.time < Feeling.SHARE_DUR
+    while reusable.length > 0
+      @_actives.push reusable.pop()
     @_actives
   mines: (s,e) -> 
     return [] if s == e

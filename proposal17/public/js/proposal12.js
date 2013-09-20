@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    var App, AppView, ArrivedFeeling, ArrivedFeelingView, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, Feeling, FeelingView, FsView, HeaderLayout, Layout, LiveFeeling, LiveFeelingView, LiveFeelings, LiveFeelingsView, LoginView, Me, MyFeeling, MyFeelingView, MyFeelings, MyFeelingsView, MyStatusView, NavLayout, NewComment, NewCommentView, NewFeelingView, ReceivedFeeling, ReceivedFeelings, ReceivedFeelingsView, Router, SharedFeelings, SharedFeelingsView, SignupView, StatusLayout, Talk, TalkView, Tpl, Wookmark, bind_scroll_event, gAddons, gW, router, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref36, _ref37, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    var App, AppView, ArrivedFeeling, ArrivedFeelingView, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, Feeling, FeelingView, FsView, HeaderLayout, Layout, LiveFeeling, LiveFeelingView, LiveFeelings, LiveFeelingsView, LoginView, Me, MyFeeling, MyFeelingView, MyFeelings, MyFeelingsView, MyStatusView, NavLayout, NewComment, NewCommentView, NewFeelingView, ReceivedFeeling, ReceivedFeelings, ReceivedFeelingsView, Router, SharedFeelings, SharedFeelingsView, SignupView, StatusLayout, Talk, TalkView, Tpl, Wookmark, active_scroll, bind_scroll_event, gAddons, gW, router, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref36, _ref37, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
     gW = [
       {
         w: '두렵다',
@@ -362,6 +362,14 @@
 
       LiveFeelings.prototype.url = '../api/live_feelings';
 
+      LiveFeelings.prototype.fetch = function(options) {
+        if (options == null) {
+          options = {};
+        }
+        options.reset = true;
+        return LiveFeelings.__super__.fetch.call(this, options);
+      };
+
       return LiveFeelings;
 
     })(Backbone.Collection);
@@ -385,6 +393,14 @@
       }
 
       Associates.prototype.url = '../api/associates';
+
+      Associates.prototype.fetch = function(options) {
+        if (options == null) {
+          options = {};
+        }
+        options.reset = true;
+        return Associates.__super__.fetch.call(this, options);
+      };
 
       return Associates;
 
@@ -435,7 +451,7 @@
       MyFeelings.prototype.url = '../api/feelings';
 
       MyFeelings.prototype.fetch_more = function() {
-        var _ref11;
+        var active_scroll, _ref11;
         return new MyFeelings().fetch({
           data: {
             type: 'my',
@@ -444,21 +460,19 @@
             n: 10
           },
           success: function(model, res) {
-            var i, len, m, r, _i, _j, _len, _ref12, _ref13;
-            len = router.models.my.length;
+            var m, my, old_len, _i, _len, _ref12;
+            my = router.models.my;
+            old_len = my.length;
             _ref12 = model.models;
             for (_i = 0, _len = _ref12.length; _i < _len; _i++) {
               m = _ref12[_i];
-              router.models.my.add(m);
+              my.add(m);
             }
-            if (router.models.my.length > len) {
-              r = [];
-              for (i = _j = len, _ref13 = router.models.my.length - 1; len <= _ref13 ? _j <= _ref13 : _j >= _ref13; i = len <= _ref13 ? ++_j : --_j) {
-                r.push(router.models.my.at(i));
-              }
-              return router.models.my.trigger('concat', r);
+            if (my.length > old_len) {
+              return my.trigger('concat', my.models.slice(old_len, my.length));
             }
-          }
+          },
+          complete: active_scroll = false
         });
       };
 
@@ -489,7 +503,7 @@
       ReceivedFeelings.prototype.url = '../api/feelings';
 
       ReceivedFeelings.prototype.fetch_more = function() {
-        var _ref13;
+        var active_scroll, _ref13;
         return new ReceivedFeelings().fetch({
           data: {
             type: 'rcv',
@@ -498,21 +512,19 @@
             n: 10
           },
           success: function(model, res) {
-            var i, len, m, r, _i, _j, _len, _ref14, _ref15;
-            len = router.models.received.length;
+            var m, old_len, rcv, _i, _len, _ref14;
+            rcv = router.models.received;
+            old_len = rcv.length;
             _ref14 = model.models;
             for (_i = 0, _len = _ref14.length; _i < _len; _i++) {
               m = _ref14[_i];
-              router.models.received.add(m);
+              rcv.add(m);
             }
-            if (router.models.received.length > len) {
-              r = [];
-              for (i = _j = len, _ref15 = router.models.received.length - 1; len <= _ref15 ? _j <= _ref15 : _j >= _ref15; i = len <= _ref15 ? ++_j : --_j) {
-                r.push(router.models.received.at(i));
-              }
-              return router.models.received.trigger('concat', r);
+            if (rcv.length > old_len) {
+              return rcv.trigger('concat', rcv.models.slice(old_len, rcv.length));
             }
-          }
+          },
+          complete: active_scroll = false
         });
       };
 
@@ -585,10 +597,12 @@
         if (options == null) {
           options = {};
         }
+        options.reset = true;
         options.data = {
           type: 'share'
         };
-        options.success = function() {
+        options.success = function(model) {
+          console.log(model);
           return router.models.shared.trigger('refresh');
         };
         return SharedFeelings.__super__.fetch.call(this, options);
@@ -1447,6 +1461,7 @@
       SharedFeelingsView.prototype.render = function() {
         var m, _i, _len, _ref38, _results;
         this.$el.append(this._attach(new ArrivedFeelingView).el);
+        console.log(this.model);
         _ref38 = this.model.models;
         _results = [];
         for (_i = 0, _len = _ref38.length; _i < _len; _i++) {
@@ -1480,12 +1495,19 @@
 
     })(FsView);
     bind_scroll_event = function() {
-      if (router.scrollable_model && $(window).scrollTop() + $(window).height() > $(document).height() - 50) {
-        return router.scrollable_model.fetch_more();
+      var active_scroll;
+      if (!active_scroll && router.scrollable_model && $(window).scrollTop() + $(window).height() > $(document).height() - 50) {
+        console.log('on_scroll');
+        router.scrollable_model.fetch_more();
+        return active_scroll = true;
       }
     };
     router = new Router;
-    $(window).on('scroll', bind_scroll_event);
+    active_scroll = false;
+    $(window).on('scroll', _.throttle(bind_scroll_event, 2000, {
+      leading: false,
+      trailing: false
+    }));
     $.ajaxSetup({
       statusCode: {
         401: function() {
