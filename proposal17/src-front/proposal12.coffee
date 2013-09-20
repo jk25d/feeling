@@ -164,6 +164,7 @@ $ ->
     model: LiveFeeling
     url: '../api/live_feelings'
     fetch: (options={}) ->
+      options.data = {n:12}
       options.reset = true
       super options
   class Associate extends Backbone.Model
@@ -368,6 +369,7 @@ $ ->
   class NewFeelingView extends FsView
     events:
       'click .fs_submit': '_on_submit'
+      'click .fs_cancel': '_on_area_click'
       'click #wordselect .ww': '_on_select_word'
       'click .toggle_area': '_on_area_click'
     template: Tpl.new_feeling
@@ -595,6 +597,7 @@ $ ->
           router.models.me.fetch()
           @model.reset()
           @model.trigger 'sync'
+        error: -> @model.fetch()
     close: ->
       super()
       @model.off 'sync', @show, @
@@ -635,7 +638,7 @@ $ ->
 
   router = new Router
   active_scroll = false
-  $(window).on 'scroll', _.throttle(bind_scroll_event, 500, {leading: false, trailing: false})
+  $(window).on 'scroll', _.throttle(bind_scroll_event, 500, {trailing: false})
   $.ajaxSetup
     statusCode:
       401: -> window.location = '/'

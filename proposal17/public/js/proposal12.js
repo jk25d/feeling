@@ -364,6 +364,9 @@
         if (options == null) {
           options = {};
         }
+        options.data = {
+          n: 8
+        };
         options.reset = true;
         return LiveFeelings.__super__.fetch.call(this, options);
       };
@@ -931,6 +934,7 @@
 
       NewFeelingView.prototype.events = {
         'click .fs_submit': '_on_submit',
+        'click .fs_cancel': '_on_area_click',
         'click #wordselect .ww': '_on_select_word',
         'click .toggle_area': '_on_area_click'
       };
@@ -1383,6 +1387,9 @@
             router.models.me.fetch();
             this.model.reset();
             return this.model.trigger('sync');
+          },
+          error: function() {
+            return this.model.fetch();
           }
         });
       };
@@ -1464,7 +1471,6 @@
     router = new Router;
     active_scroll = false;
     $(window).on('scroll', _.throttle(bind_scroll_event, 500, {
-      leading: false,
       trailing: false
     }));
     $.ajaxSetup({

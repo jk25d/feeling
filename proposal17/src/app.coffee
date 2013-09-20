@@ -90,7 +90,9 @@ class DB
   del_user: (id) -> delete @_users[id]
   feelings: -> @_feelings
   feeling: (id) -> @_feelings[id]
-  put_feeling: (feeling) -> @_feelings[feeling.id] = feeling
+  put_feeling: (feeling) -> 
+    @_feelings[feeling.id] = feeling;
+    gFeelingContainer.push feeling.id;
   del_feeling: (id) -> delete @_feelings[id]
 
 
@@ -106,7 +108,7 @@ class Session
 
 # before access, should be checked perm & sharable
 class Feeling
-  @SHARE_DUR: 30 * 1000
+  @SHARE_DUR: 10 * 60 * 1000
   @DETACHABLE_DUR: @SHARE_DUR /2
   @create: (me, is_public, word, blah) ->
     f = new Feeling(me, is_public, word, blah)
@@ -189,39 +191,32 @@ class UserFeelings
   rcvs_len: -> @_rcvs.length
   total_len: -> @_mines.length + @_rcvs.length
   my_actives: ->
-    r = []
-    for f in @actives()
-      r.push f if f.has_own_perm @_uid
-    r
+    @actives().filter (f) -> f.has_own_perm(@_uid)
   rcv_actives: ->
-    r = []
-    for f in @actives()
-      r.push f unless f.has_own_perm @_uid
-    r
+    @actives().filter (f) -> not f.has_own_perm(@_uid)
   actives: ->
-    @_filter_actives().map (fid) -> gDB.feeling fid
+    @_filter_actives().map((fid) -> gDB.feeling fid).filter((f) -> f)
   _filter_actives: ->
     return @_actives if @_actives.length == 0
     _now = now()
     reusable = []
-    for i in [@_actives.length-1..0]
-      fid = @_actives[i]
+    while @_actives.length > 0
+      fid = @_actives.pop()
       f = gDB.feeling fid
       # if this remains enough time, no need to filter next feelings
-      break if f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
-      @_actives.pop()
+      if f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
+        @_actives.push fid
+        break
       reusable.push fid if (_now - f.time) < Feeling.SHARE_DUR
     while reusable.length > 0
       @_actives.push reusable.pop()
     @_actives
   mines: (s,e) -> 
-    return [] if s == e
-    console.log "mines: #{JSON.stringify(@_mines)} (#{s}, #{e})"
-    @_mines.slice(s,e).map (fid) -> gDB.feeling fid
+    return [] if s == e || e == 0
+    @_mines[s..e-1].map((id) -> gDB.feeling id).filter((x)->x)
   rcvs: (s,e) -> 
-    return [] if s == e
-    console.log "rcvs: #{JSON.stringify(@_rcvs)} (#{s}, #{e})"
-    @_rcvs.slice(s,e).map (fid) -> gDB.feeling fid
+    return [] if s == e || e == 0
+    @_rcvs[s..e-1].map((id) -> gDB.feeling id).filter((x)->x)
   find_mine_idx: (id) ->
     for i in [0..@_mines.length-1]
       return i if @_mines[i] == id
@@ -305,8 +300,7 @@ class Dispatcher
       continue unless item && item.sharable()
       reusable.push wf
       continue if item.has_group_perm(wu.id)
-      for n in [0..item.weight(_now - wu.wait_time)]
-        candidates.push wf
+      [0..item.weight(_now - wu.wait_time)].forEach -> candidates.push wf
       n_candi++
     selected = if candidates.length == 0 then null \
       else candidates[rand(0,candidates.length-1)]
@@ -321,20 +315,17 @@ class Dispatcher
   register_user: (uid) ->
     @_user_que.push new WaitItem uid
   latest_feelings: (n) ->
-    @_item_que.slice(0, min(n, @_item_que.length)).map (wf) -> wf.id
+    r = []
+    for wf in @_item_que
+      break if r.length >= n
+      r.push wf.id if wf
+    r
   log: ->
     console.log "name, hearts, arrived, my, rcv"
     for uid, u of gDB.users()
       console.log "#{u.name}, #{u.n_hearts}, #{u.arrived_feelings.length}, #{u.feelings.mines_len()}, #{u.feelings.rcvs_len()}"
-    users = []
-    for wu in @_user_que
-      users.push JSON.stringify(gDB.user(wu.id).name)
-    console.log "userQ: #{users.join()}"
-    items = []
-    for wf in @_item_que
-      items.push wf.id
-    console.log "itemQ: #{items.join()}"
-
+    console.log "userQ: #{@_user_que.map (wu) -> JSON.stringify(gDB.user(wu.id).name)}"
+    console.log "itemQ: #{@_item_que.map((wf) -> wf.id).join()}"
 
 app.post '/users', (req,res) ->
   name = req.body.name
@@ -520,11 +511,16 @@ merge_feelings = (a,b) ->
   r
 
 gDB = new DB()
+gFeelingContainer = []
 gDispatcher = new Dispatcher()
 
 schedule = ->
   gDispatcher.run()
   gDispatcher.log()
+  # to prevent memory overflow, remove old ones.
+  while gFeelingContainer.length >= 100
+    fid = gFeelingContainer.shift()
+    gDB.del_feeling fid
   setTimeout schedule, Dispatcher.INTERVAL
 
 schedule()
@@ -536,8 +532,7 @@ u2 = User.create('asdf', 'img/profile4.jpg', 'asdf', 'asdf')
 auto_feeling= (user) ->
   word = rand(0,29)
   a = []
-  for n in [0..rand(0,9)]
-    a.push 'blah'
+  [0..rand(0,9)].forEach -> a.push 'blah '
   Feeling.create(user, true, word, a.join(''))
   setTimeout auto_feeling, 15000, user
 auto_feeling u0

@@ -27,13 +27,11 @@
 <!-- TEMPLATES -->
 
 <script type='text/template' id='tpl_navbar'>
-<div class='fs_navbar-inner' style='line-height:40px;color:#ffffff'>
+<div class='fs_navbar-inner' style='line-height:40px;'>
   <div style='float:left;margin:0 20px;'><a href='#'>FEELING SHARE</a></div>
   <div style='float:right;'>
     <a class="fs_nav_dropdown fs_link" data-toggle="dropdown">
-      <div class='icon-bar' style='display:block;margin-top:1px;width:18px;height:2px;background-color:#f5f5f5;'></div>
-      <div class='icon-bar' style='display:block;margin-top:1px;width:18px;height:2px;background-color:#f5f5f5;'></div>
-      <div class='icon-bar' style='display:block;margin-top:1px;width:18px;height:2px;background-color:#f5f5f5;'></div>
+      <i class='batch-icon' style='font-size:20px;line-height:34px;'>&#xf0a9</i>
     </a>
   </div>
   <div style=''>
@@ -92,37 +90,38 @@
   </ul>
 
   <div class='temp_area'>
-    <ul id='live_feelings' class='toggle_area' style='overflow:hidden;'>
-    </ul>
-    <div class='rd6 toggle_area' style='margin:10px;cursor:text;border:1px solid #767676;height:40px;line-height:40px;padding-left:20px;background-color:#ffffff;color:#aaaaaa;'>How are you Feeling now?</div>
+    <div style='background-color:#6a6b7d;overflow:hidden;'>
+      <ul id='live_feelings' class='toggle_area' style='margin:20px auto;'>
+      </ul>
+    </div>
+    <div class='rd6 toggle_area' style='margin:10px;cursor:text;border:1px solid #afafcc;height:40px;line-height:40px;padding-left:20px;background-color:#ffffff;color:#afafcc;'>How are you Feeling now?</div>
   </div>
 
   <div class='content0-input real_area' style='display:none;padding:0 20px;'>
     <div><textarea id='new_feeling_content' placeholder="How are you Feeling now?"></textarea></div>
     <div class='_ofh real_area' style='display:none;text-align:center'>
       <a id='new_feeling_submit' class='btn fs_submit'>작성하기</a>
+      <a id='new_feeling_cancel' class='btn fs_cancel'>취소</a>
     </div>
   </div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_live_feeling'>
-<li style='display:block;background-color:<%=gW[word].c%>'>
-  <!--div class='live_feeling'>
-    <div style='float:left;background-image:url(../img/anonymous.png)' class='profile'></div>
-    <em style='float:left'></em>
-    <div class='rd6' style='background-color:#ffffff;float:left;width:140px;padding:0 10px;box-sizing:border-box;'>
-      <div style='color:<%=gW[word].c%>;font-weight:bold'><%=gW[word].w%></div>
-      <div style='overflow:hidden'><%=blah%></div>
-    </div>
-  </div-->
-  <div class='live_feeling'>
+<li class='live_feeling' style='color:<%=gW[word].c%>'>
+  <div style='float:left;font-size:18px;text-align:center;width:30px;height:30px;line-height:30px;'><i class='batch-icon'>&#xf170;</i></div>
+  <em style='float:left;'></em>
+  <div class='rd6' style='float:left;background-color:#ffffff;width:140px;padding:8px 10px;box-sizing:border-box;overflow:hidden;font-size:12px;line-height:18px;'>
+    <span style='font-weight:bold'><%=gW[word].w%></span>
+    <span style='color:#afafcc'><%=blah%></span>
+  </div>
+  <!--div>
     <div style='padding:0 10px;box-sizing:border-box;'>
       <i class='icon-user icon-white'/>
       <span style='color:rgba(0,0,0,0.3);font-weight:bold'><%=gW[word].w%></span>
       <span style=''><%=blah%></span>
     </div>
-  </div>
+  </div-->
 </li>
 </script>
 
@@ -130,7 +129,7 @@
 <ul style='overflow:hidden;padding-left:30px;line-height:18px;'>
   <li style='float:left;'><i class='profile' style='background-image:url(<%=img %>)'></i></li>
   <li style='float:left;margin:2px;'><%= name %></li>
-  <li style='float:left;margin:2px;'><i class='icon-heart icon-white'/><%= n_hearts %></li>
+  <li style='float:left;margin:2px;'><i class='batch-icon'>&#xf04b;</i> <%= n_hearts %>
   <li style='float:left;margin:2px;'>내가 공유한 느낌: <%= my_shared %></li>
   <li style='float:left;margin:2px;'>나에게 온 느낌: <%= rcv_shared %></li>
 </ul>
@@ -155,7 +154,7 @@
 
 <script type='text/template' id='tpl_arrived_holder'>
 <div id='receive_arrived'>
-  <div class='rd10' style='border:6px solid #6a6b7d;color:#6a6b7d;height:210px;line-height:210px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
+  <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:210px;line-height:210px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
 </div>
 </script>
 
@@ -191,7 +190,7 @@
   <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
     <i class='profile' style='background-image:url(<%=users[user_id].img%>)'></i>
     <span class='_rspc'><%=users[user_id].name%></span>
-    <span class='_r' style=''><%= datefmt(time) %> 전</span>
+    <span class='_r' style=''><%= datefmt(time) %></span>
   </div>
   <div class='content'>
     <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word].w %></strong></h4>

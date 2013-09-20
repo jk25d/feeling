@@ -1,2 +1,3 @@
-for i in [-1..0]
-  console.log i
+a = []
+[0..1].forEach (x) -> a.push x
+console.log a
