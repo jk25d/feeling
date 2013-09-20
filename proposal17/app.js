@@ -343,10 +343,7 @@
 
     UserFeelings.prototype.push_mine = function(id) {
       this._actives.unshift(id);
-      this._mines.unshift(id);
-      console.log("##########");
-      console.log(JSON.stringify(this._actives));
-      return console.log(id);
+      return this._mines.unshift(id);
     };
 
     UserFeelings.prototype.push_rcv = function(id) {

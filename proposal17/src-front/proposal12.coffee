@@ -286,7 +286,6 @@ $ ->
     @signup:       _.template $('#tpl_signup').html()
     @my_status:    _.template $('#tpl_my_status').html()
     @live_feeling: _.template $('#tpl_live_feeling').html()
-    @live_status:  _.template $('#tpl_live_status').html()
     @new_feeling:  _.template $('#tpl_new_feeling').html()
     @talk:         _.template $('#tpl_talk').html()
     @my_feeling:   _.template $('#tpl_my_feeling').html()
@@ -366,26 +365,11 @@ $ ->
     render: ->
       @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
 
-  class LiveFeelingsView extends FsView
-    tagName: 'div'
-    template: Tpl.live_status
-    initialize: ->
-      @model.on 'sync', @show, @
-    render: ->
-      @$el.html @template()
-      holder = @$el.find('#live_holder')
-      for m in @model.models
-        holder.append @_attach(new LiveFeelingView(model: m)).el
-    close: ->
-      super()
-      @model.off 'sync', @show, @
-      @model.reset()
-
   class NewFeelingView extends FsView
     events:
       'click .fs_submit': '_on_submit'
-      'click .fake_area': '_on_fake_area_click'
       'click #wordselect .ww': '_on_select_word'
+      'click .toggle_area': '_on_area_click'
     template: Tpl.new_feeling
     live_template: Tpl.live_feeling
     render: ->
@@ -400,10 +384,9 @@ $ ->
       #  @$el.find('.content0-input').css('display', 'block')
       #  @_expanded = true
       #  router.layout.body.current_view.on_rendered()
-    _on_fake_area_click: ->
-      @$el.find('.real_area').css('display', 'block')
-      @$el.find('.temp_area').css('display', 'none')
-      @$el.find('.fake_area').removeClass 'fake_area'
+    _on_area_click: ->
+      @$el.find('.real_area').toggle()
+      @$el.find('.temp_area').toggle()
       router.layout.body.current_view.on_rendered()
     _on_submit: ->
       $.ajax

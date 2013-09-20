@@ -80,7 +80,7 @@
 <div style='overflow:hidden;padding:20px;'>
 
   <ul id='wordselect' class='real_area' style='display:none;'>
-    <li class='what what_spc' style='text-align:left;float:left;height:auto;border:none;margin-left:20px;'>
+    <li class='what what_spc toggle_area' style='text-align:left;float:left;height:auto;border:none;margin-left:20px;'>
       <h1><strong>How are you Feeling now?</strong></h1>
     </li>
 
@@ -92,13 +92,14 @@
   </ul>
 
   <div class='temp_area'>
-    <h3>실시간 느낌들</h3>
-    <ul id='live_feelings' class='rd10' style='overflow:hidden;background-color:rgba(255,255,255,0.3);padding:8px 4px;'>
+    <h4>실시간 느낌들</h4>
+    <ul id='live_feelings' class='rd10 toggle_area' style='overflow:hidden;background-color:rgba(255,255,255,0.3);padding:8px 4px;'>
     </ul>
+    <div class='rd6 toggle_area' style='margin:10px;cursor:text;border:1px solid #767676;height:40px;line-height:40px;padding-left:20px;background-color:#ffffff;color:#aaaaaa;'>How are you Feeling now?</div>
   </div>
 
-  <div class='content0-input' style='padding:0 20px;'>
-    <div><textarea id='new_feeling_content' class='fake_area' placeholder="How are you Feeling now?"></textarea></div>
+  <div class='content0-input real_area' style='display:none;padding:0 20px;'>
+    <div><textarea id='new_feeling_content' placeholder="How are you Feeling now?"></textarea></div>
     <div class='_ofh real_area' style='display:none;text-align:center'>
       <a id='new_feeling_submit' class='btn fs_submit'>작성하기</a>
     </div>
@@ -109,7 +110,7 @@
 <script type='text/template' id='tpl_live_feeling'>
 <li class='feeling rd10' style='background-color:<%=gW[word].c%>;'>
   <div class='live_feeling'>
-    <div style='float:left;background-image:url(<%=img%>)' class='profile'></div>
+    <div style='float:left;background-image:url(../img/anonymous.png)' class='profile'></div>
     <div style='float:left;width:140px;padding-right:4px;box-sizing:border-box;overflow:hidden'>
       <div style='color:rgba(0,0,0,0.3);font-weight:bold'><%=gW[word].w%></div>
       <div style='color:#ffffff;'><%=blah%></div>
@@ -118,18 +119,11 @@
 </li>
 </script>
 
-<script type='text/template' id='tpl_live_status'>
-<ul id='live_holder' style='overflow:hidden;padding:20px;'>
-  <li class='what_spc' style='float:left;text-align:left;height:auto;color:#9996a8;margin-left:20px;overflow:hidden;'><h1><strong>LIVE FEELINGS</strong></h1></li>
-</ul>
-<div class='me_holder'></div>
-</script>
-
 <script type='text/template' id='tpl_my_status'>
-<ul style='overflow:hidden;color:#83839c;padding-left:30px;line-height:18px;'>
+<ul style='overflow:hidden;padding-left:30px;line-height:18px;'>
   <li style='float:left;'><i class='profile' style='background-image:url(<%=img %>)'></i></li>
   <li style='float:left;margin:2px;'><%= name %></li>
-  <li style='float:left;margin:2px;'>HEART: <%= n_hearts %></li>
+  <li style='float:left;margin:2px;'><i class='icon-heart icon-white'/><%= n_hearts %></li>
   <li style='float:left;margin:2px;'>내가 공유한 느낌: <%= my_shared %></li>
   <li style='float:left;margin:2px;'>나에게 온 느낌: <%= rcv_shared %></li>
 </ul>
