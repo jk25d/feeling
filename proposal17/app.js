@@ -394,7 +394,10 @@
       while (this._actives.length > 0) {
         fid = this._actives.pop();
         f = gDB.feeling(fid);
-        if (f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR) {
+        if (!f) {
+          continue;
+        }
+        if (_now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR) {
           this._actives.push(fid);
           break;
         }

@@ -107,7 +107,6 @@ $ ->
       $.ajax
         url: '../sessions'
         type: 'DELETE'
-        dataType: 'json'
         success: (data) -> window.location = '/'
     shared_feelings: ->
       @scrollable_model = null
@@ -307,7 +306,6 @@ $ ->
       @$el.find('.fs_menu').removeClass 'active'
       $(@model.get('menu')).addClass 'active'
     _on_toggle_dropdown: ->
-      console.log 'nav drop'
       @$el.find('.fs_menu').toggleClass 'fs_menu_pop'
     _on_click_menu: (e) ->
       event_hash = $(e.currentTarget).find('a').attr('href')
@@ -330,7 +328,6 @@ $ ->
       $.ajax
         url: '../sessions'
         type: 'POST'
-        dataType: 'json'
         context: @
         data:
           email: $('#email').val()
@@ -390,7 +387,6 @@ $ ->
       $.ajax
         url: '../api/feelings'
         type: 'POST'
-        dataType: 'json'
         context: @
         data:
           word: @$el.find('#wordselect').find('.active').attr('word-id')
@@ -457,7 +453,6 @@ $ ->
       $.ajax
         url: "../api/feelings/#{id}/talks/#{uid}/comments"
         type: 'POST'
-        dataType: 'json'
         context: @
         data:
           blah: @$el.find('.talk_blah').val()
@@ -470,7 +465,6 @@ $ ->
       $.ajax
         url: "../api/feelings/#{id}/like"
         type: 'PUT'
-        dataType: 'json'
         context: @
         data:
           user_id: uid
@@ -590,7 +584,6 @@ $ ->
       $.ajax
         url: "../api/arrived_feelings/#{model.get('id')}"
         type: 'PUT'
-        dataType: 'json'
         context: @
         success: (data) ->
           router.models.shared.trigger 'prepend', new Feeling(data)
@@ -640,6 +633,8 @@ $ ->
   active_scroll = false
   $(window).on 'scroll', _.throttle(bind_scroll_event, 500, {trailing: false})
   $.ajaxSetup
+    dataType: 'json'
+    cache: false
     statusCode:
       401: -> window.location = '/'
       403: -> window.location = '/'

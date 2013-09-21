@@ -222,7 +222,6 @@
         return $.ajax({
           url: '../sessions',
           type: 'DELETE',
-          dataType: 'json',
           success: function(data) {
             return window.location = '/';
           }
@@ -782,7 +781,6 @@
       };
 
       AppView.prototype._on_toggle_dropdown = function() {
-        console.log('nav drop');
         return this.$el.find('.fs_menu').toggleClass('fs_menu_pop');
       };
 
@@ -829,7 +827,6 @@
         return $.ajax({
           url: '../sessions',
           type: 'POST',
-          dataType: 'json',
           context: this,
           data: {
             email: $('#email').val(),
@@ -975,7 +972,6 @@
         return $.ajax({
           url: '../api/feelings',
           type: 'POST',
-          dataType: 'json',
           context: this,
           data: {
             word: this.$el.find('#wordselect').find('.active').attr('word-id'),
@@ -1112,7 +1108,6 @@
         return $.ajax({
           url: "../api/feelings/" + id + "/talks/" + uid + "/comments",
           type: 'POST',
-          dataType: 'json',
           context: this,
           data: {
             blah: this.$el.find('.talk_blah').val()
@@ -1131,7 +1126,6 @@
         return $.ajax({
           url: "../api/feelings/" + id + "/like",
           type: 'PUT',
-          dataType: 'json',
           context: this,
           data: {
             user_id: uid
@@ -1380,7 +1374,6 @@
         return $.ajax({
           url: "../api/arrived_feelings/" + (model.get('id')),
           type: 'PUT',
-          dataType: 'json',
           context: this,
           success: function(data) {
             router.models.shared.trigger('prepend', new Feeling(data));
@@ -1474,6 +1467,8 @@
       trailing: false
     }));
     $.ajaxSetup({
+      dataType: 'json',
+      cache: false,
       statusCode: {
         401: function() {
           return window.location = '/';
