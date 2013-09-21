@@ -619,10 +619,10 @@
     };
 
     Dispatcher.prototype.latest_feelings = function(n) {
-      var r, wf, _i, _len, _ref;
+      var r, wf, _i, _ref;
       r = [];
       _ref = this._item_que;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      for (_i = _ref.length - 1; _i >= 0; _i += -1) {
         wf = _ref[_i];
         if (r.length >= n) {
           break;
@@ -631,7 +631,6 @@
           r.push(wf.id);
         }
       }
-      console.log(r);
       return r;
     };
 

@@ -365,7 +365,7 @@
           options = {};
         }
         options.data = {
-          n: 8
+          n: 12
         };
         options.reset = true;
         return LiveFeelings.__super__.fetch.call(this, options);

@@ -1,3 +1,3 @@
-a = []
-[0..1].forEach (x) -> a.push x
-console.log a
+a = [1,2,3]
+for x in a by -1
+  console.log x

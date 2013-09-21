@@ -267,8 +267,8 @@ class Dispatcher
   @MIN_USER_WAIT_TIME: 5000
   @INTERVAL: 5000
   constructor: ->
-    @_user_que = []
-    @_item_que = []
+    @_user_que = []     # old one first
+    @_item_que = []     # old one first
     for uid, u of gDB.users()
       register_user uid if u.arrived_feelings.length == 0
     @_user_que.sort (a,b) -> a.wait_time - b.wait_time
@@ -316,7 +316,7 @@ class Dispatcher
     @_user_que.push new WaitItem uid
   latest_feelings: (n) ->
     r = []
-    for wf in @_item_que
+    for wf in @_item_que by -1
       break if r.length >= n
       r.push wf.id if wf
     r
