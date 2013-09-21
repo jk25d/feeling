@@ -203,8 +203,9 @@ class UserFeelings
     while @_actives.length > 0
       fid = @_actives.pop()
       f = gDB.feeling fid
+      continue unless f
       # if this remains enough time, no need to filter next feelings
-      if f && _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
+      if _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
         @_actives.push fid
         break
       reusable.push fid if (_now - f.time) < Feeling.SHARE_DUR

@@ -21,6 +21,8 @@
   .what_spc {margin:0 auto;}
   .fs_container {width: 292px;margin:0 auto}
   h1 {font-size:44px;line-height:60px;}
+  .live_feeling{padding:17px 0px;}
+  .live_feeling_quote {width:120px;}
 }
 @media (min-width: 588px) {
   .what{width:355px}
@@ -44,6 +46,8 @@
 @media(min-width: 641px){
 .fs_menu { display:inline-block;margin-right:20px;}
 .fs_nav_dropdown { display:none}
+.live_feeling{padding:17px 8px;}
+.live_feeling_quote {width:140px;}
 }
 
 
@@ -266,7 +270,10 @@ body {
   float:left;box-sizing:border-box;width:92px;padding:4px 0 0 9px;line-height:16px;overflow:hidden;font-size:12px;
 }
 .live_feeling {
-  padding:17px 9px;line-height:18px;overflow:hidden;font-size:13px;
+  line-height:18px;overflow:hidden;font-size:13px;margin-left:3px;
+}
+.live_feeling_quote {
+  float:left;background-color:#ffffff;padding:8px 10px;box-sizing:border-box;overflow:hidden;font-size:12px;line-height:18px;
 }
 .profile{
   width:30px;height:30px;

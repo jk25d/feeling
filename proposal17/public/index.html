@@ -109,11 +109,13 @@
 
 <script type='text/template' id='tpl_live_feeling'>
 <li class='live_feeling' style='color:<%=gW[word].c%>'>
-  <div style='float:left;font-size:18px;text-align:center;width:30px;height:30px;line-height:30px;'><i class='batch-icon'>&#xf170;</i></div>
+  <div style='float:left;font-size:18px;width:24px;height:30px;line-height:30px;'><i class='batch-icon'>&#xf170;</i></div>
   <em style='float:left;'></em>
-  <div class='rd6' style='float:left;background-color:#ffffff;width:140px;padding:8px 10px;box-sizing:border-box;overflow:hidden;font-size:12px;line-height:18px;max-height:70px;'>
-    <span style='font-weight:bold'><%=gW[word].w%></span>
-    <span style='color:#afafcc'><%=blah%></span>
+  <div class='rd6 live_feeling_quote' style=''>
+    <div style='overflow:hidden;max-height:54px;'>
+    <span style='font-weight:bold;'><%=gW[word].w%></span>
+    <span style='color:#afafcc;'><%=blah%></span>
+    </div>
   </div>
   <!--div>
     <div style='padding:0 10px;box-sizing:border-box;'>
