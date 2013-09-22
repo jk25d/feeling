@@ -19,7 +19,6 @@ require_auth = (req, res, next) ->
     console.log '401'
     res.send 401
   else
-    me = gDB.user req.session.user_id
     next()
 
 app.configure ->
@@ -85,11 +84,17 @@ class DB
   put_email: (user) -> @_emails[user.email] = user.id
   del_email: (email) -> delete @_emails[email]
   users: -> @_users
-  user: (id) -> @_users[id]
+  user: (id) -> 
+    u = @_users[id]
+    throw "no such user: #{id}" unless u
+    u
   put_user: (user) -> @_users[user.id] = user
   del_user: (id) -> delete @_users[id]
   feelings: -> @_feelings
-  feeling: (id) -> @_feelings[id]
+  feeling: (id) -> 
+    f = @_feelings[id]
+    throw "no such feeling: #{id}" unless f
+    f
   put_feeling: (feeling) -> 
     @_feelings[feeling.id] = feeling;
     gFeelingContainer.push feeling.id;
@@ -108,7 +113,7 @@ class Session
 
 # before access, should be checked perm & sharable
 class Feeling
-  @SHARE_DUR: 10 * 60 * 1000
+  @SHARE_DUR: 20 * 60 * 1000
   @DETACHABLE_DUR: @SHARE_DUR /2
   @create: (me, is_public, word, blah) ->
     f = new Feeling(me, is_public, word, blah)
@@ -122,6 +127,7 @@ class Feeling
     @status = if is_public then 'public' else 'private'
     @time = now()
     @talks = {}
+    @like = null
   sharable_time: ->
     now() - @time < Feeling.SHARE_DUR
   sharable: ->
@@ -135,33 +141,37 @@ class Feeling
   summary: ->    # can be access with no perm
     {id: @id, user_id: @user_id, time: @time, word: @word}
   anony_content: ->
-    u = gDB.user @user_id
-    {time: @time, img: u.img, word: @word, blah: @blah}
+      {time: @time, word: @word, blah: @blah}
   extend: (user_id) ->
     x = clone @
-    u = gDB.user x.user_id
     x.users = {}
-    x.users[u.id] = {name: u.name, img: u.img}
     x.share = @sharable()
+    x.talks = {}
+    try
+      u = gDB.user x.user_id
+      x.users[u.id] = {name: u.name, img: u.img}
     unless @has_own_perm(user_id)
       x.own = false
       x.n_talk_users = 1
-      console.log JSON.stringify @
       x.n_talk_msgs = @talks[user_id].length
     else
       x.own = true
-      x.n_talk_users = len x.talks
+      x.n_talk_users = len @talks
       x.n_talk_msgs = 0
       for tuid, comments of x.talks
         x.n_talk_msgs += @talks[tuid].length
     x
   extend_full: (user_id) ->
     x = @extend(user_id)
-    unless @has_own_perm(user_id)
+    unless x.own
+      x.talks = {}
       x.talks[user_id] = @talks[user_id]
+    else
+      x.talks = @talks
     for tuid, comments of x.talks
-      tu = gDB.user tuid
-      x.users[tuid] = {name: tu.name, img: tu.img}
+      try
+        tu = gDB.user tuid
+        x.users[tuid] = {name: tu.name, img: tu.img}
     x
   weight: (remain_time) -> remain_time / Feeling.SHARE_DUR * 10
   set_public: (is_public) ->
@@ -190,19 +200,20 @@ class UserFeelings
   mines_len: -> @_mines.length
   rcvs_len: -> @_rcvs.length
   total_len: -> @_mines.length + @_rcvs.length
+  actives_len: -> @actives().length
   my_actives: ->
     @actives().filter (f) -> f.has_own_perm(@_uid)
   rcv_actives: ->
     @actives().filter (f) -> not f.has_own_perm(@_uid)
   actives: ->
-    @_filter_actives().map((fid) -> gDB.feeling fid).filter((f) -> f)
+    @_filter_actives().map((fid) -> try gDB.feeling(fid) ).filter((f) -> f)
   _filter_actives: ->
     return @_actives if @_actives.length == 0
     _now = now()
     reusable = []
     while @_actives.length > 0
       fid = @_actives.pop()
-      f = gDB.feeling fid
+      f = try gDB.feeling fid
       continue unless f
       # if this remains enough time, no need to filter next feelings
       if _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
@@ -214,19 +225,36 @@ class UserFeelings
     @_actives
   mines: (s,e) -> 
     return [] if s == e || e == 0
-    @_mines[s..e-1].map((id) -> gDB.feeling id).filter((x)->x)
+    @_mines[s..e-1].map((id) -> try gDB.feeling(id) catch).filter((x)->x)
   rcvs: (s,e) -> 
     return [] if s == e || e == 0
-    @_rcvs[s..e-1].map((id) -> gDB.feeling id).filter((x)->x)
+    @_rcvs[s..e-1].map((id) -> try gDB.feeling(id) catch).filter((x)->x)
+  find_active_idx: (id) ->
+    for i in [0..@_actives.length-1]
+      return i if @_actives[i] == id
+    -1
   find_mine_idx: (id) ->
     for i in [0..@_mines.length-1]
       return i if @_mines[i] == id
-    0
+    -1
   find_rcv_idx: (id) ->
     for i in [0..@_rcvs.length-1]
       return i if @_rcvs[i] == id
-    0
-  
+    -1
+  update_mine: (id) ->
+    return unless id
+    aid = @find_active_idx id
+    mid = @find_mine_idx id
+    remove_item(@_actives, aid) if aid >= 0
+    remove_item(@_mines, mid) if mid >= 0
+    @push_mine id
+  update_rcv: (id) ->
+    return unless id
+    aid = @find_active_idx id
+    rid = @find_rcv_idx id
+    remove_item(@_actives, aid) if aid >= 0
+    remove_item(@_rcvs, rid) if rid >= 0
+    @push_rcv id
 
 class User
   @create: (name, img, email, password) ->
@@ -241,15 +269,13 @@ class User
     @n_availables = 0
     @arrived_feelings = []
     @feelings = new UserFeelings(@id)
-  summary: (extend = false)->
+  summary: ->
     u = clone @
     delete u.password
     u.arrived_feelings = @arrived_feelings.length
-    u.my_feelings = @feelings.mines_len()
-    u.rcv_feelings = @feelings.rcvs_len()
-    if extend
-      u.my_shared = @feelings.my_actives().length
-      u.rcv_shared = @feelings.rcv_actives().length
+    u.n_my_feelings = @feelings.mines_len()
+    u.n_rcv_feelings = @feelings.rcvs_len()
+    u.n_active_feelings = @feelings.actives_len()
     u
   valid_arrived_feeling: (id) ->
     @arrived_feelings.length > 0 && @arrived_feelings[0] == id
@@ -259,6 +285,9 @@ class User
     gDispatcher.register_user @id
   grab_feeling: (fid) ->
     @feelings.push_rcv fid
+  inc_heart: (fid) ->
+    @n_hearts++
+    @feelings.update_mine fid
 
 
 class WaitItem
@@ -278,12 +307,12 @@ class Dispatcher
     _now = now()
     while @_user_que.length > 0
       wu = @_user_que.shift()
-      u = gDB.user wu.id
+      u = try gDB.user wu.id
       continue unless u
       if _now - u.wait_time < Dispatcher.MIN_USER_WAIT_TIME
         hungry_users.push wu
         break
-      fid = @select_item(wu)
+      fid = try @select_item(wu)
       unless fid
         hungry_users.push wu
         continue
@@ -297,7 +326,7 @@ class Dispatcher
     _now = now()
     while @_item_que.length > 0 && n_candi < 30
       wf = @_item_que.shift()
-      item = gDB.feeling wf.id
+      item = try gDB.feeling wf.id
       continue unless item && item.sharable()
       reusable.push wf
       continue if item.has_group_perm(wu.id)
@@ -325,13 +354,19 @@ class Dispatcher
     console.log "name, hearts, arrived, my, rcv"
     for uid, u of gDB.users()
       console.log "#{u.name}, #{u.n_hearts}, #{u.arrived_feelings.length}, #{u.feelings.mines_len()}, #{u.feelings.rcvs_len()}"
-    console.log "userQ: #{@_user_que.map (wu) -> JSON.stringify(gDB.user(wu.id).name)}"
+    console.log "userQ: #{@_user_que.map (wu) -> JSON.stringify(gDB.user(wu.id)?.name)}"
     console.log "itemQ: #{@_item_que.map((wf) -> wf.id).join()}"
 
 app.post '/users', (req,res) ->
   name = req.body.name
   email = req.body.email
   password = req.body.password
+  password_confirm = req.body.password_confirm
+
+  unless name && email && password && password == password_confirm
+    console.log [name, email, password, password_confirm]
+    res.send 400, "Wrong Parameters"
+    return
 
   if gDB.email email
     res.send 400, "Duplicated email"
@@ -341,7 +376,7 @@ app.post '/users', (req,res) ->
 
 app.get '/api/me', (req,res) ->
   me = gDB.user req.session.user_id
-  res.json me.summary(true)
+  res.json me.summary()
 
 app.get '/api/feelings', (req,res) ->
   me = gDB.user req.session.user_id
@@ -351,10 +386,10 @@ app.get '/api/feelings', (req,res) ->
   from = req.query.from || 0
 
   res.json if type == 'my'
-    from_idx = if from == 0 then 0 else me.feelings.find_mine_idx(from) 
+    from_idx = if from == 0 then 0 else max(0, me.feelings.find_mine_idx(from))
     me.feelings.mines(max(0,from_idx+skip), min(me.feelings.mines_len(),from_idx+skip+n)).map (f) -> f.extend(me.id)
   else if type == 'rcv'
-    from_idx = if from == 0 then 0 else me.feelings.find_rcv_idx(from) 
+    from_idx = if from == 0 then 0 else max(0, me.feelings.find_rcv_idx(from))
     me.feelings.rcvs(max(0,from_idx+skip), min(me.feelings.rcvs_len(),from_idx+skip+n)).map (f) -> f.extend(me.id)
   else
     me.feelings.actives().map (f) -> f.extend(me.id)
@@ -376,9 +411,7 @@ app.get '/api/feelings/:id', (req,res) ->
   id = req.params.id
 
   f = gDB.feeling id
-  if not f
-    res.send 404, "No such feeling: #{id}"
-  else if not f.has_group_perm me.id
+  if not f.has_group_perm me.id
     res.json f.summary()
   else
     res.json f.extend_full me.id
@@ -388,7 +421,7 @@ app.put '/api/feelings/:id', (req,res) ->
   id = req.params.id
   is_public = req.body.is_public
   f = gDB.feeling id
-  unless f && f.has_own_perm me.id
+  unless f.has_own_perm me.id
     res.send 406, "No permission to access this feeling: #{id}"
   else
     f.set_public(is_public)
@@ -399,21 +432,22 @@ app.put '/api/feelings/:id/like', (req,res) ->
   id = req.params.id
   user_id = req.body.user_id
   f = gDB.feeling id
-  unless f && f.has_own_perm me.id
+  unless f.has_own_perm me.id
     res.send 406, "No permission to access this feeling: #{id}"
   else
     if f.like
       res.send 406, "Already Done"
     else
       f.like = user_id
-      gDB.user(user_id).n_hearts++
+      u = gDB.user(user_id)
+      u.inc_heart id
       res.json {}
 
 app.del '/api/feelings/:id', (req,res) ->
   me = gDB.user req.session.user_id
   id = req.params.id
   f = gDB.feeling id
-  unless f && f.has_own_perm me.id
+  unless f.has_own_perm me.id
     res.send 406, "No permission to access this feeling: #{id}"
   else
     f.remove()
@@ -424,9 +458,8 @@ app.post '/api/feelings/:id/talks/:user_id/comments', (req,res) ->
   id = req.params.id
   user_id = req.params.user_id
   blah = req.body.blah
-  console.log "comment: #{blah}"
   f = gDB.feeling id
-  unless f && f.has_group_perm me.id
+  unless f.has_group_perm me.id
     res.send 406, "No permission to access this feeling: #{id}"
     return
   unless f.sharable()
@@ -434,16 +467,26 @@ app.post '/api/feelings/:id/talks/:user_id/comments', (req,res) ->
     return
   comment = { user_id: me.id, blah: blah, time: now() }
   if f.has_own_perm(me.id)
+    # reply on my feeling
     f.talks[user_id].push comment
+
+    # notify to listener. careful!! so headache!! 
+    listener = gDB.user user_id
+    listener.feelings.update_rcv id
   else
+    # msg to others feeling
     f.talks[me.id].push comment
+
+    # notify to listener. careful!! so headache!! 
+    listener = gDB.user f.user_id
+    listener.feelings.update_mine id
   res.json {}
 
 app.get '/api/arrived_feelings', (req,res) ->
   me = gDB.user req.session.user_id
   r = []
   for fid in me.arrived_feelings
-    f = gDB.feeling fid
+    f = try gDB.feeling fid
     if f && f.sharable()
       r.push f.summary()         # keep arrived and send its summary
     else
@@ -454,14 +497,17 @@ app.put '/api/arrived_feelings/:id', (req,res) ->
   me = gDB.user req.session.user_id
   id = req.params.id
 
+  console.log "arrived_id: #{id}"
+  console.log JSON.stringify(me.arrived_feelings)
   unless me.valid_arrived_feeling(id)
+    console.log "404 err"
     res.send 404, "No such feeling: #{id}"
     return
   
   me.pop_arrived_feeling()
 
   f = gDB.feeling id
-  unless f && f.sharable()
+  unless f.sharable()
     throw "This feeling is no longer sharable."
   else
     f.grant_group_perm me.id
@@ -472,8 +518,40 @@ app.get '/api/live_feelings', (req,res) ->
   me = gDB.user req.session.user_id
   n = req.query.n || 20
   res.json gDispatcher.latest_feelings(n).map (fid) ->
-    gDB.feeling(fid)?.anony_content()
+    f = try gDB.feeling(fid)
+    f?.anony_content()
 
+
+# DATASTRUCTURE
+
+class OrderedMap
+  constructor: -> 
+    @_h = {}
+    @_a = []
+    @length = 0
+  get: (k) -> 
+    @_h[k]
+  set: (k,v) -> 
+    @_h[k] = v
+    @_a.push k
+    @length++
+  del: (k) ->
+    if @_h[k]
+      delete @_h[k]
+      @length--
+  keys: ->
+    h = @_h
+    @_a = @_a.filter (k) -> h[k]
+    @length = @_a.length
+
+class OrderedSet extends OrderedMap
+  set: (k) -> super k,k
+
+class ReverdSet extends OrderedMap
+  set: (k) ->
+    @_h[k] = k
+    @_a.unshift k
+    @length++
 
 # UTILS
 clone = (obj) ->
@@ -519,14 +597,14 @@ schedule = ->
   gDispatcher.run()
   gDispatcher.log()
   # to prevent memory overflow, remove old ones.
-  while gFeelingContainer.length >= 100
+  while gFeelingContainer.length >= 1000
     fid = gFeelingContainer.shift()
     gDB.del_feeling fid
   setTimeout schedule, Dispatcher.INTERVAL
 
 schedule()
 
-u0 = User.create('sun', 'img/profile.jpg', 'sun@gmail.com', 'sun00')
+u0 = User.create('sun', 'img/profile3.jpg', 'sun@gmail.com', 'sun00')
 u1 = User.create('moon', 'img/profile2.jpg', 'moon@gmail.com', 'moon00')
 u2 = User.create('asdf', 'img/profile4.jpg', 'asdf', 'asdf')
 

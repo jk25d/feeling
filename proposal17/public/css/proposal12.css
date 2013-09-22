@@ -19,34 +19,34 @@
 @media (max-width: 320px) {
   .what{width:260px}
   .what_spc {margin:0 auto;}
-  .fs_container {width: 292px;margin:0 auto}
+  .fs_container {width: 300px;margin:0 auto}
   h1 {font-size:44px;line-height:60px;}
-  .live_feeling{padding:17px 0px;}
+  .live_feeling{padding:10px 0px;}
   .live_feeling_quote {width:120px;}
 }
-@media (min-width: 588px) {
+@media (min-width: 600px) {
   .what{width:355px}
   .what_spc {margin:0 45px 0 15px;}
-  .fs_container {width: 568px;margin:0 auto}
+  .fs_container {width: 580px;margin:0 auto}
   h1 {font-size:60px;line-height:60px;}
 }
-@media (min-width: 864px) {
-  .fs_container {width: 844px;margin:0 auto}
+@media (min-width: 880px) {
+  .fs_container {width: 860px;margin:0 auto}
 }
-@media (min-width: 1140px) {
-  .fs_container {width: 1120px;margin:0 auto}
+@media (min-width: 1160px) {
+  .fs_container {width: 1140px;margin:0 auto}
 }
-@media (min-width: 1416px) {
-  .fs_container {width: 1396px;margin:0 auto}
+@media (min-width: 1440px) {
+  .fs_container {width: 1420;margin:0 auto}
 }
 @media(max-width: 640px){
-.fs_menu { display:none;}
+.fs_menu { display:none;padding:0 20px;}
 .fs_nav_dropdown { display:inline-block }
 }
 @media(min-width: 641px){
-.fs_menu { display:inline-block;margin-right:20px;}
+.fs_menu { display:inline-block;padding:0 6px;}
 .fs_nav_dropdown { display:none}
-.live_feeling{padding:17px 8px;}
+.live_feeling{padding:10px 8px;}
 .live_feeling_quote {width:140px;}
 }
 
@@ -70,6 +70,7 @@ textarea {
   font-size:12px;
   width:100%;
   box-sizing:border-box;
+  -moz-box-sizing:border-box;
   margin:6px;
   padding:4px 6px 4px 6px;
   line-height:20px;
@@ -91,15 +92,15 @@ input[type="text"]:focus,
 input[type="password"]:focus {
   outline:2px solid #afafcc;
 }
-ul {list-style:none;margin:0;padding:0;}
-li{display:inline-block;}
-div {box-sizing:border-box;}
+ul {overflow:hidden;list-style:none;margin:0;padding:0;}
+li{overflow:hidden;display:inline-block;box-sizing:border-box;-moz-box-sizing:border-box;}
+div {overflow:hidden;box-sizing:border-box;-moz-box-sizing:border-box;}
 
 h2 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:20px;line-height:24px;}
 h3 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:25px;line-height:30px;}
 h4 {margin:0;padding:0;font-weight:bold;display:inline-block;font-size:16px;line-height:24px;}
 h5 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;line-height:18px;}
-h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;line-height:18px;color:#bbbbbb;}
+h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:12px;line-height:18px;color:#bbbbbb;}
 
 
 /* common classes */
@@ -137,21 +138,31 @@ h6 {margin:0;padding:0;font-weight:normal;display:inline-block;font-size:13px;li
 ._ofh {overflow:hidden}
 ._pad10 {padding:10px}
 .fs_link {cursor:pointer}
+.talk_submit,
+.likeit,
 .fs_submit {
   cursor:pointer;
   display: inline-block;
   padding: 10px 0;
-  margin:0 20px;
   width:240px;
   font-size: 13px;
   line-height: 20px;
   color: #ffffff;
   text-align: center;
+  border:1px solid #4c4d5f;
   background-color:#4c4d5f;
     -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   -khtml-border-radius: 5px;
   border-radius: 5px;
+}
+.likeit,
+.talk_submit{
+  background-color:transparent;
+  border:3px solid #ffffff;
+  padding:4px 0;
+  margin:0 6px;
+  width:100px;
 }
 .fs_cancel {
   cursor:pointer;
@@ -210,6 +221,10 @@ body {
   background-color:#ffffff;
   border-bottom:1px solid #afafcc;
   color:#afafcc;
+  overflow:visible;
+}
+.fs_menu{
+  overflow:visible;
 }
 .fs_menu_pop{
   display:block;clear:both;
@@ -217,7 +232,7 @@ body {
 .fs_menu.active {
   background-color:#afafcc;
 }
-.fs_menu.active a{
+.fs_menu.active{
   color:#ffffff;
 }
 
@@ -226,7 +241,7 @@ body {
 #fs_status{
 }
 #fs_body {
-  padding:16px;margin-top:20px;box-sizing:border-box;
+  padding:16px;margin-top:20px;
   -moz-border-radius: 8px;
   -webkit-border-radius: 8px;
   -khtml-border-radius: 8px;
@@ -240,22 +255,14 @@ body {
 .main>.content0-input {padding:0 10px 12px 10px;background-color:#E8E8E8}
 .main>.content1-header { padding:10px 10px 8px 10px;}
 
-.card>.inner {padding:20px;}
 .card>.inner>.header{padding:12px 0 5px 0;overflow:hidden;border-bottom:1px solid #ffffff;}
 .card>.inner>.content{margin:22px 0 0 0;height:60px;}
 .card>.inner>.content>._word{margin-right:10px;font-weight:bold;}
-.card>.comments{background-color:#ffffff;}
-.card>.comments2 {background-color:#ffffff;padding:0 10px 10px 10px;}
-.card>.comments>.content{line-height:18px;padding:16px 20px 20px 20px;font-size:13px;overflow:hidden;}
-.card>.comments2>.content{border-top:1px solid #dddddd;padding-top:10px;}
 
-.talks {line-height:20px;padding:15px 10px;}
+.talks {line-height:20px;}
 
 .feeling{
   margin:5px;overflow:hidden;float:left;border:1px solid #afafcc;
-}
-.feeling > .wc {
-  float:left;box-sizing:border-box;width:34px;height:34px;line-height:34px;overflow:hidden;
 }
 .feeling > .ww {
   float:left;width:130px;padding-left:9px;line-height:34px;overflow:hidden;font-size:12px;
@@ -263,20 +270,14 @@ body {
 .feeling .active{
   background-color:#afafcc;color:#ffffff;
 }
-.live_wc{
-  float:left;box-sizing:border-box;width:40px;height:40px;line-height:40px;overflow:hidden;
-}
-.live_ww{
-  float:left;box-sizing:border-box;width:92px;padding:4px 0 0 9px;line-height:16px;overflow:hidden;font-size:12px;
-}
 .live_feeling {
   line-height:18px;overflow:hidden;font-size:13px;margin-left:3px;
 }
 .live_feeling_quote {
-  float:left;background-color:#ffffff;padding:8px 10px;box-sizing:border-box;overflow:hidden;font-size:12px;line-height:18px;
+  float:left;background-color:#ffffff;padding:8px 10px;overflow:hidden;font-size:12px;line-height:18px;
 }
 .profile{
-  width:30px;height:30px;
+  width:32px;height:32px;
   display:inline-block;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -284,11 +285,11 @@ body {
   border-radius: 4px;
   max-width: 100%;
   background-size:30px 30px;
-  margin:3px;
+  margin:4px 8px 4px 4px;
 }
 .myprofile{
   background-image:url(../img/profile.jpg);
-  background-size:30px 30px;
+  background-size:32px 32px;
   background-repeat:no-repeat;
   background-color:#020303;
 }
@@ -303,7 +304,7 @@ img.transparent {
 }
 
 #flipcard {
-  background-color:#45474c;height:224px;color:#c6aae2;text-align:center;padding-top:100px;box-sizing:border-box;
+  background-color:#45474c;height:235px;color:#c6aae2;text-align:center;
 }
 
 em{

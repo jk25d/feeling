@@ -27,55 +27,68 @@
 <!-- TEMPLATES -->
 
 <script type='text/template' id='tpl_navbar'>
-<div class='fs_navbar-inner' style='line-height:40px;'>
-  <div style='float:left;margin:0 20px;'><a href='#'>FEELING SHARE</a></div>
-  <div style='float:right;'>
+<div class='fs_navbar-inner' style='line-height:40px;overflow:visible;'>
+  <div style='float:left;margin:0 20px;overflow:visible;'><a href='#'>FEELING SHARE</a></div>
+  <div style='float:right;overflow:visible;'>
     <a class="fs_nav_dropdown fs_link" data-toggle="dropdown">
       <i class='batch-icon' style='font-size:20px;line-height:34px;'>&#xf0a9</i>
     </a>
   </div>
-  <div style=''>
+  <div style='overflow:visible;'>
   <% if(menu != '#menu_signup'){ %>
-    <div id='menu_share' class='fs_menu'><a href='#shared_feelings'>SHARED FEELINGS</a></div>
-    <div id='menu_my' class='fs_menu'><a href='#my_feelings'>MY FEELINGS</a></div>
-    <div id='menu_received' class='fs_menu'><a href='#received_feelings'>RECEIVED</a></div>
-    <div class='fs_menu'><a href='#logout'>LOGOUT</a></div>
+    <a href='#shared_feelings'><div id='menu_share' class='fs_menu'>SHARED FEELINGS</div></a>
+    <a href='#my_feelings'><div id='menu_my' class='fs_menu'>MY FEELINGS</div></a>
+    <a href='#received_feelings'><div id='menu_received' class='fs_menu'>RECEIVED</div></a>
+    <a href='#logout'><div class='fs_menu'>LOGOUT</div></a>
   <% }else{ %>
-    <div id='menu_signup' class='fs_menu'><a href='#'>SIGN UP</a></div>
+    <a href='#'><div id='menu_signup' class='fs_menu'>SIGN UP</div></a>
   <% } %>
   </div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_login'>
-<div style='width:300px;margin:0 auto'>
+<div style='width:300px;margin:0 auto;text-align:center;'>
 <div style='padding:10px;'>
-  <input id='email' type="text" placeholder="ID" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;'></input>
+  <input id='email' type="text" placeholder="ID"></input>
 </div>
 <div style='padding:0 10px 0 10px;'>
-  <input id='password' type="password" placeholder="PASSWORD" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;font-size:12px;'></input>
+  <input id='password' type="password" placeholder="PASSWORD"></input>
 </div>
-<div style='overflow:hidden;padding:0 10px 10px 10px;'>
-  <a id='login_btn' class='btn fs_submit _r'>LOGIN</a>
+<div style='padding:0 10px 10px 10px;'>
+  <a id='login_btn' class='fs_submit'>LOGIN</a>
+</div>
+<div style='padding:0 10px 10px 10px;'>
+  <a id='flip_signup_btn' class='fs_cancel'>SIGNUP PAGE</a>
 </div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_signup'>
-<div class='container'>
-  <div class='row'>
-    <div class='span4 offset4'>
-      <h2>SIGN UP</h2>
-      <div style='overflow:hidden;padding:0 10px 10px 10px;'>
-        <a class='btn fs_submit _r'>SIGNUP</a>
-      </div>
-    </div>
-  </div><!-- row -->
+<div style='width:300px;margin:10px auto;text-align:center;'>
+<div style='padding:10px;'>
+  <input id='signup_name' type="text" placeholder="NAME"></input>
+</div>
+<div style='padding:0 10px;'>
+  <input id='signup_email' type="text" placeholder="EMAIL"></input>
+</div>
+<div style='padding:0 10px;'>
+  <input id='signup_password' type="password" placeholder="PASSWORD"></input>
+</div>
+<div style='padding:0 10px;'>
+  <input id='signup_password_confirm' type="password"></input>
+</div>
+<div style='padding:0 10px 10px 10px;'>
+  <a id='signup_btn' class='fs_submit'>SIGNUP</a>
+</div>
+<div style='padding:0 10px 10px 10px;'>
+  <a id='flip_login_btn' class='fs_cancel'>LOGIN PAGE</a>
+</div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_new_feeling'>
-<div style='overflow:hidden;'>
+<div style=''>
 
   <ul id='wordselect' class='real_area' style='display:none;'>
     <li class='what what_spc toggle_area' style='text-align:left;float:left;height:auto;border:none;margin-left:20px;'>
@@ -90,8 +103,8 @@
   </ul>
 
   <div class='temp_area'>
-    <div style='background-color:#6a6b7d;overflow:hidden;'>
-      <ul id='live_feelings' class='toggle_area' style='margin:20px auto;'>
+    <div style='background-color:#6a6b7d;'>
+      <ul id='live_feelings' class='toggle_area' style='margin:30px auto;'>
       </ul>
     </div>
     <div class='rd6 toggle_area' style='margin:10px;cursor:text;border:1px solid #afafcc;height:40px;line-height:40px;padding-left:20px;background-color:#ffffff;color:#afafcc;'>How are you Feeling now?</div>
@@ -112,13 +125,13 @@
   <div style='float:left;font-size:18px;width:24px;height:30px;line-height:30px;'><i class='batch-icon'>&#xf170;</i></div>
   <em style='float:left;'></em>
   <div class='rd6 live_feeling_quote' style=''>
-    <div style='overflow:hidden;max-height:54px;'>
+    <div style='max-height:54px;'>
     <span style='font-weight:bold;'><%=gW[word].w%></span>
     <span style='color:#afafcc;'><%=blah%></span>
     </div>
   </div>
   <!--div>
-    <div style='padding:0 10px;box-sizing:border-box;'>
+    <div style='padding:0 10px;'>
       <i class='icon-user icon-white'/>
       <span style='color:rgba(0,0,0,0.3);font-weight:bold'><%=gW[word].w%></span>
       <span style=''><%=blah%></span>
@@ -128,12 +141,13 @@
 </script>
 
 <script type='text/template' id='tpl_my_status'>
-<ul style='overflow:hidden;padding-left:30px;line-height:18px;'>
+<ul style='padding-left:30px;line-height:18px;'>
   <li style='float:left;'><i class='profile' style='background-image:url(<%=img %>)'></i></li>
   <li style='float:left;margin:2px;'><%= name %></li>
   <li style='float:left;margin:2px;'><i class='batch-icon'>&#xf04b;</i> <%= n_hearts %>
-  <li style='float:left;margin:2px;'>내가 공유한 느낌: <%= my_shared %></li>
-  <li style='float:left;margin:2px;'>나에게 온 느낌: <%= rcv_shared %></li>
+  <li style='float:left;margin:2px;'>공유중인 느낌: <%= n_active_feelings %></li>
+  <li style='float:left;margin:2px;'>내 느낌: <%= n_my_feelings %></li>
+  <li style='float:left;margin:2px;'>받은 느낌: <%= n_rcv_feelings %></li>
 </ul>
 </script>
 
@@ -146,97 +160,110 @@
 </script>
 
 <script type='text/template' id='tpl_new_comment'>
-<div style='border-top:1px solid #dddddd;padding-top:10px;overflow:hidden'>
-  <input type="text" placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
+<div style='border-top:1px solid #dddddd;padding-top:10px;'>
+  <input type="text" placeholder="남기고 싶은말"></input>
 </div>
-<div style='overflow:hidden'>
+<div style=''>
   <a class='btn _r fs_link'>작성하기</a>
 </div>
 </script>
 
 <script type='text/template' id='tpl_arrived_holder'>
 <div id='receive_arrived'>
-  <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:210px;line-height:210px;margin:5px;text-align:center;'>받을 수 있는 느낌: <%= n_available_feelings %></div>
+  <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:225px;margin:5px;text-align:center;'><div style='margin-top:80px;line-height:40px;font-size:30px;'>Refresh</div></div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_arrived_feeling'>
 <div id='flipcard' style='color:#ffffff;background-color:<%= gW[word].c %>'>
-  <div>새 느낌이 도착했습니다.</div>
+  <div style='margin-top:100px'>새 느낌이 도착했습니다.</div>
   <div><span class='icon-heart icon-white'></span></div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_my_feeling'>
-<div class='inner fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
-  <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
-    <h3><strong class='_rspc' style=''>OCT 13</strong></h3>
-    <h5 style=''><%= time %></h5>
-  </div>
-  <div class='content'>
-    <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word].w %></strong></h4>
-    <span><%= content %></span>
-  </div>
-</div>
-<div style='background-color:<%= gW[word].c %>;color:rgba(0,0,0,0.4)'>
-  <div class='talks' style='background-color:rgba(0,0,0,0.2)'>
-    <% for(var u in talks){ %>
-    <span class='_rspc'><%=u%>: <%=talks[u].length%></span>
-    <% } %>
-  </div>
-</div>
 </script>
 
 <script type='text/template' id='tpl_feeling'>
-  <div class='inner fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
-  <div class='header' style='border-bottom:1px solid rgba(0,0,0,0.1)'>
-    <i class='profile' style='background-image:url(<%=users[user_id].img%>)'></i>
-    <span class='_rspc'><%=users[user_id].name%></span>
-    <span class='_r' style=''><%= datefmt(time) %></span>
+<div class='inner' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
+  <div class='expand_area fs_link'>
+  <div style='border-bottom:1px solid rgba(0,0,0,0.1);margin:24px 0 8px 0'>
+    <div class='card_header' style='padding:0 12px;margin-bottom:6px;'>
+      <i class='profile' style='float:left;display:block;background-image:url(<%=users[user_id].img%>)'></i>
+      <div style='float:left;'>
+        <div style='font-size:18px;line-height:20px;font-weight:bold'><%=users[user_id].name%></div>
+        <div style='width:190px;'>
+          <span style='float:right;font-size:12px;line-height:14px;color:rgba(0,0,0,0.4);'><%= datefmt(time) %> ago</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class='content'>
-    <h4><strong class='_rspc10' style='color:rgba(0,0,0,0.4)'><%= gW[word].w %></strong></h4>
-    <span><%= blah %></span>
+  <div class='card_body' style='margin:16px 18px 18px 18px;'>
+    <div style='height:80px;line-height:20px;'>
+      <span style='font-size:16px;font-weight:bold;color:rgba(0,0,0,0.4);margin-right:10px;'><%= gW[word].w %></span>
+      <span style='font-size:13px;'><%= blah %></span>
+    </div>
   </div>
-</div>
-<div style='background-color:<%= gW[word].c %>;color:#ffffff'>
-  <ul class='talks' style='background-color:rgba(0,0,0,0.2)'>
-    <li><i class='icon-user icon-white'/> <%= n_talk_users%></li>
-    <li><i class='icon-comment icon-white'/> <%= n_talk_msgs%></li>
-  </ul>
+  </div>
+  <div class='card_talk' style='background-color:rgba(0,0,0,0.2);color:#ffffff;'>
+    <div class='talks'>
+      <div>
+        <% if(!own && like_me) {%>
+          <div style='float:right;margin:15px 12px 4px 0;height:20px;'>
+            received <i class='icon-heart icon-white'/> from <%=users[user_id].name%>
+          </div>
+        <% }else if(own && like && users[like]) { %>
+          <div style='float:right;margin:15px 12px 4px 0;height:20px;'>
+            You sent <i class='icon-heart icon-white'/> to <%=users[like].name%>
+          </div>
+        <% } %>
+        <div class='talk_summary' style='float:left;margin:15px 0 15px 12px;height:20px;'>
+          <span style='margin-right:4px'><i class='icon-user icon-white'/> <%= n_talk_users%></span>
+          <span><i class='icon-comment icon-white'/> <%= n_talk_msgs%></span>
+        </div>
+      </div>
+      <div class='comments_holder'>
+      </div>
+    </div>
+  </div>
 </div>
 </script>
 
 <script type='text/template' id='tpl_talk'>
-<div style='border-bottom:1px solid rgba(0,0,0,0.3)'>
-  <div>
-    <i class='profile' style='background-image:url(<%=users[talk_user_id].img%>)'></i>
-    <span><%=users[talk_user_id].name%></span>
-    <% if(my_id == feeling_user_id && !like) { %>
-    <i class='icon-heart icon-white fs_link'></i>
-    <% } %>
-  </div>
-  <div class='comments'>
+<div style='border-bottom:1px solid <%=gW[word].c%>;'>
+  <div style='width:240px;margin:0 auto;margin-top:2px;margin-bottom:6px;'>
+    <% if(comments.length ==0){%>
+      <div style=''>
+        <i class='profile' style='float:left;background-image:url(<%=users[talk_user_id].img%>)'></i>
+        <div style='float:left'>
+          <div style='font-size:14px;font-weight:bold;line-height:32px;'><%=users[talk_user_id].name %></div>
+        </div>
+      </div>
+    <%}%>
     <% var commentor_id = null %>
     <% for(var i=0; i<comments.length; i++){ %>
       <% commentor_id = comments[i].user_id %>
-      <div>
-        <h5 class='_rspc'><%=users[commentor_id].name %></h5>
-        <h5 class='_rspc'><%=comments[i].blah %></h5>
-        <h5><%=datefmt(comments[i].time)%></h5>
+      <div style='margin-bottom:8px;'>
+        <i class='profile' style='float:left;background-image:url(<%=users[commentor_id].img%>)'></i>
+        <div style='float:left;'>
+          <div style=''>
+            <span style='float:left;line-height:18px;font-size:14px;font-weight:bold'><%=users[commentor_id].name %></span>
+            <span style='float:right;line-height:18px;font-size:12px;color:rgba(255,255,255,0.3)'><%=datefmt(comments[i].time)%> ago</span>
+          </div>
+          <div style='line-height:16px;word-wrap:break-word;width:196px;'><%=comments[i].blah %></div>
+        </div>
       </div>
     <% } %>
-
-    <% if( (my_id == talk_user_id && commentor_id && commentor_id != my_id) || (my_id != talk_user_id && !commentor_id || commentor_id != my_id) ) { %>
-      <div>
-        <div style='padding:10px;overflow:hidden'>
-          <input type="text" class='talk_blah' placeholder="남기고 싶은말" style='width:100%;box-sizing:border-box;padding:4px 6px 4px 6px;line-height:20px;height:30px;margin-bottom:6px;'></input>
-        </div>
-        <div style='overflow:hidden'>
-          <a class='talk_submit _r fs_link'>작성하기</a>
-        </div>
-      </div>
+    <% if( (shared === true && my_id === talk_user_id && (!commentor_id || commentor_id !== my_id)) || (shared === true && my_id === feeling_user_id && my_id !== talk_user_id && (!commentor_id || commentor_id !== my_id) ) ) { %>
+      <textarea class='talk_blah' style='display:block;width:228px;' placeholder="남기고 싶은말"></textarea>
+      <a class='talk_submit _r fs_link'>작성하기</a>
     <% }%>
+    <% if(my_id == feeling_user_id && !like) { %>
+    <a class='likeit _r'><i class='icon-heart icon-white'></i> LIKE</a>
+    <% } %>
+    <% if( !shared || shared === false ) { %>
+      <div style='color:rgba(255,255,255,0.3)'>This feeling is no longer sharable</div>
+    <% } %>
   </div>
 </div>
 </script>

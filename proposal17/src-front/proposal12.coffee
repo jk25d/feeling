@@ -57,7 +57,7 @@ $ ->
         align: 'left'
         autoResize: true
         container: $("##{@id}")
-        offset: 16
+        offset: 20
         itemWidth: 260
 
   class Router extends Backbone.Router
@@ -71,7 +71,6 @@ $ ->
     layout: {}
     models: {}
     initialize: ->
-      console.log 'router init'
       @models.me = new Me
       @models.live_feelings = new LiveFeelings
       @models.associates = new Associates
@@ -93,6 +92,12 @@ $ ->
       @layout.header.show new LoginView
       @layout.status.show()
       @layout.body.show()
+    refresh_page: ->
+      Backbone.history.loadUrl()
+      #console.log window.location.hash
+      #if window.location.hash.length > 0
+      #  Backbone.history.fragment = null;
+      #  Backbone.history.navigate(window.location.hash.substring(1), true); 
     index: ->
       $.ajax
         url: '../sessions'
@@ -302,29 +307,50 @@ $ ->
     initialize: ->
       @model.on 'change:menu', @show, @
     render: ->
+      @$el.css 'overflow', 'visible'
       @$el.html @template(@model.toJSON())
       @$el.find('.fs_menu').removeClass 'active'
       $(@model.get('menu')).addClass 'active'
     _on_toggle_dropdown: ->
       @$el.find('.fs_menu').toggleClass 'fs_menu_pop'
     _on_click_menu: (e) ->
-      event_hash = $(e.currentTarget).find('a').attr('href')
+      event_hash = $(e.currentTarget).parent().attr('href')
       current_hash = window.location.hash
-      if event_hash.charAt(0) == '#' && event_hash == current_hash
+      if event_hash && current_hash && event_hash.charAt(0) == '#' && event_hash == current_hash
         e.preventDefault()
-        Backbone.history.fragment = null        
-        router.navigate event_hash.substr(1), {trigger: true}
+        router.refresh_page()
     close: ->
       super()
       @model.off 'change:menu', @show, @
 
   class LoginView extends FsView
     events:
-      'click .fs_submit': '_on_submit'
-    template: Tpl.login
+      'click #login_btn': '_on_login'
+      'click .fs_cancel': '_on_flip'
+      'click #signup_btn': '_on_signup'
+    login_template: Tpl.login
+    signup_template: Tpl.signup
+    initialize: -> @_signup_mode = false
     render: ->
-      @$el.html @template()
-    _on_submit: ->
+      @$el.html if @_signup_mode then @signup_template else @login_template()
+    _on_flip: ->
+      @_signup_mode = not @_signup_mode
+      @show()
+    _on_signup: ->
+      $.ajax
+        url: '../users'
+        type: 'POST'
+        context: @
+        data:
+          name: $('#signup_name').val()
+          email: $('#signup_email').val()
+          password: $('#signup_password').val()
+          password_confirm: $('#signup_password_confirm').val()
+        success: (data) ->
+          window.location = '/'
+        fail: ->
+          window.location = '/'
+    _on_login: ->
       $.ajax
         url: '../sessions'
         type: 'POST'
@@ -396,38 +422,6 @@ $ ->
           Backbone.history.fragment = null
           router.navigate 'shared_feelings', {trigger: true}
 
-  class MyFeelingView extends FsView
-    tagName: 'li'
-    events:
-      'click .inner': '_on_expand'
-    template: Tpl.my_feeling
-    initialize: ->
-      @model.on 'change', @show, @
-    render: ->
-      @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
-      @$el.addClass('rd6').addClass('_sd0').addClass('card')
-      @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
-      if @_expand
-        holder = @$el.find('.talks')
-        holder.empty()
-        for u,talk of @model.get('talks')
-          m =
-            shared: @model.get('share')
-            user_id: u
-            comments: talk
-          holder.append @_attach(new TalkView(model: new Talk(m))).el
-
-      if @_on_expand_triggered
-        @$el.trigger 'refreshWookmark'
-      @_on_expand_triggered = false
-    _on_expand: (event) ->
-      @_on_expand_triggered = true
-      @_expand = not @_expand
-      @show()
-    close: ->
-      super()
-      @model.off 'change', @show, @
-
   class NewCommentView extends FsView
     className: 'new_comment'
     events:
@@ -442,12 +436,11 @@ $ ->
   class TalkView extends FsView
     events:
       'click .talk_submit': '_on_submit'
-      'click .icon-heart': '_on_like'
+      'click .likeit': '_on_like'
     template: Tpl.talk
     render: ->
       @$el.html @template(_.extend(@model.toJSON(), gAddons))
     _on_submit: ->
-      console.log @options.parent
       id = @options.parent.get 'id'
       uid = @model.get 'talk_user_id'
       $.ajax
@@ -459,7 +452,6 @@ $ ->
         success: (data) ->
           @options.parent.fetch()
     _on_like: ->
-      console.log @options.parent
       id = @options.parent.get 'id'
       uid = @model.get 'talk_user_id'
       $.ajax
@@ -474,20 +466,22 @@ $ ->
   class FeelingView extends FsView
     tagName: 'li'
     events:
-      'click .inner': '_on_expand'
+      'click .expand_area': '_on_expand'
     template: Tpl.feeling
     initialize: ->
       @model.on 'sync', @show, @
     render: ->
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
-      @$el.html @template _.extend(@model.toJSON(), gAddons)
+      like_me = @model.get('like') == router.models.me?.id
+      @$el.html @template _.extend(@model.toJSON(), gAddons, {like_me: like_me})
 
       if @_expand
         if @model.get('n_talk_users') == 0
           @_expand = false
         else
-          holder = @$el.find('.talks')
+          @$el.find('.talk_summary').remove()
+          holder = @$el.find('.comments_holder')
           holder.empty()
           feeling_user_id = @model.get('user_id')
           for u,talk of @model.get('talks')
@@ -501,14 +495,13 @@ $ ->
                 comments: talk
                 users: @model.get('users')
                 like: @model.get('like')
+                word: @model.get('word')
             holder.append @_attach(new TalkView(talk_model)).el
-      if @_on_expand_triggered
-        @$el.trigger 'refreshWookmark'
-      @_on_expand_triggered = false
+      @$el.trigger 'refreshWookmark'
     _on_expand: (event) ->
-      @_on_expand_triggered = true
       @_expand = not @_expand
-      @model.fetch()
+      @model.fetch
+        error: -> router.refresh_page()
     close: ->
       super()
       @model.off 'sync', @show, @
@@ -608,7 +601,6 @@ $ ->
       @model.on 'prepend', @_on_prepend, @
     render: ->
       @$el.append @_attach(new ArrivedFeelingView).el
-      console.log @model
       for m in @model.models
         @$el.append @_attach(new FeelingView(model: m)).el
     on_rendered: ->
@@ -624,7 +616,7 @@ $ ->
       @model.reset()
 
   bind_scroll_event = ->
-    if not active_scroll && router.scrollable_model && $(window).scrollTop() + $(window).height() >  $(document).height() - 50
+    if not active_scroll && router.scrollable_model && $(window).scrollTop() + $(window).height() >  $(document).height() - 100
       console.log 'on_scroll'
       router.scrollable_model.fetch_more()
       active_scroll = true
