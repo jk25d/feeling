@@ -1,35 +1,35 @@
 $ ->
   gW = [
-    { w: '두렵다', c: '#556270' },
-    { w: '무섭다', c: '#556270' },
-    { w: '우울하다', c: '#7f94b0' },
-    { w: '기운이없다', c: '#938172' },
-    { w: '무기력하다', c: '#938172' },
-    { w: '의욕이없다', c: '#938172' },
-    { w: '불안하다', c: '#77cca4' },
-    { w: '외롭다', c: '#c3ff68' },
-    { w: '걱정된다', c: '#14b0d9' },
-    { w: '허전하다', c: '#14d925' },
-    { w: '삶이힘들다', c: '#e177b3' },
-    { w: '한심하다', c: '#ffc6e2' },
-    { w: '짜증난다', c: '#c6aae2' },
-    { w: '슬프다', c: '#77cca4' },
-    { w: '절망스럽다', c: '#d9cbb8' },
-    { w: '화난다', c: '#594944' },
-    { w: '쓸쓸하다', c: '#758fe6' },
-    { w: '초조하다', c: '#b5242e' },
-    { w: '마음아프다', c: '#29a9b3' },
-    { w: '열등감느낀다', c: '#e8175d' },
-    { w: '사랑스럽다', c: '#14b0d9' },
-    { w: '소중하다', c: '#c3ff68' },
-    { w: '설레다', c: '#14d925' },
-    { w: '즐겁다', c: '#e177b3' },
-    { w: '기쁘다', c: '#ffc6e2' },
-    { w: '뿌듯하다', c: '#c6aae2' },
-    { w: '만족스럽다', c: '#77cca4' },
-    { w: '가슴벅차다', c: '#d9cbb8' },
-    { w: '자신있다', c: '#f0ba3c' },
-    { w: '기운차다', c: '#c47147' }
+    { w: '두려워요', c: '#556270' },
+    { w: '무서워요', c: '#556270' },
+    { w: '우울해요', c: '#7f94b0' },
+    { w: '기운이없어요', c: '#938172' },
+    { w: '무기력해요', c: '#938172' },
+    { w: '의욕이없네요', c: '#938172' },
+    { w: '불안해요', c: '#77cca4' },
+    { w: '외로워요', c: '#c47147' },
+    { w: '걱정되요', c: '#14b0d9' },
+    { w: '허전해요', c: '#14d925' },
+    { w: '힘들어요', c: '#e177b3' },
+    { w: '한심해요', c: '#ffc6e2' },
+    { w: '짜증나요', c: '#c6aae2' },
+    { w: '슬퍼요', c: '#77cca4' },
+    { w: '절망스러워요', c: '#d9cbb8' },
+    { w: '화가나요', c: '#594944' },
+    { w: '쓸쓸해요', c: '#758fe6' },
+    { w: '초조해요', c: '#b5242e' },
+    { w: '마음이아파요', c: '#29a9b3' },
+    { w: '열등감느껴요', c: '#e8175d' },
+    { w: '사랑하고있어요', c: '#14b0d9' },
+    { w: '재미있어요', c: '#c3ff68' },
+    { w: '설레요', c: '#14d925' },
+    { w: '가슴이벅차요', c: '#d9cbb8' },
+    { w: '즐거워요', c: '#e177b3' },
+    { w: '기뻐요', c: '#ffc6e2' },
+    { w: '뿌듯하네요', c: '#c6aae2' },
+    { w: '만족해요', c: '#77cca4' },
+    { w: '행복해요', c: '#f0ba3c' },
+    { w: '신나요', c: '#aae04c' }
   ]
 
   gAddons = 
@@ -470,17 +470,17 @@ $ ->
     template: Tpl.feeling
     initialize: ->
       @model.on 'sync', @show, @
+      @_expand = false
     render: ->
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
       like_me = @model.get('like') == router.models.me?.id
-      @$el.html @template _.extend(@model.toJSON(), gAddons, {like_me: like_me})
+      @$el.html @template _.extend(@model.toJSON(), gAddons, {like_me: like_me, expanded: @_expand})
 
       if @_expand
         if @model.get('n_talk_users') == 0
           @_expand = false
         else
-          @$el.find('.talk_summary').remove()
           holder = @$el.find('.comments_holder')
           holder.empty()
           feeling_user_id = @model.get('user_id')
@@ -552,7 +552,7 @@ $ ->
     tagName: 'li'
     className: 'arrived_feeling'
     events:
-      'click #receive_arrived': '_on_receive'
+      #'click #receive_arrived': '_on_receive'
       'click #flipcard': '_on_flip'
     template: Tpl.arrived
     holder_template: Tpl.arrived_holder

@@ -1,6 +1,8 @@
 express = require 'express'
-app = express()
+config = require './config'
+feeling_seeds = require './feeling_seeds'
 
+app = express()
 
 #### CONFIGURATION ####
 
@@ -24,11 +26,11 @@ require_auth = (req, res, next) ->
 app.configure ->
   app.use express.bodyParser()
   app.use express.cookieParser()
-  app.use express.cookieSession(secret: 'deadbeef')
+  app.use express.cookieSession(secret: config.secret)
   app.use express.logger { format: ':method :url' }
   app.use (err, req, res, next) ->
     console.error err.stack
-    res.send 500, 'Something broke!'
+    res.send 500, 'Something broken!'
   app.use app.router
   app.all '/api/*', require_auth
   app.use express.static("#{__dirname}/public")
@@ -102,19 +104,16 @@ class DB
 
 
 class Session
-  @EXPIRE_TIME: 30 * 60 * 1000
   @create: (uid) ->
     s = new Session(uid)
     gDB.put_session uid, s
     s
   constructor: (@user_id) -> @update()
   update: -> @time = now()
-  expired: -> now() - @time > Session.EXPIRE_TIME
+  expired: -> now() - @time > config.session_expire_time
 
 # before access, should be checked perm & sharable
 class Feeling
-  @SHARE_DUR: 20 * 60 * 1000
-  @DETACHABLE_DUR: @SHARE_DUR /2
   @create: (me, is_public, word, blah) ->
     f = new Feeling(me, is_public, word, blah)
     gDB.put_feeling f
@@ -129,9 +128,11 @@ class Feeling
     @talks = {}
     @like = null
   sharable_time: ->
-    now() - @time < Feeling.SHARE_DUR
+    now() - @time < config.feeling_share_dur
   sharable: ->
     @status == 'public' && @sharable_time()
+  dispatchable: ->
+    @status == 'public' && now() - @time < config.feeling_dispatchable_dur
   has_own_perm: (user_id) ->
     @user_id == user_id
   has_group_perm: (user_id) ->
@@ -147,6 +148,7 @@ class Feeling
     x.users = {}
     x.share = @sharable()
     x.talks = {}
+    x.blah = @blah.substr(0, min(80,@blah.length))
     try
       u = gDB.user x.user_id
       x.users[u.id] = {name: u.name, img: u.img}
@@ -163,6 +165,7 @@ class Feeling
     x
   extend_full: (user_id) ->
     x = @extend(user_id)
+    x.blah = @blah
     unless x.own
       x.talks = {}
       x.talks[user_id] = @talks[user_id]
@@ -173,7 +176,7 @@ class Feeling
         tu = gDB.user tuid
         x.users[tuid] = {name: tu.name, img: tu.img}
     x
-  weight: (remain_time) -> remain_time / Feeling.SHARE_DUR * 10
+  weight: (remain_time) -> remain_time / config.feeling_dispatchable_dur * 10
   set_public: (is_public) ->
     return if @status == 'removed'
     if @status == 'private' && is_public
@@ -216,10 +219,10 @@ class UserFeelings
       f = try gDB.feeling fid
       continue unless f
       # if this remains enough time, no need to filter next feelings
-      if _now - f.time < Feeling.SHARE_DUR + Feeling.DETACHABLE_DUR
+      if _now - f.time < config.feeling_share_dur + config.feeling_dispatchable_dur
         @_actives.push fid
         break
-      reusable.push fid if (_now - f.time) < Feeling.SHARE_DUR
+      reusable.push fid if (_now - f.time) < config.feeling_share_dur
     while reusable.length > 0
       @_actives.push reusable.pop()
     @_actives
@@ -294,8 +297,6 @@ class WaitItem
   constructor: (@id) -> @wait_time = now()
 
 class Dispatcher
-  @MIN_USER_WAIT_TIME: 5000
-  @INTERVAL: 5000
   constructor: ->
     @_user_que = []     # old one first
     @_item_que = []     # old one first
@@ -309,7 +310,7 @@ class Dispatcher
       wu = @_user_que.shift()
       u = try gDB.user wu.id
       continue unless u
-      if _now - u.wait_time < Dispatcher.MIN_USER_WAIT_TIME
+      if _now - wu.wait_time < config.user_receive_wait_time
         hungry_users.push wu
         break
       fid = try @select_item(wu)
@@ -327,7 +328,7 @@ class Dispatcher
     while @_item_que.length > 0 && n_candi < 30
       wf = @_item_que.shift()
       item = try gDB.feeling wf.id
-      continue unless item && item.sharable()
+      continue unless item && item.dispatchable()
       reusable.push wf
       continue if item.has_group_perm(wu.id)
       [0..item.weight(_now - wu.wait_time)].forEach -> candidates.push wf
@@ -597,10 +598,10 @@ schedule = ->
   gDispatcher.run()
   gDispatcher.log()
   # to prevent memory overflow, remove old ones.
-  while gFeelingContainer.length >= 1000
+  while gFeelingContainer.length >= config.feeling_container_size
     fid = gFeelingContainer.shift()
     gDB.del_feeling fid
-  setTimeout schedule, Dispatcher.INTERVAL
+  setTimeout schedule, config.schedule_interval
 
 schedule()
 
@@ -609,11 +610,10 @@ u1 = User.create('moon', 'img/profile2.jpg', 'moon@gmail.com', 'moon00')
 u2 = User.create('asdf', 'img/profile4.jpg', 'asdf', 'asdf')
 
 auto_feeling= (user) ->
+  return if config.auto_feeling_interval <= 0
   word = rand(0,29)
-  a = []
-  [0..rand(0,9)].forEach -> a.push 'blah '
-  Feeling.create(user, true, word, a.join(''))
-  setTimeout auto_feeling, 15000, user
+  Feeling.create(user, true, word, feeling_seeds[word])
+  setTimeout auto_feeling, config.auto_feeling_interval, user
 auto_feeling u0
 auto_feeling u1
 

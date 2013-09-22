@@ -48,11 +48,11 @@
 </script>
 
 <script type='text/template' id='tpl_login'>
-<div style='width:300px;margin:0 auto;text-align:center;'>
-<div style='padding:10px;'>
+<div style='width:300px;margin:10px auto;text-align:center;'>
+<div style='padding:0 10px 10px 10px;'>
   <input id='email' type="text" placeholder="ID"></input>
 </div>
-<div style='padding:0 10px 0 10px;'>
+<div style='padding:0 10px 10px 10px;'>
   <input id='password' type="password" placeholder="PASSWORD"></input>
 </div>
 <div style='padding:0 10px 10px 10px;'>
@@ -66,17 +66,17 @@
 
 <script type='text/template' id='tpl_signup'>
 <div style='width:300px;margin:10px auto;text-align:center;'>
-<div style='padding:10px;'>
+<div style='padding:0 10px 10px 10px;'>
   <input id='signup_name' type="text" placeholder="NAME"></input>
 </div>
-<div style='padding:0 10px;'>
+<div style='padding:0 10px 10px 10px;'>
   <input id='signup_email' type="text" placeholder="EMAIL"></input>
 </div>
-<div style='padding:0 10px;'>
+<div style='padding:0 10px 10px 10px;'>
   <input id='signup_password' type="password" placeholder="PASSWORD"></input>
 </div>
-<div style='padding:0 10px;'>
-  <input id='signup_password_confirm' type="password"></input>
+<div style='padding:0 10px 10px 10px;'>
+  <input id='signup_password_confirm' type="password" placeholder="PASSWORD CONFIRM"></input>
 </div>
 <div style='padding:0 10px 10px 10px;'>
   <a id='signup_btn' class='fs_submit'>SIGNUP</a>
@@ -111,7 +111,7 @@
   </div>
 
   <div class='content0-input real_area' style='display:none;padding:0 20px;'>
-    <div><textarea id='new_feeling_content' placeholder="How are you Feeling now?"></textarea></div>
+    <textarea id='new_feeling_content' placeholder="How are you Feeling now?"></textarea>
     <div class='_ofh real_area' style='display:none;text-align:center'>
       <a id='new_feeling_submit' class='btn fs_submit'>작성하기</a>
       <a id='new_feeling_cancel' class='btn fs_cancel'>취소</a>
@@ -170,7 +170,9 @@
 
 <script type='text/template' id='tpl_arrived_holder'>
 <div id='receive_arrived'>
-  <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:225px;margin:5px;text-align:center;'><div style='margin-top:80px;line-height:40px;font-size:30px;'>Refresh</div></div>
+  <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:225px;margin:5px;text-align:center;'>
+    <div style='margin-top:80px;line-height:40px;font-size:14px;'>Waiting New Feeling ...</div>
+  </div>
 </div>
 </script>
 
@@ -198,8 +200,12 @@
       </div>
     </div>
   </div>
-  <div class='card_body' style='margin:16px 18px 18px 18px;'>
-    <div style='height:80px;line-height:20px;'>
+  <div class='card_body' style='margin:16px 18px 18px 18px;line-height:20px;'>
+    <% if(expanded) { %>
+    <div>
+    <% }else{ %>
+    <div style='height:80px;'>
+    <% } %>
       <span style='font-size:16px;font-weight:bold;color:rgba(0,0,0,0.4);margin-right:10px;'><%= gW[word].w %></span>
       <span style='font-size:13px;'><%= blah %></span>
     </div>
@@ -217,10 +223,12 @@
             You sent <i class='icon-heart icon-white'/> to <%=users[like].name%>
           </div>
         <% } %>
-        <div class='talk_summary' style='float:left;margin:15px 0 15px 12px;height:20px;'>
+        <% if(expanded === false) { %>
+        <div style='float:left;margin:15px 0 15px 12px;height:20px;'>
           <span style='margin-right:4px'><i class='icon-user icon-white'/> <%= n_talk_users%></span>
           <span><i class='icon-comment icon-white'/> <%= n_talk_msgs%></span>
         </div>
+        <% } %>
       </div>
       <div class='comments_holder'>
       </div>
@@ -255,11 +263,11 @@
       </div>
     <% } %>
     <% if( (shared === true && my_id === talk_user_id && (!commentor_id || commentor_id !== my_id)) || (shared === true && my_id === feeling_user_id && my_id !== talk_user_id && (!commentor_id || commentor_id !== my_id) ) ) { %>
-      <textarea class='talk_blah' style='display:block;width:228px;' placeholder="남기고 싶은말"></textarea>
-      <a class='talk_submit _r fs_link'>작성하기</a>
+      <textarea class='talk_blah' style='display:block;' placeholder="남기고 싶은말"></textarea>
+      <a class='talk_submit _r fs_link' style='margin-top:4px;'>작성하기</a>
     <% }%>
     <% if(my_id == feeling_user_id && !like) { %>
-    <a class='likeit _r'><i class='icon-heart icon-white'></i> LIKE</a>
+    <a class='likeit _r' style='margin-top:4px;'><i class='icon-heart icon-white'></i> LIKE</a>
     <% } %>
     <% if( !shared || shared === false ) { %>
       <div style='color:rgba(255,255,255,0.3)'>This feeling is no longer sharable</div>

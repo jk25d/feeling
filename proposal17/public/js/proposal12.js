@@ -7,95 +7,95 @@
     var App, AppView, ArrivedFeeling, ArrivedFeelingView, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, Feeling, FeelingView, FsView, HeaderLayout, Layout, LiveFeeling, LiveFeelingView, LiveFeelings, LoginView, Me, MyFeeling, MyFeelings, MyFeelingsView, MyStatusView, NavLayout, NewComment, NewCommentView, NewFeelingView, ReceivedFeeling, ReceivedFeelings, ReceivedFeelingsView, Router, SharedFeelings, SharedFeelingsView, SignupView, StatusLayout, Talk, TalkView, Tpl, Wookmark, active_scroll, bind_scroll_event, gAddons, gW, router, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
     gW = [
       {
-        w: '두렵다',
+        w: '두려워요',
         c: '#556270'
       }, {
-        w: '무섭다',
+        w: '무서워요',
         c: '#556270'
       }, {
-        w: '우울하다',
+        w: '우울해요',
         c: '#7f94b0'
       }, {
-        w: '기운이없다',
+        w: '기운이없어요',
         c: '#938172'
       }, {
-        w: '무기력하다',
+        w: '무기력해요',
         c: '#938172'
       }, {
-        w: '의욕이없다',
+        w: '의욕이없네요',
         c: '#938172'
       }, {
-        w: '불안하다',
+        w: '불안해요',
         c: '#77cca4'
       }, {
-        w: '외롭다',
-        c: '#c3ff68'
+        w: '외로워요',
+        c: '#c47147'
       }, {
-        w: '걱정된다',
+        w: '걱정되요',
         c: '#14b0d9'
       }, {
-        w: '허전하다',
+        w: '허전해요',
         c: '#14d925'
       }, {
-        w: '삶이힘들다',
+        w: '힘들어요',
         c: '#e177b3'
       }, {
-        w: '한심하다',
+        w: '한심해요',
         c: '#ffc6e2'
       }, {
-        w: '짜증난다',
+        w: '짜증나요',
         c: '#c6aae2'
       }, {
-        w: '슬프다',
+        w: '슬퍼요',
         c: '#77cca4'
       }, {
-        w: '절망스럽다',
+        w: '절망스러워요',
         c: '#d9cbb8'
       }, {
-        w: '화난다',
+        w: '화가나요',
         c: '#594944'
       }, {
-        w: '쓸쓸하다',
+        w: '쓸쓸해요',
         c: '#758fe6'
       }, {
-        w: '초조하다',
+        w: '초조해요',
         c: '#b5242e'
       }, {
-        w: '마음아프다',
+        w: '마음이아파요',
         c: '#29a9b3'
       }, {
-        w: '열등감느낀다',
+        w: '열등감느껴요',
         c: '#e8175d'
       }, {
-        w: '사랑스럽다',
+        w: '사랑하고있어요',
         c: '#14b0d9'
       }, {
-        w: '소중하다',
+        w: '재미있어요',
         c: '#c3ff68'
       }, {
-        w: '설레다',
+        w: '설레요',
         c: '#14d925'
       }, {
-        w: '즐겁다',
-        c: '#e177b3'
-      }, {
-        w: '기쁘다',
-        c: '#ffc6e2'
-      }, {
-        w: '뿌듯하다',
-        c: '#c6aae2'
-      }, {
-        w: '만족스럽다',
-        c: '#77cca4'
-      }, {
-        w: '가슴벅차다',
+        w: '가슴이벅차요',
         c: '#d9cbb8'
       }, {
-        w: '자신있다',
+        w: '즐거워요',
+        c: '#e177b3'
+      }, {
+        w: '기뻐요',
+        c: '#ffc6e2'
+      }, {
+        w: '뿌듯하네요',
+        c: '#c6aae2'
+      }, {
+        w: '만족해요',
+        c: '#77cca4'
+      }, {
+        w: '행복해요',
         c: '#f0ba3c'
       }, {
-        w: '기운차다',
-        c: '#c47147'
+        w: '신나요',
+        c: '#aae04c'
       }
     ];
     gAddons = {
@@ -1125,7 +1125,8 @@
       FeelingView.prototype.template = Tpl.feeling;
 
       FeelingView.prototype.initialize = function() {
-        return this.model.on('sync', this.show, this);
+        this.model.on('sync', this.show, this);
+        return this._expand = false;
       };
 
       FeelingView.prototype.render = function() {
@@ -1134,13 +1135,13 @@
         this.$el.addClass('rd6').addClass('_sd0').addClass('card');
         like_me = this.model.get('like') === ((_ref32 = router.models.me) != null ? _ref32.id : void 0);
         this.$el.html(this.template(_.extend(this.model.toJSON(), gAddons, {
-          like_me: like_me
+          like_me: like_me,
+          expanded: this._expand
         })));
         if (this._expand) {
           if (this.model.get('n_talk_users') === 0) {
             this._expand = false;
           } else {
-            this.$el.find('.talk_summary').remove();
             holder = this.$el.find('.comments_holder');
             holder.empty();
             feeling_user_id = this.model.get('user_id');
@@ -1309,7 +1310,6 @@
       ArrivedFeelingView.prototype.className = 'arrived_feeling';
 
       ArrivedFeelingView.prototype.events = {
-        'click #receive_arrived': '_on_receive',
         'click #flipcard': '_on_flip'
       };
 
