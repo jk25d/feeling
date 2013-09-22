@@ -617,6 +617,6 @@ auto_feeling= (user) ->
 auto_feeling u0
 auto_feeling u1
 
-app.listen '3333'
-console.log 'listening on 3333'
+app.listen config.port
+console.log "listening on #{config.port}"
 
