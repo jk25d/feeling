@@ -517,7 +517,7 @@ app.put '/api/arrived_feelings/:id', (req,res) ->
 
 app.get '/api/live_feelings', (req,res) ->
   me = gDB.user req.session.user_id
-  n = req.query.n || 20
+  n = req.query.n || 8
   res.json gDispatcher.latest_feelings(n).map (fid) ->
     f = try gDB.feeling(fid)
     f?.anony_content()
@@ -611,7 +611,7 @@ u2 = User.create('asdf', 'img/profile4.jpg', 'asdf', 'asdf')
 
 auto_feeling= (user) ->
   return if config.auto_feeling_interval <= 0
-  word = rand(0,29)
+  word = rand(0,15)
   Feeling.create(user, true, word, feeling_seeds[word])
   setTimeout auto_feeling, config.auto_feeling_interval, user
 auto_feeling u0

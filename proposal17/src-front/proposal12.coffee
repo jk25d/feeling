@@ -1,35 +1,21 @@
 $ ->
   gW = [
-    { w: '두려워요', c: '#556270' },
-    { w: '무서워요', c: '#556270' },
-    { w: '우울해요', c: '#7f94b0' },
-    { w: '기운이없어요', c: '#938172' },
-    { w: '무기력해요', c: '#938172' },
-    { w: '의욕이없네요', c: '#938172' },
-    { w: '불안해요', c: '#77cca4' },
-    { w: '외로워요', c: '#c47147' },
-    { w: '걱정되요', c: '#14b0d9' },
-    { w: '허전해요', c: '#14d925' },
-    { w: '힘들어요', c: '#e177b3' },
-    { w: '한심해요', c: '#ffc6e2' },
-    { w: '짜증나요', c: '#c6aae2' },
-    { w: '슬퍼요', c: '#77cca4' },
-    { w: '절망스러워요', c: '#d9cbb8' },
-    { w: '화가나요', c: '#594944' },
-    { w: '쓸쓸해요', c: '#758fe6' },
-    { w: '초조해요', c: '#b5242e' },
-    { w: '마음이아파요', c: '#29a9b3' },
-    { w: '열등감느껴요', c: '#e8175d' },
-    { w: '사랑하고있어요', c: '#14b0d9' },
-    { w: '재미있어요', c: '#c3ff68' },
-    { w: '설레요', c: '#14d925' },
-    { w: '가슴이벅차요', c: '#d9cbb8' },
-    { w: '즐거워요', c: '#e177b3' },
-    { w: '기뻐요', c: '#ffc6e2' },
-    { w: '뿌듯하네요', c: '#c6aae2' },
-    { w: '만족해요', c: '#77cca4' },
-    { w: '행복해요', c: '#f0ba3c' },
-    { w: '신나요', c: '#aae04c' }
+    { w: '멍해요', c: '#f0ba3c' },
+    { w: '그냥그래', c: '#7f94b0' },
+    { w: '짱좋아요', c: '#14b0d9' },
+    { w: '잼나요', c: '#c6aae2' },
+    { w: '신나요', c: '#aae04c' },
+    { w: '설레요', c: '#e177b3' },
+    { w: '행복해요', c: '#e8175d' },
+    { w: '외로워요', c: '#29a9b3' },
+    { w: '한심해요', c: '#938172' },
+    { w: '우울해요', c: '#556270' },
+    { w: '힘들어요', c: '#77cca4' },
+    { w: '슬퍼요', c: '#d9cbb8' },
+    { w: '무기력해요', c: '#758fe6' },
+    { w: '초조해요', c: '#ffc6e2' },
+    { w: '멘붕', c: '#f0ba3c' },
+    { w: '짜증나요', c: '#c47147' }
   ]
 
   gAddons = 
@@ -105,7 +91,7 @@ $ ->
           401: ->
           403: ->
         context: @
-        success: -> @navigate 'shared_feelings', {trigger: true}
+        success: -> @navigate 'my_feelings', {trigger: true}
         error: -> @_login_view()
     logout: ->
       @scrollable_model = null
@@ -120,10 +106,10 @@ $ ->
         success: (model, res) ->
           router.layout.status.show new MyStatusView(model: router.models.me)
       @models.shared.fetch()
-      router.layout.body.show new SharedFeelingsView(model: router.models.shared)
       @models.live_feelings.fetch
         success: (model, res) ->
-          router.layout.header.show new NewFeelingView(model: router.models.live_feelings)
+          router.layout.header.show new LiveFeelingsView(model: router.models.live_feelings)
+      @layout.body.show new SharedFeelingsView(model: router.models.shared)
     my_feelings: ->
       @scrollable_model = @models.my
       @models.app.set {menu: '#menu_my'}
@@ -131,7 +117,7 @@ $ ->
         success: (model, res) ->
           router.layout.status.show new MyStatusView(model: model)
       @models.my.fetch_more()
-      @layout.header.show()
+      @layout.header.show new NewFeelingView()
       @layout.body.show new MyFeelingsView(model: @models.my)
     received_feelings: ->
       @scrollable_model = @models.received
@@ -291,10 +277,10 @@ $ ->
     @signup:       _.template $('#tpl_signup').html()
     @my_status:    _.template $('#tpl_my_status').html()
     @live_feeling: _.template $('#tpl_live_feeling').html()
+    @live_feelings: _.template $('#tpl_live_feelings').html()
     @new_feeling:  _.template $('#tpl_new_feeling').html()
     @talk:         _.template $('#tpl_talk').html()
     @my_feeling:   _.template $('#tpl_my_feeling').html()
-    @new_comment:  _.template $('#tpl_new_comment').html()
     @feeling:      _.template $('#tpl_feeling').html()
     @arrived:      _.template $('#tpl_arrived_feeling').html()
     @arrived_holder: _.template $('#tpl_arrived_holder').html()
@@ -360,7 +346,7 @@ $ ->
           password: $('#password').val()
         success: (data) ->
           router.models.app.set {'logged_in': true}
-          router.navigate 'shared_feelings', {trigger: true}
+          router.navigate 'my_feelings', {trigger: true}
         fail: ->
           window.location = '/'
 
@@ -389,26 +375,25 @@ $ ->
     render: ->
       @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
 
-  class NewFeelingView extends FsView
-    events:
-      'click .fs_submit': '_on_submit'
-      'click .fs_cancel': '_on_area_click'
-      'click #wordselect .ww': '_on_select_word'
-      'click .toggle_area': '_on_area_click'
-    template: Tpl.new_feeling
+  class LiveFeelingsView extends FsView
+    template: Tpl.live_feelings
     live_template: Tpl.live_feeling
     render: ->
-      @$el.html @template({gW: gW})
+      @$el.html @template()
       ul = @$el.find('#live_feelings')
       for m in @model.models
         ul.append @live_template(_.extend(m.toJSON(), {gW:gW}))
+
+  class NewFeelingView extends FsView
+    events:
+      'click .fs_submit': '_on_submit'
+      'click #wordselect .ww': '_on_select_word'
+    template: Tpl.new_feeling
+    render: ->
+      @$el.html @template({gW: gW})
     _on_select_word: (e) ->
       @$el.find('#wordselect').find('.active').removeClass 'active'
       $(e.currentTarget).addClass 'active'
-    _on_area_click: ->
-      @$el.find('.real_area').toggle()
-      @$el.find('.temp_area').toggle()
-      router.layout.body.current_view.on_rendered()
     _on_submit: ->
       $.ajax
         url: '../api/feelings'
@@ -420,18 +405,7 @@ $ ->
           is_public: true
         success: (data) ->
           Backbone.history.fragment = null
-          router.navigate 'shared_feelings', {trigger: true}
-
-  class NewCommentView extends FsView
-    className: 'new_comment'
-    events:
-      'click .fs_link': '_on_submit'
-    template: Tpl.new_comment
-    render: ->
-      @$el.html @template()
-      @
-    _on_submit: (event) -> 
-      alert 'not implemented'
+          router.navigate 'my_feelings', {trigger: true}
 
   class TalkView extends FsView
     events:
@@ -462,6 +436,23 @@ $ ->
           user_id: uid
         success: (data) ->
           @options.parent.fetch()
+
+  class MyFeelingView extends FsView
+    tagName: 'li'
+    className: 'my_card'
+    events:
+      'click .my_card': '_on_detail'
+    template: Tpl.my_feeling
+    initialize: ->
+      @model.on 'sync', @show, @
+    render: ->
+      @$el.html @template _.extend(@model.toJSON(), gAddons)
+    _on_detail: (event) ->
+      @model.fetch
+        error: -> router.refresh_page()
+    close: ->
+      super()
+      @model.off 'sync', @show, @
 
   class FeelingView extends FsView
     tagName: 'li'
@@ -508,20 +499,15 @@ $ ->
 
   class MyFeelingsView extends FsView
     tagName: 'ul'
-    id: 'my_feelings_holder'
-    className: 'fs_tiles'
+    className: 'my_feelings_holder'
     initialize: ->
-      @_wookmark = new Wookmark(@id)
       @model.on 'concat', @_on_concat, @
     render: ->
       for m in @model.models
-        @$el.append @_attach(new FeelingView(model: m)).el
-    on_rendered: ->
-      @_wookmark.apply()
+        @$el.append @_attach(new MyFeelingView(model: m)).el
     _on_concat: (list) ->
       for m in list
-        @$el.append @_attach(new FeelingView(model: m)).el
-      @_wookmark.apply()
+        @$el.append @_attach(new MyFeelingView(model: m)).el
     close: ->
       super()
       @model.off 'concat', @_on_concat, @
@@ -532,6 +518,7 @@ $ ->
     id: 'received_feelings_holder'
     className: 'fs_tiles'
     initialize: ->
+      @$el.addClass 'fs_container' unless @$el.hasClass 'fs_container'
       @_wookmark = new Wookmark(@id)
       @model.on 'concat', @_on_concat, @
     render: ->
@@ -595,6 +582,8 @@ $ ->
     className: 'fs_tiles'
     initialize: ->
       @_wookmark = new Wookmark(@id)
+      @$el.addClass 'fs_container' unless @$el.hasClass 'fs_container'
+
       # dont bind with sync
       # it makes this view refreshed when any child is fetched
       @model.on 'refresh', @show, @

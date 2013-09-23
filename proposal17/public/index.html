@@ -20,7 +20,7 @@
 <div id='fs_navbar'></div>
 <div id='fs_status'></div>
 <div id='fs_header'></div>
-<div id='fs_body' class='fs_container' >
+<div id='fs_body'>
 </div>
 
 
@@ -36,8 +36,8 @@
   </div>
   <div style='overflow:visible;'>
   <% if(menu != '#menu_signup'){ %>
-    <a href='#shared_feelings'><div id='menu_share' class='fs_menu'>SHARED FEELINGS</div></a>
     <a href='#my_feelings'><div id='menu_my' class='fs_menu'>MY FEELINGS</div></a>
+    <a href='#shared_feelings'><div id='menu_share' class='fs_menu'>SHARED FEELINGS</div></a>
     <a href='#received_feelings'><div id='menu_received' class='fs_menu'>RECEIVED</div></a>
     <a href='#logout'><div class='fs_menu'>LOGOUT</div></a>
   <% }else{ %>
@@ -88,35 +88,30 @@
 </script>
 
 <script type='text/template' id='tpl_new_feeling'>
-<div style=''>
-
-  <ul id='wordselect' class='real_area' style='display:none;'>
-    <li class='what what_spc toggle_area' style='text-align:left;float:left;height:auto;border:none;margin-left:20px;'>
-      <h1><strong>How are you Feeling now?</strong></h1>
+<div class='what what_spc toggle_area' style='display:inline-block;text-align:left;height:auto;border:none;margin-left:20px;'>
+  <h1><strong>How are you Feeling now?</strong></h1>
+</div>
+<ul id='wordselect' style='display:inline-block;width:320px;'>
+  <% for(var wid in gW){ %>
+    <li class='fs_link feeling rd10' style='color:<%=gW[wid].c%>;'>
+      <div class='ww' word-id="<%= wid %>"><%=gW[wid].w%></div>
     </li>
+  <% } %>
+</ul>
 
-    <% for(var wid in gW){ %>
-      <li class='fs_link feeling rd10' style='color:<%=gW[wid].c%>;'>
-        <div class='ww' word-id="<%= wid %>"><%=gW[wid].w%></div>
-      </li>
-    <% } %>
+<div style='padding:0 20px;'>
+  <textarea id='new_feeling_content' placeholder="How are you Feeling now?"></textarea>
+  <div class='_ofh' style='text-align:center'>
+    <a id='new_feeling_submit' class='btn fs_submit'>작성하기</a>
+    <a id='new_feeling_cancel' class='btn fs_cancel'>취소</a>
+  </div>
+</div>
+</script>
+
+<script type='text/template' id='tpl_live_feelings'>
+<div style='background-color:#6a6b7d;'>
+  <ul id='live_feelings' class='toggle_area' style='margin:30px auto;'>
   </ul>
-
-  <div class='temp_area'>
-    <div style='background-color:#6a6b7d;'>
-      <ul id='live_feelings' class='toggle_area' style='margin:30px auto;'>
-      </ul>
-    </div>
-    <div class='rd6 toggle_area' style='margin:10px;cursor:text;border:1px solid #afafcc;height:40px;line-height:40px;padding-left:20px;background-color:#ffffff;color:#afafcc;'>How are you Feeling now?</div>
-  </div>
-
-  <div class='content0-input real_area' style='display:none;padding:0 20px;'>
-    <textarea id='new_feeling_content' placeholder="How are you Feeling now?"></textarea>
-    <div class='_ofh real_area' style='display:none;text-align:center'>
-      <a id='new_feeling_submit' class='btn fs_submit'>작성하기</a>
-      <a id='new_feeling_cancel' class='btn fs_cancel'>취소</a>
-    </div>
-  </div>
 </div>
 </script>
 
@@ -124,19 +119,12 @@
 <li class='live_feeling' style='color:<%=gW[word].c%>'>
   <div style='float:left;font-size:18px;width:24px;height:30px;line-height:30px;'><i class='batch-icon'>&#xf170;</i></div>
   <em style='float:left;'></em>
-  <div class='rd6 live_feeling_quote' style=''>
+  <div class='rd6 live_feeling_quote'>
     <div style='max-height:54px;'>
     <span style='font-weight:bold;'><%=gW[word].w%></span>
     <span style='color:#afafcc;'><%=blah%></span>
     </div>
   </div>
-  <!--div>
-    <div style='padding:0 10px;'>
-      <i class='icon-user icon-white'/>
-      <span style='color:rgba(0,0,0,0.3);font-weight:bold'><%=gW[word].w%></span>
-      <span style=''><%=blah%></span>
-    </div>
-  </div-->
 </li>
 </script>
 
@@ -159,15 +147,6 @@
   </div>
 </script>
 
-<script type='text/template' id='tpl_new_comment'>
-<div style='border-top:1px solid #dddddd;padding-top:10px;'>
-  <input type="text" placeholder="남기고 싶은말"></input>
-</div>
-<div style=''>
-  <a class='btn _r fs_link'>작성하기</a>
-</div>
-</script>
-
 <script type='text/template' id='tpl_arrived_holder'>
 <div id='receive_arrived'>
   <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:225px;margin:5px;text-align:center;'>
@@ -181,9 +160,6 @@
   <div style='margin-top:100px'>새 느낌이 도착했습니다.</div>
   <div><span class='icon-heart icon-white'></span></div>
 </div>
-</script>
-
-<script type='text/template' id='tpl_my_feeling'>
 </script>
 
 <script type='text/template' id='tpl_feeling'>
@@ -235,6 +211,46 @@
     </div>
   </div>
 </div>
+</script>
+
+<script type='text/template' id='tpl_my_feeling'>
+<div class='fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff'>
+  <div style='float:left;padding:6px 4px 0 4px;width:120px;'>
+    <% var date = new Date(time) %>
+    <div>
+      <span style='font-size:20px;line-height:22px;font-weight:bold;'><%= date.toLocaleDateString() %></span>
+    </div>
+    <div>
+      <span style='font-size:12px;line-height:16px;color:rgba(0,0,0,0.3)'><%= date.toLocaleTimeString() %></span>
+    </div>
+    <div style='float:right;font-size:12px;line-height:20px;color:rgba(0,0,0,0.3);margin-top:36px;'>
+      <span><i class='batch-icon'>&#xf170;</i> <%= n_talk_users%></span>
+      <span><i class='batch-icon'>&#xf009;</i> <%= n_talk_msgs%></span>
+    </div>
+  </div>
+
+  <div style='float:left;width:190px;'>
+    <div style='font-size:15px;line-height:24px;margin:6px 6px 8px 6px;font-weight:bold;color:rgba(0,0,0,0.3)'><%= gW[word].w %></div>
+    <div style='font-size:12px;line-height:20px;height:60px;margin:5px 6px;'><%= blah %></div>
+  </div>
+</div>
+<!--div class='fs_link' style='background-color:<%= gW[word].c %>;color:#ffffff;border:1px solid rgba(0,0,0,0.3);'>
+  <div style='font-size:15px;line-height:24px;margin:18px 6px 8px 6px;font-weight:bold;color:rgba(0,0,0,0.4);'><%= gW[word].w %></div>
+  <div style='font-size:12px;line-height:20px;height:60px;margin:5px 6px;'><%= blah %></div>
+  <div style='background-color:rgba(0,0,0,0.3);padding:6px 4px 0 4px;'>
+    <% var date = new Date(time) %>
+    <div>
+      <span style='float:right;font-size:20px;line-height:22px;font-weight:bold;'><%= date.toLocaleDateString() %></span>
+    </div>
+    <div>
+      <span style='float:right;font-size:12px;line-height:16px;color:<%= gW[word].c %>'><%= date.toLocaleTimeString() %></span>
+    </div>
+    <div style='font-size:12px;line-height:20px;color:<%= gW[word].c %>'>
+      <span><i class='batch-icon'>&#xf170;</i> <%= n_talk_users%></span>
+      <span><i class='batch-icon'>&#xf009;</i> <%= n_talk_msgs%></span>
+    </div>
+  </div>
+</div-->
 </script>
 
 <script type='text/template' id='tpl_talk'>

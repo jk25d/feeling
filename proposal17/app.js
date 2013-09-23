@@ -936,7 +936,7 @@
   app.get('/api/live_feelings', function(req, res) {
     var me, n;
     me = gDB.user(req.session.user_id);
-    n = req.query.n || 20;
+    n = req.query.n || 8;
     return res.json(gDispatcher.latest_feelings(n).map(function(fid) {
       var f;
       f = (function() {
@@ -1123,7 +1123,7 @@
     if (config.auto_feeling_interval <= 0) {
       return;
     }
-    word = rand(0, 29);
+    word = rand(0, 15);
     Feeling.create(user, true, word, feeling_seeds[word]);
     return setTimeout(auto_feeling, config.auto_feeling_interval, user);
   };

@@ -1,5 +1,5 @@
 module.exports =
-  port: '3333'
+  port: 3333
   secret: 'deadbeef'
   session_expire_time: 30 * 60 * 1000
 

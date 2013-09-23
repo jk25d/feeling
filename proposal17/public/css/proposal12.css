@@ -17,18 +17,24 @@
 /* responsive */
 
 @media (max-width: 320px) {
-  .what{width:260px}
+  .what{width:260px;}
   .what_spc {margin:0 auto;}
-  .fs_container {width: 300px;margin:0 auto}
+  .fs_container {width: 300px;margin:0 auto;}
   h1 {font-size:44px;line-height:60px;}
   .live_feeling{padding:10px 0px;}
   .live_feeling_quote {width:120px;}
+  .my_feelings_holder{
+    padding:20px 0;
+  }
 }
 @media (min-width: 600px) {
   .what{width:355px}
   .what_spc {margin:0 45px 0 15px;}
   .fs_container {width: 580px;margin:0 auto}
   h1 {font-size:60px;line-height:60px;}
+  .my_feelings_holder{
+    padding:14px 12px;
+  }
 }
 @media (min-width: 880px) {
   .fs_container {width: 860px;margin:0 auto}
@@ -244,15 +250,11 @@ body {
 #fs_status{
 }
 #fs_body {
-  padding:16px;margin-top:20px;
-  -moz-border-radius: 8px;
-  -webkit-border-radius: 8px;
-  -khtml-border-radius: 8px;
-  border-radius: 8px;
+
 }
 .me_holder {height:40px;overflow:hidden;padding-left:30px;}
 .fs_tiles {position:relative;}
-.card {width:260px;overflow:hidden;}
+.card {width:260px;}
 .main>.header0 {padding:12px 10px 10px 10px;}
 .main>.content0-header {text-align:center;background-color:#E8E8E8;padding:30px 10px 16px 10px;}
 .main>.content0-input {padding:0 10px 12px 10px;background-color:#E8E8E8}
@@ -262,13 +264,19 @@ body {
 .card>.inner>.content{margin:22px 0 0 0;height:60px;}
 .card>.inner>.content>._word{margin-right:10px;font-weight:bold;}
 
+.my_feelings_holder{
+}
+.my_card {
+  width:314px;float:left;
+}
+
 .talks {line-height:20px;}
 
 .feeling{
-  margin:5px;overflow:hidden;float:left;border:1px solid #afafcc;
+  margin:4px;overflow:hidden;float:left;border:1px solid #afafcc;
 }
 .feeling > .ww {
-  float:left;width:130px;padding-left:9px;line-height:34px;overflow:hidden;font-size:12px;
+  float:left;width:70px;text-align:center;line-height:34px;overflow:hidden;font-size:12px;
 }
 .feeling .active{
   background-color:#afafcc;color:#ffffff;
