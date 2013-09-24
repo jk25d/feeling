@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    var App, AppView, ArrivedFeeling, ArrivedFeelingView, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, Feeling, FeelingView, FsView, HeaderLayout, Layout, LiveFeeling, LiveFeelingView, LiveFeelings, LiveFeelingsView, LoginView, Me, MyFeeling, MyFeelingView, MyFeelings, MyFeelingsView, MyStatusView, NavLayout, NewComment, NewFeelingView, ReceivedFeeling, ReceivedFeelings, ReceivedFeelingsView, Router, SharedFeelings, SharedFeelingsView, SignupView, StatusLayout, Talk, TalkView, Tpl, Wookmark, active_scroll, bind_scroll_event, gAddons, gW, router, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref36, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    var App, AppView, ArrivedFeeling, ArrivedFeelings, Associate, Associates, BodyLayout, Comment, Feeling, FeelingView, FsView, HeaderLayout, Layout, LiveFeeling, LiveFeelingView, LiveFeelings, LiveFeelingsView, LoginView, Me, MyFeelingView, MyFeelings, MyFeelingsView, MyStatusView, NavLayout, NewArrivedFeeling, NewArrivedFeelingView, NewComment, NewFeelingView, ReceivedFeelings, ReceivedFeelingsView, Router, SharedFeelings, SharedFeelingsView, SignupView, StatusLayout, Talk, TalkView, Tpl, Wookmark, active_scroll, bind_scroll_event, gAddons, gW, router, schedule, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref3, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
     gW = [
       {
         w: '멍해요',
@@ -80,6 +80,25 @@
           return "" + (Math.floor(m)) + "m";
         }
         return "" + (Math.floor(s)) + "s";
+      },
+      datestr: function(time) {
+        var d;
+        d = new Date(time);
+        return d.getDate();
+      },
+      date2str: function(time) {
+        var d, m;
+        d = new Date(time);
+        m = "" + (d.getMonth() + 1);
+        return "" + (m.length > 1 ? m : '0' + m) + "/" + (d.getFullYear());
+      },
+      timestr: function(time) {
+        var d, m, postfix, _h;
+        d = new Date(time);
+        _h = d.getHours();
+        postfix = _h > 11 ? "PM" : "AM";
+        m = "" + (d.getMinutes() + 1);
+        return "" + (_h % 12 + 1) + ":" + (m.length > 1 ? m : '0' + m) + " " + postfix;
       }
     };
     Wookmark = (function() {
@@ -96,7 +115,7 @@
         }
         this.handler = $("#" + this.id + " > li");
         return this.handler.wookmark({
-          align: 'left',
+          align: 'center',
           autoResize: true,
           container: $("#" + this.id),
           offset: 20,
@@ -127,6 +146,8 @@
       Router.prototype.layout = {};
 
       Router.prototype.models = {};
+
+      Router.prototype.schedules = {};
 
       Router.prototype.initialize = function() {
         this.models.me = new Me;
@@ -194,13 +215,10 @@
         this.models.app.set({
           menu: '#menu_share'
         });
-        this.models.me.fetch({
-          success: function(model, res) {
-            return router.layout.status.show(new MyStatusView({
-              model: router.models.me
-            }));
-          }
-        });
+        router.layout.status.show(new MyStatusView({
+          model: this.models.me
+        }));
+        this.models.me.fetch();
         this.models.shared.fetch();
         this.models.live_feelings.fetch({
           success: function(model, res) {
@@ -219,13 +237,11 @@
         this.models.app.set({
           menu: '#menu_my'
         });
-        this.models.me.fetch({
-          success: function(model, res) {
-            return router.layout.status.show(new MyStatusView({
-              model: model
-            }));
-          }
-        });
+        router.layout.status.show(new MyStatusView({
+          model: this.models.me
+        }));
+        this.models.me.fetch();
+        this.models.my.reset();
         this.models.my.fetch_more();
         this.layout.header.show(new NewFeelingView());
         return this.layout.body.show(new MyFeelingsView({
@@ -238,13 +254,13 @@
         this.models.app.set({
           menu: '#menu_received'
         });
-        this.models.me.fetch({
-          success: function(model, res) {
-            return router.layout.status.show(new MyStatusView({
-              model: model
-            }));
-          }
+        this.models.app.set({
+          menu: '#menu_my'
         });
+        router.layout.status.show(new MyStatusView({
+          model: this.models.me
+        }));
+        this.models.received.reset();
         this.models.received.fetch_more();
         this.layout.header.show();
         return this.layout.body.show(new ReceivedFeelingsView({
@@ -284,10 +300,10 @@
         email: '',
         img: '',
         n_hearts: 0,
-        n_available_feelings: 0,
-        arrived_feelings: 0,
-        my_feelings: 0,
-        rcv_feelings: 0,
+        n_active_feelings: 0,
+        has_available_feeling: false,
+        n_my_feelings: 0,
+        n_rcv_feelings: 0,
         my_shared: 0,
         rcv_shared: 0
       };
@@ -388,15 +404,17 @@
       return Talk;
 
     })(Backbone.Model);
-    MyFeeling = (function(_super) {
-      __extends(MyFeeling, _super);
+    Feeling = (function(_super) {
+      __extends(Feeling, _super);
 
-      function MyFeeling() {
-        _ref9 = MyFeeling.__super__.constructor.apply(this, arguments);
+      function Feeling() {
+        _ref9 = Feeling.__super__.constructor.apply(this, arguments);
         return _ref9;
       }
 
-      return MyFeeling;
+      Feeling.prototype.urlRoot = '../api/feelings';
+
+      return Feeling;
 
     })(Backbone.Model);
     MyFeelings = (function(_super) {
@@ -407,7 +425,7 @@
         return _ref10;
       }
 
-      MyFeelings.prototype.model = MyFeeling;
+      MyFeelings.prototype.model = Feeling;
 
       MyFeelings.prototype.url = '../api/feelings';
 
@@ -440,45 +458,34 @@
       return MyFeelings;
 
     })(Backbone.Collection);
-    ReceivedFeeling = (function(_super) {
-      __extends(ReceivedFeeling, _super);
-
-      function ReceivedFeeling() {
-        _ref11 = ReceivedFeeling.__super__.constructor.apply(this, arguments);
-        return _ref11;
-      }
-
-      return ReceivedFeeling;
-
-    })(Backbone.Model);
     ReceivedFeelings = (function(_super) {
       __extends(ReceivedFeelings, _super);
 
       function ReceivedFeelings() {
-        _ref12 = ReceivedFeelings.__super__.constructor.apply(this, arguments);
-        return _ref12;
+        _ref11 = ReceivedFeelings.__super__.constructor.apply(this, arguments);
+        return _ref11;
       }
 
-      ReceivedFeelings.prototype.model = ReceivedFeeling;
+      ReceivedFeelings.prototype.model = Feeling;
 
       ReceivedFeelings.prototype.url = '../api/feelings';
 
       ReceivedFeelings.prototype.fetch_more = function() {
-        var active_scroll, _ref13;
+        var active_scroll, _ref12;
         return new ReceivedFeelings().fetch({
           data: {
             type: 'rcv',
             from: this.models.length === 0 ? 0 : this.models[0].id,
-            skip: ((_ref13 = this.models) != null ? _ref13.length : void 0) || 0,
+            skip: ((_ref12 = this.models) != null ? _ref12.length : void 0) || 0,
             n: 10
           },
           success: function(model, res) {
-            var m, old_len, rcv, _i, _len, _ref14;
+            var m, old_len, rcv, _i, _len, _ref13;
             rcv = router.models.received;
             old_len = rcv.length;
-            _ref14 = model.models;
-            for (_i = 0, _len = _ref14.length; _i < _len; _i++) {
-              m = _ref14[_i];
+            _ref13 = model.models;
+            for (_i = 0, _len = _ref13.length; _i < _len; _i++) {
+              m = _ref13[_i];
               rcv.add(m);
             }
             if (rcv.length > old_len) {
@@ -492,6 +499,19 @@
       return ReceivedFeelings;
 
     })(Backbone.Collection);
+    NewArrivedFeeling = (function(_super) {
+      __extends(NewArrivedFeeling, _super);
+
+      function NewArrivedFeeling() {
+        _ref12 = NewArrivedFeeling.__super__.constructor.apply(this, arguments);
+        return _ref12;
+      }
+
+      NewArrivedFeeling.prototype.url = '../api/feelings/has_new';
+
+      return NewArrivedFeeling;
+
+    })(Backbone.Model);
     ArrivedFeeling = (function(_super) {
       __extends(ArrivedFeeling, _super);
 
@@ -529,25 +549,12 @@
       return NewComment;
 
     })(Backbone.Model);
-    Feeling = (function(_super) {
-      __extends(Feeling, _super);
-
-      function Feeling() {
-        _ref16 = Feeling.__super__.constructor.apply(this, arguments);
-        return _ref16;
-      }
-
-      Feeling.prototype.urlRoot = '../api/feelings';
-
-      return Feeling;
-
-    })(Backbone.Model);
     SharedFeelings = (function(_super) {
       __extends(SharedFeelings, _super);
 
       function SharedFeelings() {
-        _ref17 = SharedFeelings.__super__.constructor.apply(this, arguments);
-        return _ref17;
+        _ref16 = SharedFeelings.__super__.constructor.apply(this, arguments);
+        return _ref16;
       }
 
       SharedFeelings.prototype.model = Feeling;
@@ -563,7 +570,6 @@
           type: 'share'
         };
         options.success = function(model) {
-          console.log(model);
           return router.models.shared.trigger('refresh');
         };
         return SharedFeelings.__super__.fetch.call(this, options);
@@ -579,10 +585,10 @@
         if (this.current_view) {
           this.current_view.close();
         }
+        this.current_view = view;
         if (!view) {
           return $("#" + this.id).empty();
         }
-        this.current_view = view;
         this.current_view.show();
         $("#" + this.id).html(this.current_view.el);
         return this.current_view.on_rendered();
@@ -595,8 +601,8 @@
       __extends(NavLayout, _super);
 
       function NavLayout() {
-        _ref18 = NavLayout.__super__.constructor.apply(this, arguments);
-        return _ref18;
+        _ref17 = NavLayout.__super__.constructor.apply(this, arguments);
+        return _ref17;
       }
 
       NavLayout.prototype.id = 'fs_navbar';
@@ -608,8 +614,8 @@
       __extends(HeaderLayout, _super);
 
       function HeaderLayout() {
-        _ref19 = HeaderLayout.__super__.constructor.apply(this, arguments);
-        return _ref19;
+        _ref18 = HeaderLayout.__super__.constructor.apply(this, arguments);
+        return _ref18;
       }
 
       HeaderLayout.prototype.id = 'fs_header';
@@ -621,8 +627,8 @@
       __extends(StatusLayout, _super);
 
       function StatusLayout() {
-        _ref20 = StatusLayout.__super__.constructor.apply(this, arguments);
-        return _ref20;
+        _ref19 = StatusLayout.__super__.constructor.apply(this, arguments);
+        return _ref19;
       }
 
       StatusLayout.prototype.id = 'fs_status';
@@ -634,8 +640,8 @@
       __extends(BodyLayout, _super);
 
       function BodyLayout() {
-        _ref21 = BodyLayout.__super__.constructor.apply(this, arguments);
-        return _ref21;
+        _ref20 = BodyLayout.__super__.constructor.apply(this, arguments);
+        return _ref20;
       }
 
       BodyLayout.prototype.id = 'fs_body';
@@ -647,8 +653,8 @@
       __extends(FsView, _super);
 
       function FsView() {
-        _ref22 = FsView.__super__.constructor.apply(this, arguments);
-        return _ref22;
+        _ref21 = FsView.__super__.constructor.apply(this, arguments);
+        return _ref21;
       }
 
       FsView.prototype._attach = function(view) {
@@ -672,7 +678,9 @@
         this._detach_all();
         this.$el.empty();
         this.render();
-        return this.on_rendered();
+        this._rendered = true;
+        this.on_rendered();
+        return this;
       };
 
       FsView.prototype.on_rendered = function() {};
@@ -707,7 +715,11 @@
 
       Tpl.my_feeling = _.template($('#tpl_my_feeling').html());
 
+      Tpl.my_feelings = _.template($('#tpl_my_feelings').html());
+
       Tpl.feeling = _.template($('#tpl_feeling').html());
+
+      Tpl.new_arrived = _.template($('#tpl_new_arrived').html());
 
       Tpl.arrived = _.template($('#tpl_arrived_feeling').html());
 
@@ -720,8 +732,8 @@
       __extends(AppView, _super);
 
       function AppView() {
-        _ref23 = AppView.__super__.constructor.apply(this, arguments);
-        return _ref23;
+        _ref22 = AppView.__super__.constructor.apply(this, arguments);
+        return _ref22;
       }
 
       AppView.prototype.events = {
@@ -768,8 +780,8 @@
       __extends(LoginView, _super);
 
       function LoginView() {
-        _ref24 = LoginView.__super__.constructor.apply(this, arguments);
-        return _ref24;
+        _ref23 = LoginView.__super__.constructor.apply(this, arguments);
+        return _ref23;
       }
 
       LoginView.prototype.events = {
@@ -845,8 +857,8 @@
       __extends(SignupView, _super);
 
       function SignupView() {
-        _ref25 = SignupView.__super__.constructor.apply(this, arguments);
-        return _ref25;
+        _ref24 = SignupView.__super__.constructor.apply(this, arguments);
+        return _ref24;
       }
 
       SignupView.prototype.events = {
@@ -870,23 +882,26 @@
       __extends(MyStatusView, _super);
 
       function MyStatusView() {
-        _ref26 = MyStatusView.__super__.constructor.apply(this, arguments);
-        return _ref26;
+        _ref25 = MyStatusView.__super__.constructor.apply(this, arguments);
+        return _ref25;
       }
 
       MyStatusView.prototype.template = Tpl.my_status;
 
       MyStatusView.prototype.initialize = function() {
-        return this.model.on('sync', this.show, this);
+        this.model.on('change', this.show, this);
+        return console.log(router.schedules.me);
       };
 
       MyStatusView.prototype.render = function() {
+        router.schedules.me = true;
         return this.$el.html(this.template(this.model.toJSON()));
       };
 
       MyStatusView.prototype.close = function() {
         MyStatusView.__super__.close.call(this);
-        return this.model.off('sync', this.show, this);
+        router.schedules.me = false;
+        return this.model.off('change', this.show, this);
       };
 
       return MyStatusView;
@@ -896,8 +911,8 @@
       __extends(LiveFeelingView, _super);
 
       function LiveFeelingView() {
-        _ref27 = LiveFeelingView.__super__.constructor.apply(this, arguments);
-        return _ref27;
+        _ref26 = LiveFeelingView.__super__.constructor.apply(this, arguments);
+        return _ref26;
       }
 
       LiveFeelingView.prototype.tagName = 'li';
@@ -917,8 +932,8 @@
       __extends(LiveFeelingsView, _super);
 
       function LiveFeelingsView() {
-        _ref28 = LiveFeelingsView.__super__.constructor.apply(this, arguments);
-        return _ref28;
+        _ref27 = LiveFeelingsView.__super__.constructor.apply(this, arguments);
+        return _ref27;
       }
 
       LiveFeelingsView.prototype.template = Tpl.live_feelings;
@@ -926,13 +941,13 @@
       LiveFeelingsView.prototype.live_template = Tpl.live_feeling;
 
       LiveFeelingsView.prototype.render = function() {
-        var m, ul, _i, _len, _ref29, _results;
+        var m, ul, _i, _len, _ref28, _results;
         this.$el.html(this.template());
         ul = this.$el.find('#live_feelings');
-        _ref29 = this.model.models;
+        _ref28 = this.model.models;
         _results = [];
-        for (_i = 0, _len = _ref29.length; _i < _len; _i++) {
-          m = _ref29[_i];
+        for (_i = 0, _len = _ref28.length; _i < _len; _i++) {
+          m = _ref28[_i];
           _results.push(ul.append(this.live_template(_.extend(m.toJSON(), {
             gW: gW
           }))));
@@ -947,13 +962,15 @@
       __extends(NewFeelingView, _super);
 
       function NewFeelingView() {
-        _ref29 = NewFeelingView.__super__.constructor.apply(this, arguments);
-        return _ref29;
+        _ref28 = NewFeelingView.__super__.constructor.apply(this, arguments);
+        return _ref28;
       }
+
+      NewFeelingView.prototype.id = 'new_feeling_holder';
 
       NewFeelingView.prototype.events = {
         'click .fs_submit': '_on_submit',
-        'click #wordselect .ww': '_on_select_word'
+        'click #wordselect .feeling': '_on_select_word'
       };
 
       NewFeelingView.prototype.template = Tpl.new_feeling;
@@ -995,8 +1012,8 @@
       __extends(TalkView, _super);
 
       function TalkView() {
-        _ref30 = TalkView.__super__.constructor.apply(this, arguments);
-        return _ref30;
+        _ref29 = TalkView.__super__.constructor.apply(this, arguments);
+        return _ref29;
       }
 
       TalkView.prototype.events = {
@@ -1051,8 +1068,8 @@
       __extends(MyFeelingView, _super);
 
       function MyFeelingView() {
-        _ref31 = MyFeelingView.__super__.constructor.apply(this, arguments);
-        return _ref31;
+        _ref30 = MyFeelingView.__super__.constructor.apply(this, arguments);
+        return _ref30;
       }
 
       MyFeelingView.prototype.tagName = 'li';
@@ -1060,30 +1077,38 @@
       MyFeelingView.prototype.className = 'my_card';
 
       MyFeelingView.prototype.events = {
-        'click .my_card': '_on_detail'
+        'click .my_feeling_summary': '_on_toggle'
       };
 
       MyFeelingView.prototype.template = Tpl.my_feeling;
 
       MyFeelingView.prototype.initialize = function() {
-        return this.model.on('sync', this.show, this);
+        return this.expand = false;
       };
 
       MyFeelingView.prototype.render = function() {
         return this.$el.html(this.template(_.extend(this.model.toJSON(), gAddons)));
       };
 
-      MyFeelingView.prototype._on_detail = function(event) {
-        return this.model.fetch({
-          error: function() {
-            return router.refresh_page();
-          }
-        });
+      MyFeelingView.prototype._on_toggle = function(e) {
+        var card_detail;
+        this.expand = !this.expand;
+        card_detail = this.$el.find('.card_detail');
+        if (this.expand) {
+          card_detail.show();
+          card_detail.html(this._attach(new FeelingView({
+            model: this.model,
+            expand: true
+          })).el);
+          return this.model.fetch();
+        } else {
+          card_detail.hide();
+          return this._detach_all();
+        }
       };
 
       MyFeelingView.prototype.close = function() {
-        MyFeelingView.__super__.close.call(this);
-        return this.model.off('sync', this.show, this);
+        return MyFeelingView.__super__.close.call(this);
       };
 
       return MyFeelingView;
@@ -1093,8 +1118,8 @@
       __extends(FeelingView, _super);
 
       function FeelingView() {
-        _ref32 = FeelingView.__super__.constructor.apply(this, arguments);
-        return _ref32;
+        _ref31 = FeelingView.__super__.constructor.apply(this, arguments);
+        return _ref31;
       }
 
       FeelingView.prototype.tagName = 'li';
@@ -1107,43 +1132,39 @@
 
       FeelingView.prototype.initialize = function() {
         this.model.on('sync', this.show, this);
-        return this._expand = false;
+        return this._expand = this.options.expand || false;
       };
 
       FeelingView.prototype.render = function() {
-        var feeling_user_id, holder, like_me, talk, talk_model, u, _ref33, _ref34;
+        var feeling_user_id, holder, like_me, talk, talk_model, u, _ref32, _ref33;
         this.$el.removeClass('rd6').removeClass('_sd0').removeClass('card');
         this.$el.addClass('rd6').addClass('_sd0').addClass('card');
-        like_me = this.model.get('like') === ((_ref33 = router.models.me) != null ? _ref33.id : void 0);
+        like_me = this.model.get('like') === ((_ref32 = router.models.me) != null ? _ref32.id : void 0);
         this.$el.html(this.template(_.extend(this.model.toJSON(), gAddons, {
           like_me: like_me,
           expanded: this._expand
         })));
         if (this._expand) {
-          if (this.model.get('n_talk_users') === 0) {
-            this._expand = false;
-          } else {
-            holder = this.$el.find('.comments_holder');
-            holder.empty();
-            feeling_user_id = this.model.get('user_id');
-            _ref34 = this.model.get('talks');
-            for (u in _ref34) {
-              talk = _ref34[u];
-              talk_model = {
-                parent: this.model,
-                model: new Talk({
-                  shared: this.model.get('share'),
-                  my_id: this.model.get('own') ? feeling_user_id : u,
-                  feeling_user_id: feeling_user_id,
-                  talk_user_id: u,
-                  comments: talk,
-                  users: this.model.get('users'),
-                  like: this.model.get('like'),
-                  word: this.model.get('word')
-                })
-              };
-              holder.append(this._attach(new TalkView(talk_model)).el);
-            }
+          holder = this.$el.find('.comments_holder');
+          holder.empty();
+          feeling_user_id = this.model.get('user_id');
+          _ref33 = this.model.get('talks');
+          for (u in _ref33) {
+            talk = _ref33[u];
+            talk_model = {
+              parent: this.model,
+              model: new Talk({
+                shared: this.model.get('share'),
+                my_id: this.model.get('own') ? feeling_user_id : u,
+                feeling_user_id: feeling_user_id,
+                talk_user_id: u,
+                comments: talk,
+                users: this.model.get('users'),
+                like: this.model.get('like'),
+                word: this.model.get('word')
+              })
+            };
+            holder.append(this._attach(new TalkView(talk_model)).el);
           }
         }
         return this.$el.trigger('refreshWookmark');
@@ -1170,25 +1191,26 @@
       __extends(MyFeelingsView, _super);
 
       function MyFeelingsView() {
-        _ref33 = MyFeelingsView.__super__.constructor.apply(this, arguments);
-        return _ref33;
+        _ref32 = MyFeelingsView.__super__.constructor.apply(this, arguments);
+        return _ref32;
       }
 
-      MyFeelingsView.prototype.tagName = 'ul';
-
-      MyFeelingsView.prototype.className = 'my_feelings_holder';
+      MyFeelingsView.prototype.template = Tpl.my_feelings;
 
       MyFeelingsView.prototype.initialize = function() {
         return this.model.on('concat', this._on_concat, this);
       };
 
       MyFeelingsView.prototype.render = function() {
-        var m, _i, _len, _ref34, _results;
-        _ref34 = this.model.models;
+        var holder, m, _i, _len, _ref33, _results;
+        this.$el.html(this.template());
+        holder = this.$el.find('.my_feelings_holder');
+        holder.empty();
+        _ref33 = this.model.models;
         _results = [];
-        for (_i = 0, _len = _ref34.length; _i < _len; _i++) {
-          m = _ref34[_i];
-          _results.push(this.$el.append(this._attach(new MyFeelingView({
+        for (_i = 0, _len = _ref33.length; _i < _len; _i++) {
+          m = _ref33[_i];
+          _results.push(holder.append(this._attach(new MyFeelingView({
             model: m
           })).el));
         }
@@ -1196,11 +1218,12 @@
       };
 
       MyFeelingsView.prototype._on_concat = function(list) {
-        var m, _i, _len, _results;
+        var holder, m, _i, _len, _results;
+        holder = this.$el.find('.my_feelings_holder');
         _results = [];
         for (_i = 0, _len = list.length; _i < _len; _i++) {
           m = list[_i];
-          _results.push(this.$el.append(this._attach(new MyFeelingView({
+          _results.push(holder.append(this._attach(new MyFeelingView({
             model: m
           })).el));
         }
@@ -1220,8 +1243,8 @@
       __extends(ReceivedFeelingsView, _super);
 
       function ReceivedFeelingsView() {
-        _ref34 = ReceivedFeelingsView.__super__.constructor.apply(this, arguments);
-        return _ref34;
+        _ref33 = ReceivedFeelingsView.__super__.constructor.apply(this, arguments);
+        return _ref33;
       }
 
       ReceivedFeelingsView.prototype.tagName = 'ul';
@@ -1236,11 +1259,11 @@
       };
 
       ReceivedFeelingsView.prototype.render = function() {
-        var m, _i, _len, _ref35, _results;
-        _ref35 = this.model.models;
+        var m, _i, _len, _ref34, _results;
+        _ref34 = this.model.models;
         _results = [];
-        for (_i = 0, _len = _ref35.length; _i < _len; _i++) {
-          m = _ref35[_i];
+        for (_i = 0, _len = _ref34.length; _i < _len; _i++) {
+          m = _ref34[_i];
           _results.push(this.$el.append(this._attach(new FeelingView({
             model: m
           })).el));
@@ -1272,63 +1295,39 @@
       return ReceivedFeelingsView;
 
     })(FsView);
-    ArrivedFeelingView = (function(_super) {
-      __extends(ArrivedFeelingView, _super);
+    NewArrivedFeelingView = (function(_super) {
+      __extends(NewArrivedFeelingView, _super);
 
-      function ArrivedFeelingView() {
-        _ref35 = ArrivedFeelingView.__super__.constructor.apply(this, arguments);
-        return _ref35;
+      function NewArrivedFeelingView() {
+        _ref34 = NewArrivedFeelingView.__super__.constructor.apply(this, arguments);
+        return _ref34;
       }
 
-      ArrivedFeelingView.prototype.tagName = 'li';
+      NewArrivedFeelingView.prototype.tagName = 'li';
 
-      ArrivedFeelingView.prototype.className = 'arrived_feeling';
-
-      ArrivedFeelingView.prototype.events = {
+      NewArrivedFeelingView.prototype.events = {
         'click #flipcard': '_on_flip'
       };
 
-      ArrivedFeelingView.prototype.template = Tpl.arrived;
+      NewArrivedFeelingView.prototype.template = Tpl.new_arrived;
 
-      ArrivedFeelingView.prototype.holder_template = Tpl.arrived_holder;
-
-      ArrivedFeelingView.prototype.initialize = function() {
-        this.model = new ArrivedFeelings;
-        this.model.fetch();
-        this.model.on('sync', this.show, this);
-        return router.models.me.on('sync', this.show, this);
-      };
-
-      ArrivedFeelingView.prototype.render = function() {
+      NewArrivedFeelingView.prototype.render = function() {
         this.$el.removeClass('rd6').removeClass('_sd0').removeClass('card');
-        if (this.model.length > 0) {
-          this.$el.addClass('rd6').addClass('_sd0').addClass('card');
-          this.$el.html(this.template(_.extend(this.model.at(0).toJSON(), {
-            gW: gW
-          })));
-        } else {
-          this.$el.addClass('rd6').addClass('card');
-          this.$el.html(this.holder_template(router.models.me.toJSON()));
-        }
+        this.$el.addClass('rd6').addClass('_sd0').addClass('card');
+        this.$el.html(this.template());
         return this;
       };
 
-      ArrivedFeelingView.prototype._on_receive = function(event) {
-        return this.model.fetch();
-      };
+      NewArrivedFeelingView.prototype.on_rendered = function() {};
 
-      ArrivedFeelingView.prototype._on_flip = function(event) {
-        var model;
-        model = this.model.at(0);
+      NewArrivedFeelingView.prototype._on_flip = function(event) {
         return $.ajax({
-          url: "../api/arrived_feelings/" + (model.get('id')),
-          type: 'PUT',
+          url: "../api/feelings/new",
+          type: 'GET',
           context: this,
           success: function(data) {
             router.models.shared.trigger('prepend', new Feeling(data));
-            router.models.me.fetch();
-            this.model.reset();
-            return this.model.trigger('sync');
+            return router.models.me.fetch();
           },
           error: function() {
             return this.model.fetch();
@@ -1336,21 +1335,19 @@
         });
       };
 
-      ArrivedFeelingView.prototype.close = function() {
-        ArrivedFeelingView.__super__.close.call(this);
-        this.model.off('sync', this.show, this);
-        return router.models.me.off('sync', this.show, this);
+      NewArrivedFeelingView.prototype.close = function() {
+        return NewArrivedFeelingView.__super__.close.call(this);
       };
 
-      return ArrivedFeelingView;
+      return NewArrivedFeelingView;
 
     })(FsView);
     SharedFeelingsView = (function(_super) {
       __extends(SharedFeelingsView, _super);
 
       function SharedFeelingsView() {
-        _ref36 = SharedFeelingsView.__super__.constructor.apply(this, arguments);
-        return _ref36;
+        _ref35 = SharedFeelingsView.__super__.constructor.apply(this, arguments);
+        return _ref35;
       }
 
       SharedFeelingsView.prototype.tagName = 'ul';
@@ -1361,17 +1358,17 @@
 
       SharedFeelingsView.prototype.initialize = function() {
         this._wookmark = new Wookmark(this.id);
+        router.models.me.on('change:has_available_feeling', this._on_new_feeling, this);
         this.model.on('refresh', this.show, this);
         return this.model.on('prepend', this._on_prepend, this);
       };
 
       SharedFeelingsView.prototype.render = function() {
-        var m, _i, _len, _ref37, _results;
-        this.$el.append(this._attach(new ArrivedFeelingView).el);
-        _ref37 = this.model.models;
+        var m, _i, _len, _ref36, _results;
+        _ref36 = this.model.models;
         _results = [];
-        for (_i = 0, _len = _ref37.length; _i < _len; _i++) {
-          m = _ref37[_i];
+        for (_i = 0, _len = _ref36.length; _i < _len; _i++) {
+          m = _ref36[_i];
           _results.push(this.$el.append(this._attach(new FeelingView({
             model: m
           })).el));
@@ -1380,12 +1377,35 @@
       };
 
       SharedFeelingsView.prototype.on_rendered = function() {
+        this._wookmark.apply();
+        return this._on_new_feeling();
+      };
+
+      SharedFeelingsView.prototype._on_new_feeling = function() {
+        if (!this._rendered) {
+          return;
+        }
+        if (this.arrived_view) {
+          this.arrived_view.close();
+          this.arrived_view = null;
+        }
+        if (!router.models.me.get('has_available_feeling')) {
+          return;
+        }
+        this.arrived_view = new NewArrivedFeelingView().show();
+        this.$el.prepend(this.arrived_view.el);
+        this.arrived_view.on_rendered();
         return this._wookmark.apply();
       };
 
       SharedFeelingsView.prototype._on_prepend = function(model) {
+        console.log('prepend');
+        if (this.arrived_view) {
+          this.arrived_view.close();
+          this.arrived_view = null;
+        }
         this.model.unshift(model);
-        this.$el.find('.arrived_feeling').after(this._attach(new FeelingView({
+        this.$el.prepend(this._attach(new FeelingView({
           model: model
         })).el);
         return this._wookmark.apply();
@@ -1393,6 +1413,10 @@
 
       SharedFeelingsView.prototype.close = function() {
         SharedFeelingsView.__super__.close.call(this);
+        if (this.arrived_view) {
+          this.arrived_view.close();
+        }
+        router.models.me.off('change:has_available_feeling', this._on_new_feeling, this);
         this.model.off('refresh', this.show, this);
         this.model.off('prepend', this._on_prepend, this);
         return this.model.reset();
@@ -1401,6 +1425,14 @@
       return SharedFeelingsView;
 
     })(FsView);
+    schedule = function() {
+      console.log('schedule...');
+      console.log(router.schedules.me);
+      if (router.schedules.me) {
+        router.models.me.fetch();
+      }
+      return setTimeout(schedule, 10000);
+    };
     bind_scroll_event = function() {
       var active_scroll;
       if (!active_scroll && router.scrollable_model && $(window).scrollTop() + $(window).height() > $(document).height() - 100) {
@@ -1426,7 +1458,8 @@
         }
       }
     });
-    return Backbone.history.start();
+    Backbone.history.start();
+    return schedule();
   });
 
 }).call(this);

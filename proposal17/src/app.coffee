@@ -264,7 +264,6 @@ class User
     u = new User(name, img, email, password)
     gDB.put_user u
     gDB.put_email u
-    gDispatcher.register_user u.id
     u
   constructor: (@name, @img, @email, @password) ->
     @id = 'u' + gDB.users_seq++
@@ -272,6 +271,9 @@ class User
     @n_availables = 0
     @arrived_feelings = []
     @feelings = new UserFeelings(@id)
+    @wait_time = now() - config.user_receive_wait_time
+  has_available_feeling: ->
+    now() - @wait_time > config.user_receive_wait_time && gDispatcher.available_items(@id)
   summary: ->
     u = clone @
     delete u.password
@@ -279,15 +281,11 @@ class User
     u.n_my_feelings = @feelings.mines_len()
     u.n_rcv_feelings = @feelings.rcvs_len()
     u.n_active_feelings = @feelings.actives_len()
+    u.has_available_feeling = @has_available_feeling()
     u
-  valid_arrived_feeling: (id) ->
-    @arrived_feelings.length > 0 && @arrived_feelings[0] == id
-  pop_arrived_feeling: ->
-    fid = @arrived_feelings.pop()
-    @arrived_feelings = []
-    gDispatcher.register_user @id
   grab_feeling: (fid) ->
     @feelings.push_rcv fid
+    @wait_time = now()
   inc_heart: (fid) ->
     @n_hearts++
     @feelings.update_mine fid
@@ -358,6 +356,52 @@ class Dispatcher
     console.log "userQ: #{@_user_que.map (wu) -> JSON.stringify(gDB.user(wu.id)?.name)}"
     console.log "itemQ: #{@_item_que.map((wf) -> wf.id).join()}"
 
+class Dispatcher2
+  constructor: ->
+    @_item_que = []     # old one first
+  available_items: (uid) ->
+    for fid in @_item_que by -1
+      item = try gDB.feeling fid
+      return true if item && item.dispatchable() && not item.has_group_perm(uid)
+    return false 
+  request_item: (u) ->
+    candidates = []
+    n_candi = 0
+    reusable = []
+    _now = now()
+    while @_item_que.length > 0 && n_candi < 30
+      fid = @_item_que.shift()
+      item = try gDB.feeling fid
+      continue unless item && item.dispatchable()
+      reusable.push fid
+      continue if item.has_group_perm(u.id)
+      console.log "item has no perm"
+      [0..item.weight(_now - item.time)].forEach -> candidates.push item
+      n_candi++
+    selected = if candidates.length == 0 then null \
+      else candidates[rand(0,candidates.length-1)]
+    while reusable.length > 0
+      fid = reusable.pop()
+      continue if selected && selected.id == fid
+      @_item_que.unshift fid
+    @_item_que.push selected.id if selected
+    selected
+  register_item: (id) ->
+    @_item_que.push id
+  latest_feelings: (n) ->
+    r = []
+    for fid in @_item_que by -1
+      break if r.length >= n
+      r.push fid
+    r
+  log: ->
+    console.log "name, hearts, arrived, my, rcv"
+    for uid, u of gDB.users()
+      console.log "#{u.name}, #{u.n_hearts}, #{u.arrived_feelings.length}, #{u.feelings.mines_len()}, #{u.feelings.rcvs_len()}"
+    console.log "userQ: #{@_user_que.map (wu) -> JSON.stringify(gDB.user(wu.id)?.name)}"
+    console.log "itemQ: #{@_item_que.map((wf) -> wf.id).join()}"
+
+
 app.post '/users', (req,res) ->
   name = req.body.name
   email = req.body.email
@@ -378,6 +422,20 @@ app.post '/users', (req,res) ->
 app.get '/api/me', (req,res) ->
   me = gDB.user req.session.user_id
   res.json me.summary()
+
+app.get '/api/feelings/has_new', (req,res) ->
+  me = gDB.user req.session.user_id
+  res.json 
+    available: me.has_available_feeling()
+
+app.get '/api/feelings/new', (req,res) ->
+  me = gDB.user req.session.user_id
+  throw "not ready to get new one" unless me.has_available_feeling()
+  f = gDispatcher.request_item(me)
+  throw "no appropriate item" unless f
+  f.grant_group_perm me.id
+  me.grab_feeling(f.id)
+  res.json f.extend(me.id)
 
 app.get '/api/feelings', (req,res) ->
   me = gDB.user req.session.user_id
@@ -483,38 +541,6 @@ app.post '/api/feelings/:id/talks/:user_id/comments', (req,res) ->
     listener.feelings.update_mine id
   res.json {}
 
-app.get '/api/arrived_feelings', (req,res) ->
-  me = gDB.user req.session.user_id
-  r = []
-  for fid in me.arrived_feelings
-    f = try gDB.feeling fid
-    if f && f.sharable()
-      r.push f.summary()         # keep arrived and send its summary
-    else
-      me.pop_arrived_feeling()   # throw away
-  res.json r
-
-app.put '/api/arrived_feelings/:id', (req,res) ->
-  me = gDB.user req.session.user_id
-  id = req.params.id
-
-  console.log "arrived_id: #{id}"
-  console.log JSON.stringify(me.arrived_feelings)
-  unless me.valid_arrived_feeling(id)
-    console.log "404 err"
-    res.send 404, "No such feeling: #{id}"
-    return
-  
-  me.pop_arrived_feeling()
-
-  f = gDB.feeling id
-  unless f.sharable()
-    throw "This feeling is no longer sharable."
-  else
-    f.grant_group_perm me.id
-    me.grab_feeling(id)
-  res.json f.extend_full me.id
-
 app.get '/api/live_feelings', (req,res) ->
   me = gDB.user req.session.user_id
   n = req.query.n || 8
@@ -592,18 +618,7 @@ merge_feelings = (a,b) ->
 
 gDB = new DB()
 gFeelingContainer = []
-gDispatcher = new Dispatcher()
-
-schedule = ->
-  gDispatcher.run()
-  gDispatcher.log()
-  # to prevent memory overflow, remove old ones.
-  while gFeelingContainer.length >= config.feeling_container_size
-    fid = gFeelingContainer.shift()
-    gDB.del_feeling fid
-  setTimeout schedule, config.schedule_interval
-
-schedule()
+gDispatcher = new Dispatcher2()
 
 u0 = User.create('sun', 'img/profile3.jpg', 'sun@gmail.com', 'sun00')
 u1 = User.create('moon', 'img/profile2.jpg', 'moon@gmail.com', 'moon00')

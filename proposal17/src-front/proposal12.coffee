@@ -33,6 +33,19 @@ $ ->
       return "#{Math.floor(h)}h" if h > 1
       return "#{Math.floor(m)}m" if m > 1
       "#{Math.floor(s)}s"
+    datestr: (time) ->
+      d = new Date(time)
+      d.getDate()
+    date2str: (time) ->
+      d = new Date(time)
+      m = "#{d.getMonth() + 1}"
+      "#{if m.length > 1 then m else '0'+m}/#{d.getFullYear()}"
+    timestr: (time) ->
+      d = new Date(time)
+      _h = d.getHours()
+      postfix = if _h > 11 then "PM" else "AM"
+      m = "#{d.getMinutes() + 1}"
+      "#{_h%12+1}:#{if m.length > 1 then m else '0'+m} #{postfix}"
 
   class Wookmark
     constructor: (@id) ->
@@ -40,7 +53,7 @@ $ ->
       @handler?.wookmarkInstance?.clear()
       @handler = $("##{@id} > li")
       @handler.wookmark
-        align: 'left'
+        align: 'center'
         autoResize: true
         container: $("##{@id}")
         offset: 20
@@ -56,6 +69,7 @@ $ ->
       'received_feelings': 'received_feelings'
     layout: {}
     models: {}
+    schedules: {}
     initialize: ->
       @models.me = new Me
       @models.live_feelings = new LiveFeelings
@@ -102,9 +116,8 @@ $ ->
     shared_feelings: ->
       @scrollable_model = null
       @models.app.set {menu: '#menu_share'}
-      @models.me.fetch
-        success: (model, res) ->
-          router.layout.status.show new MyStatusView(model: router.models.me)
+      router.layout.status.show new MyStatusView(model: @models.me)
+      @models.me.fetch()
       @models.shared.fetch()
       @models.live_feelings.fetch
         success: (model, res) ->
@@ -113,18 +126,18 @@ $ ->
     my_feelings: ->
       @scrollable_model = @models.my
       @models.app.set {menu: '#menu_my'}
-      @models.me.fetch
-        success: (model, res) ->
-          router.layout.status.show new MyStatusView(model: model)
+      router.layout.status.show new MyStatusView(model: @models.me)
+      @models.me.fetch()
+      @models.my.reset()
       @models.my.fetch_more()
       @layout.header.show new NewFeelingView()
       @layout.body.show new MyFeelingsView(model: @models.my)
     received_feelings: ->
       @scrollable_model = @models.received
       @models.app.set {menu: '#menu_received'}
-      @models.me.fetch
-        success: (model, res) ->
-          router.layout.status.show new MyStatusView(model: model)
+      @models.app.set {menu: '#menu_my'}
+      router.layout.status.show new MyStatusView(model: @models.me)
+      @models.received.reset()
       @models.received.fetch_more()
       @layout.header.show()
       @layout.body.show new ReceivedFeelingsView(model: @models.received)
@@ -142,10 +155,10 @@ $ ->
       email: ''
       img: ''
       n_hearts: 0
-      n_available_feelings: 0
-      arrived_feelings: 0
-      my_feelings: 0
-      rcv_feelings: 0
+      n_active_feelings: 0
+      has_available_feeling: false
+      n_my_feelings: 0
+      n_rcv_feelings: 0
       my_shared: 0
       rcv_shared: 0
     url: '../api/me'
@@ -154,7 +167,7 @@ $ ->
     model: LiveFeeling
     url: '../api/live_feelings'
     fetch: (options={}) ->
-      options.data = {n:12}
+      options.data = {n:8}
       options.reset = true
       super options
   class Associate extends Backbone.Model
@@ -166,9 +179,10 @@ $ ->
 
   class Comment extends Backbone.Model
   class Talk extends Backbone.Model
-  class MyFeeling extends Backbone.Model
+  class Feeling extends Backbone.Model
+    urlRoot: '../api/feelings'
   class MyFeelings extends Backbone.Collection
-    model: MyFeeling
+    model: Feeling
     url: '../api/feelings'
     fetch_more: ->
       new MyFeelings().fetch
@@ -186,9 +200,8 @@ $ ->
         complete:
           active_scroll = false
 
-  class ReceivedFeeling extends Backbone.Model
   class ReceivedFeelings extends Backbone.Collection
-    model: ReceivedFeeling
+    model: Feeling
     url: '../api/feelings'
     fetch_more: ->
       new ReceivedFeelings().fetch
@@ -206,21 +219,22 @@ $ ->
         complete:
           active_scroll = false
 
+  class NewArrivedFeeling extends Backbone.Model
+    url: '../api/feelings/has_new'
+
   class ArrivedFeeling extends Backbone.Model
   class ArrivedFeelings extends Backbone.Collection
     model: ArrivedFeeling
     url: '../api/arrived_feelings'
 
   class NewComment extends Backbone.Model      
-  class Feeling extends Backbone.Model
-    urlRoot: '../api/feelings'
   class SharedFeelings extends Backbone.Collection
     model: Feeling
     url: '../api/feelings'
     fetch: (options={}) ->
       options.reset = true
       options.data = {type: 'share'}
-      options.success = (model) -> console.log model;router.models.shared.trigger 'refresh'
+      options.success = (model) -> router.models.shared.trigger 'refresh'
       super options
 
 
@@ -229,8 +243,8 @@ $ ->
   class Layout
     show: (view) ->  
       @current_view.close() if @current_view
-      return $("##{@id}").empty() unless view
       @current_view = view
+      return $("##{@id}").empty() unless view
       @current_view.show()
       $("##{@id}").html @current_view.el
       @current_view.on_rendered()
@@ -264,7 +278,9 @@ $ ->
       @_detach_all()
       @$el.empty()
       @render()
+      @_rendered = true
       @on_rendered()
+      @
     on_rendered: ->
     close: ->
       @_detach_all()
@@ -281,7 +297,9 @@ $ ->
     @new_feeling:  _.template $('#tpl_new_feeling').html()
     @talk:         _.template $('#tpl_talk').html()
     @my_feeling:   _.template $('#tpl_my_feeling').html()
+    @my_feelings:   _.template $('#tpl_my_feelings').html()
     @feeling:      _.template $('#tpl_feeling').html()
+    @new_arrived:  _.template $('#tpl_new_arrived').html()
     @arrived:      _.template $('#tpl_arrived_feeling').html()
     @arrived_holder: _.template $('#tpl_arrived_holder').html()
 
@@ -362,12 +380,15 @@ $ ->
   class MyStatusView extends FsView
     template: Tpl.my_status
     initialize: ->
-      @model.on 'sync', @show, @
+      @model.on 'change', @show, @    
+      console.log router.schedules.me
     render: ->
+      router.schedules.me = true
       @$el.html @template(@model.toJSON())    
     close: ->
       super()
-      @model.off 'sync', @show, @
+      router.schedules.me = false
+      @model.off 'change', @show, @
 
   class LiveFeelingView extends FsView
     tagName: 'li'
@@ -385,9 +406,10 @@ $ ->
         ul.append @live_template(_.extend(m.toJSON(), {gW:gW}))
 
   class NewFeelingView extends FsView
+    id: 'new_feeling_holder'
     events:
       'click .fs_submit': '_on_submit'
-      'click #wordselect .ww': '_on_select_word'
+      'click #wordselect .feeling': '_on_select_word'
     template: Tpl.new_feeling
     render: ->
       @$el.html @template({gW: gW})
@@ -441,18 +463,23 @@ $ ->
     tagName: 'li'
     className: 'my_card'
     events:
-      'click .my_card': '_on_detail'
+      'click .my_feeling_summary': '_on_toggle'
     template: Tpl.my_feeling
-    initialize: ->
-      @model.on 'sync', @show, @
+    initialize: -> @expand = false
     render: ->
       @$el.html @template _.extend(@model.toJSON(), gAddons)
-    _on_detail: (event) ->
-      @model.fetch
-        error: -> router.refresh_page()
+    _on_toggle: (e) ->
+      @expand = not @expand
+      card_detail = @$el.find('.card_detail')
+      if @expand
+        card_detail.show()
+        card_detail.html @_attach(new FeelingView({model: @model, expand:true})).el
+        @model.fetch()
+      else
+        card_detail.hide()
+        @_detach_all()
     close: ->
       super()
-      @model.off 'sync', @show, @
 
   class FeelingView extends FsView
     tagName: 'li'
@@ -461,33 +488,30 @@ $ ->
     template: Tpl.feeling
     initialize: ->
       @model.on 'sync', @show, @
-      @_expand = false
+      @_expand = @options.expand || false
     render: ->
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
       like_me = @model.get('like') == router.models.me?.id
       @$el.html @template _.extend(@model.toJSON(), gAddons, {like_me: like_me, expanded: @_expand})
 
-      if @_expand
-        if @model.get('n_talk_users') == 0
-          @_expand = false
-        else
-          holder = @$el.find('.comments_holder')
-          holder.empty()
-          feeling_user_id = @model.get('user_id')
-          for u,talk of @model.get('talks')
-            talk_model =
-              parent: @model
-              model: new Talk
-                shared: @model.get('share')
-                my_id: if @model.get('own') then feeling_user_id else u
-                feeling_user_id: feeling_user_id
-                talk_user_id: u
-                comments: talk
-                users: @model.get('users')
-                like: @model.get('like')
-                word: @model.get('word')
-            holder.append @_attach(new TalkView(talk_model)).el
+      if @_expand #&& @model.get('n_talk_users') > 0
+        holder = @$el.find('.comments_holder')
+        holder.empty()
+        feeling_user_id = @model.get('user_id')
+        for u,talk of @model.get('talks')
+          talk_model =
+            parent: @model
+            model: new Talk
+              shared: @model.get('share')
+              my_id: if @model.get('own') then feeling_user_id else u
+              feeling_user_id: feeling_user_id
+              talk_user_id: u
+              comments: talk
+              users: @model.get('users')
+              like: @model.get('like')
+              word: @model.get('word')
+          holder.append @_attach(new TalkView(talk_model)).el
       @$el.trigger 'refreshWookmark'
     _on_expand: (event) ->
       @_expand = not @_expand
@@ -498,16 +522,19 @@ $ ->
       @model.off 'sync', @show, @
 
   class MyFeelingsView extends FsView
-    tagName: 'ul'
-    className: 'my_feelings_holder'
+    template: Tpl.my_feelings
     initialize: ->
       @model.on 'concat', @_on_concat, @
     render: ->
+      @$el.html @template()
+      holder = @$el.find('.my_feelings_holder')
+      holder.empty()
       for m in @model.models
-        @$el.append @_attach(new MyFeelingView(model: m)).el
+        holder.append @_attach(new MyFeelingView(model: m)).el
     _on_concat: (list) ->
+      holder = @$el.find('.my_feelings_holder')
       for m in list
-        @$el.append @_attach(new MyFeelingView(model: m)).el
+        holder.append @_attach(new MyFeelingView(model: m)).el
     close: ->
       super()
       @model.off 'concat', @_on_concat, @
@@ -518,7 +545,7 @@ $ ->
     id: 'received_feelings_holder'
     className: 'fs_tiles'
     initialize: ->
-      @$el.addClass 'fs_container' unless @$el.hasClass 'fs_container'
+      #@$el.addClass 'fs_container' unless @$el.hasClass 'fs_container'
       @_wookmark = new Wookmark(@id)
       @model.on 'concat', @_on_concat, @
     render: ->
@@ -534,75 +561,81 @@ $ ->
       super()
       @model.off 'concat', @_on_concat, @
       @model.reset()
-
-  class ArrivedFeelingView extends FsView
+    
+  class NewArrivedFeelingView extends FsView
     tagName: 'li'
-    className: 'arrived_feeling'
     events:
-      #'click #receive_arrived': '_on_receive'
       'click #flipcard': '_on_flip'
-    template: Tpl.arrived
-    holder_template: Tpl.arrived_holder
-    initialize: ->
-      @model = new ArrivedFeelings
-      @model.fetch()
-      @model.on 'sync', @show, @
-      router.models.me.on 'sync', @show, @
+    template: Tpl.new_arrived
     render: ->
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
-      if @model.length > 0
-        @$el.addClass('rd6').addClass('_sd0').addClass('card')
-        @$el.html @template(_.extend(@model.at(0).toJSON(), {gW: gW}))
-      else
-        @$el.addClass('rd6').addClass('card')
-        @$el.html @holder_template(router.models.me.toJSON())
+      @$el.addClass('rd6').addClass('_sd0').addClass('card')
+      @$el.html @template()
       @
-    _on_receive: (event) ->
-      @model.fetch()
+    on_rendered: ->
+      #@$el.trigger 'refreshWookmark'
     _on_flip: (event) ->
-      model = @model.at 0
       $.ajax
-        url: "../api/arrived_feelings/#{model.get('id')}"
-        type: 'PUT'
+        url: "../api/feelings/new"
+        type: 'GET'
         context: @
         success: (data) ->
           router.models.shared.trigger 'prepend', new Feeling(data)
           router.models.me.fetch()
-          @model.reset()
-          @model.trigger 'sync'
         error: -> @model.fetch()
     close: ->
       super()
-      @model.off 'sync', @show, @
-      router.models.me.off 'sync', @show, @
-    
+
   class SharedFeelingsView extends FsView
     tagName: 'ul'
     id: 'shared_feelings_holder'
     className: 'fs_tiles'
     initialize: ->
       @_wookmark = new Wookmark(@id)
-      @$el.addClass 'fs_container' unless @$el.hasClass 'fs_container'
+      router.models.me.on 'change:has_available_feeling', @_on_new_feeling, @
 
       # dont bind with sync
       # it makes this view refreshed when any child is fetched
       @model.on 'refresh', @show, @
       @model.on 'prepend', @_on_prepend, @
     render: ->
-      @$el.append @_attach(new ArrivedFeelingView).el
       for m in @model.models
         @$el.append @_attach(new FeelingView(model: m)).el
     on_rendered: ->
       @_wookmark.apply()
+      @_on_new_feeling()
+    _on_new_feeling: ->
+      return unless @_rendered
+      if @arrived_view
+        @arrived_view.close()
+        @arrived_view = null
+      unless router.models.me.get('has_available_feeling')
+        return
+      @arrived_view = new NewArrivedFeelingView().show()
+      @$el.prepend @arrived_view.el
+      @arrived_view.on_rendered()
+      @_wookmark.apply()
     _on_prepend: (model) ->
+      console.log 'prepend'
+      if @arrived_view
+          @arrived_view.close()
+          @arrived_view =null
       @model.unshift model
-      @$el.find('.arrived_feeling').after @_attach(new FeelingView(model: model)).el
+      @$el.prepend @_attach(new FeelingView(model: model)).el
       @_wookmark.apply()
     close: ->
       super()
+      @arrived_view.close() if @arrived_view
+      router.models.me.off 'change:has_available_feeling', @_on_new_feeling, @
       @model.off 'refresh', @show, @
       @model.off 'prepend', @_on_prepend, @
       @model.reset()
+
+  schedule = ->
+    console.log ('schedule...')
+    if router.schedules.me
+      router.models.me.fetch()
+    setTimeout schedule, 10000
 
   bind_scroll_event = ->
     if not active_scroll && router.scrollable_model && $(window).scrollTop() + $(window).height() >  $(document).height() - 100
@@ -620,3 +653,4 @@ $ ->
       401: -> window.location = '/'
       403: -> window.location = '/'
   Backbone.history.start()
+  schedule()
