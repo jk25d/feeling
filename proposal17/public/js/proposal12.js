@@ -341,7 +341,7 @@
           options = {};
         }
         options.data = {
-          n: 12
+          n: 8
         };
         options.reset = true;
         return LiveFeelings.__super__.fetch.call(this, options);
@@ -1427,7 +1427,6 @@
     })(FsView);
     schedule = function() {
       console.log('schedule...');
-      console.log(router.schedules.me);
       if (router.schedules.me) {
         router.models.me.fetch();
       }
