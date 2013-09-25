@@ -384,29 +384,7 @@
     };
 
     UserFeelings.prototype.actives_len = function() {
-      return this.actives().length;
-    };
-
-    UserFeelings.prototype.my_actives = function() {
-      return this.actives().filter(function(f) {
-        return f.has_own_perm(this._uid);
-      });
-    };
-
-    UserFeelings.prototype.rcv_actives = function() {
-      return this.actives().filter(function(f) {
-        return !f.has_own_perm(this._uid);
-      });
-    };
-
-    UserFeelings.prototype.actives = function() {
-      return this._filter_actives().map(function(fid) {
-        try {
-          return gDB.feeling(fid);
-        } catch (_error) {}
-      }).filter(function(f) {
-        return f;
-      });
+      return this.actives(0, this._actives.length).length;
     };
 
     UserFeelings.prototype._filter_actives = function() {
@@ -440,18 +418,33 @@
       return this._actives;
     };
 
+    UserFeelings.prototype.actives = function(s, e) {
+      var l;
+      console.log("actives: " + s + ", " + e);
+      if (s === e || e === 0) {
+        return [];
+      }
+      l = this._filter_actives();
+      console.log("filter_actives: " + l.length);
+      return l.slice(s, +min(l.length - 1, e - 1) + 1 || 9e9).map(function(id) {
+        try {
+          return gDB.feeling(id);
+        } catch (_error) {}
+      }).filter(function(f) {
+        return f;
+      });
+    };
+
     UserFeelings.prototype.mines = function(s, e) {
       if (s === e || e === 0) {
         return [];
       }
-      return this._mines.slice(s, +(e - 1) + 1 || 9e9).map(function(id) {
+      return this._mines.slice(s, +min(this._mines.length - 1, e - 1) + 1 || 9e9).map(function(id) {
         try {
           return gDB.feeling(id);
-        } catch (_error) {
-
-        }
-      }).filter(function(x) {
-        return x;
+        } catch (_error) {}
+      }).filter(function(f) {
+        return f;
       });
     };
 
@@ -459,14 +452,12 @@
       if (s === e || e === 0) {
         return [];
       }
-      return this._rcvs.slice(s, +(e - 1) + 1 || 9e9).map(function(id) {
+      return this._rcvs.slice(s, +min(this._rcvs.length - 1, e - 1) + 1 || 9e9).map(function(id) {
         try {
           return gDB.feeling(id);
-        } catch (_error) {
-
-        }
-      }).filter(function(x) {
-        return x;
+        } catch (_error) {}
+      }).filter(function(f) {
+        return f;
       });
     };
 
@@ -903,9 +894,9 @@
       return f.extend(me.id);
     })) : type === 'rcv' ? (from_idx = from === 0 ? 0 : max(0, me.feelings.find_rcv_idx(from)), me.feelings.rcvs(max(0, from_idx + skip), min(me.feelings.rcvs_len(), from_idx + skip + n)).map(function(f) {
       return f.extend(me.id);
-    })) : me.feelings.actives().map(function(f) {
+    })) : (from_idx = from === 0 ? 0 : max(0, me.feelings.find_active_idx(from)), me.feelings.actives(max(0, from_idx + skip), from_idx + skip + n).map(function(f) {
       return f.extend(me.id);
-    }));
+    })));
   });
 
   app.post('/api/feelings', function(req, res) {

@@ -211,7 +211,7 @@
       };
 
       Router.prototype.shared_feelings = function() {
-        this.scrollable_model = null;
+        this.scrollable_model = this.models.shared;
         this.models.app.set({
           menu: '#menu_share'
         });
@@ -219,7 +219,8 @@
           model: this.models.me
         }));
         this.models.me.fetch();
-        this.models.shared.fetch();
+        this.models.shared.reset();
+        this.models.shared.fetch_more();
         this.models.live_feelings.fetch({
           success: function(model, res) {
             return router.layout.header.show(new LiveFeelingsView({
@@ -228,7 +229,7 @@
           }
         });
         return this.layout.body.show(new SharedFeelingsView({
-          model: router.models.shared
+          model: this.models.shared
         }));
       };
 
@@ -561,18 +562,30 @@
 
       SharedFeelings.prototype.url = '../api/feelings';
 
-      SharedFeelings.prototype.fetch = function(options) {
-        if (options == null) {
-          options = {};
-        }
-        options.reset = true;
-        options.data = {
-          type: 'share'
-        };
-        options.success = function(model) {
-          return router.models.shared.trigger('refresh');
-        };
-        return SharedFeelings.__super__.fetch.call(this, options);
+      SharedFeelings.prototype.fetch_more = function() {
+        var active_scroll, _ref17;
+        return new SharedFeelings().fetch({
+          data: {
+            type: 'shared',
+            from: this.models.length === 0 ? 0 : this.models[0].id,
+            skip: ((_ref17 = this.models) != null ? _ref17.length : void 0) || 0,
+            n: 10
+          },
+          success: function(model, res) {
+            var m, old_len, shared, _i, _len, _ref18;
+            shared = router.models.shared;
+            old_len = shared.length;
+            _ref18 = model.models;
+            for (_i = 0, _len = _ref18.length; _i < _len; _i++) {
+              m = _ref18[_i];
+              shared.add(m);
+            }
+            if (shared.length > old_len) {
+              return shared.trigger('concat', shared.models.slice(old_len, shared.length));
+            }
+          },
+          complete: active_scroll = false
+        });
       };
 
       return SharedFeelings;
@@ -1239,68 +1252,12 @@
       return MyFeelingsView;
 
     })(FsView);
-    ReceivedFeelingsView = (function(_super) {
-      __extends(ReceivedFeelingsView, _super);
-
-      function ReceivedFeelingsView() {
-        _ref33 = ReceivedFeelingsView.__super__.constructor.apply(this, arguments);
-        return _ref33;
-      }
-
-      ReceivedFeelingsView.prototype.tagName = 'ul';
-
-      ReceivedFeelingsView.prototype.id = 'received_feelings_holder';
-
-      ReceivedFeelingsView.prototype.className = 'fs_tiles';
-
-      ReceivedFeelingsView.prototype.initialize = function() {
-        this._wookmark = new Wookmark(this.id);
-        return this.model.on('concat', this._on_concat, this);
-      };
-
-      ReceivedFeelingsView.prototype.render = function() {
-        var m, _i, _len, _ref34, _results;
-        _ref34 = this.model.models;
-        _results = [];
-        for (_i = 0, _len = _ref34.length; _i < _len; _i++) {
-          m = _ref34[_i];
-          _results.push(this.$el.append(this._attach(new FeelingView({
-            model: m
-          })).el));
-        }
-        return _results;
-      };
-
-      ReceivedFeelingsView.prototype.on_rendered = function() {
-        return this._wookmark.apply();
-      };
-
-      ReceivedFeelingsView.prototype._on_concat = function(list) {
-        var m, _i, _len;
-        for (_i = 0, _len = list.length; _i < _len; _i++) {
-          m = list[_i];
-          this.$el.append(this._attach(new FeelingView({
-            model: m
-          })).el);
-        }
-        return this._wookmark.apply();
-      };
-
-      ReceivedFeelingsView.prototype.close = function() {
-        ReceivedFeelingsView.__super__.close.call(this);
-        this.model.off('concat', this._on_concat, this);
-        return this.model.reset();
-      };
-
-      return ReceivedFeelingsView;
-
-    })(FsView);
     NewArrivedFeelingView = (function(_super) {
       __extends(NewArrivedFeelingView, _super);
 
       function NewArrivedFeelingView() {
-        _ref34 = NewArrivedFeelingView.__super__.constructor.apply(this, arguments);
-        return _ref34;
+        _ref33 = NewArrivedFeelingView.__super__.constructor.apply(this, arguments);
+        return _ref33;
       }
 
       NewArrivedFeelingView.prototype.tagName = 'li';
@@ -1342,6 +1299,62 @@
       return NewArrivedFeelingView;
 
     })(FsView);
+    ReceivedFeelingsView = (function(_super) {
+      __extends(ReceivedFeelingsView, _super);
+
+      function ReceivedFeelingsView() {
+        _ref34 = ReceivedFeelingsView.__super__.constructor.apply(this, arguments);
+        return _ref34;
+      }
+
+      ReceivedFeelingsView.prototype.tagName = 'ul';
+
+      ReceivedFeelingsView.prototype.id = 'received_feelings_holder';
+
+      ReceivedFeelingsView.prototype.className = 'fs_tiles';
+
+      ReceivedFeelingsView.prototype.initialize = function() {
+        this._wookmark = new Wookmark(this.id);
+        return this.model.on('concat', this._on_concat, this);
+      };
+
+      ReceivedFeelingsView.prototype.render = function() {
+        var m, _i, _len, _ref35, _results;
+        _ref35 = this.model.models;
+        _results = [];
+        for (_i = 0, _len = _ref35.length; _i < _len; _i++) {
+          m = _ref35[_i];
+          _results.push(this.$el.append(this._attach(new FeelingView({
+            model: m
+          })).el));
+        }
+        return _results;
+      };
+
+      ReceivedFeelingsView.prototype.on_rendered = function() {
+        return this._wookmark.apply();
+      };
+
+      ReceivedFeelingsView.prototype._on_concat = function(list) {
+        var m, _i, _len;
+        for (_i = 0, _len = list.length; _i < _len; _i++) {
+          m = list[_i];
+          this.$el.append(this._attach(new FeelingView({
+            model: m
+          })).el);
+        }
+        return this._wookmark.apply();
+      };
+
+      ReceivedFeelingsView.prototype.close = function() {
+        ReceivedFeelingsView.__super__.close.call(this);
+        this.model.off('concat', this._on_concat, this);
+        return this.model.reset();
+      };
+
+      return ReceivedFeelingsView;
+
+    })(FsView);
     SharedFeelingsView = (function(_super) {
       __extends(SharedFeelingsView, _super);
 
@@ -1359,7 +1372,7 @@
       SharedFeelingsView.prototype.initialize = function() {
         this._wookmark = new Wookmark(this.id);
         router.models.me.on('change:has_available_feeling', this._on_new_feeling, this);
-        this.model.on('refresh', this.show, this);
+        this.model.on('concat', this._on_concat, this);
         return this.model.on('prepend', this._on_prepend, this);
       };
 
@@ -1408,6 +1421,17 @@
         this.$el.prepend(this._attach(new FeelingView({
           model: model
         })).el);
+        return this._wookmark.apply();
+      };
+
+      SharedFeelingsView.prototype._on_concat = function(list) {
+        var m, _i, _len;
+        for (_i = 0, _len = list.length; _i < _len; _i++) {
+          m = list[_i];
+          this.$el.append(this._attach(new FeelingView({
+            model: m
+          })).el);
+        }
         return this._wookmark.apply();
       };
 

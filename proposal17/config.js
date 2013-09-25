@@ -9,7 +9,7 @@
     user_receive_wait_time: 60 * 1000,
     schedule_interval: 5000,
     feeling_container_size: 10000,
-    auto_feeling_interval: 5 * 60 * 1000
+    auto_feeling_interval: 5 * 1000
   };
 
 }).call(this);

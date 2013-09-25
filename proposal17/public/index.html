@@ -123,7 +123,7 @@
 
 <script type='text/template' id='tpl_live_feeling'>
 <li class='live_feeling' style='color:<%=gW[word].c%>'>
-  <div style='float:left;font-size:18px;width:24px;height:30px;line-height:30px;'><i class='batch-icon'>&#xf170;</i></div>
+  <div class='live_feeling_user' style='float:left;font-size:18px;height:30px;line-height:30px;'><i class='batch-icon'>&#xf170;</i></div>
   <em style='float:left;'></em>
   <div class='rd6 live_feeling_quote'>
     <div style='max-height:54px;'>
@@ -135,15 +135,33 @@
 </script>
 
 <script type='text/template' id='tpl_my_status'>
-<ul style='padding-left:30px;line-height:18px;'>
-  <li style='float:left;'><i class='profile' style='background-image:url(<%=img %>)'></i></li>
-  <li style='float:left;margin:8px;'><span class='me_name'><%= name %></span></li>
-  <li style='float:left;margin:8px;'><i class='batch-icon'>&#xf04b;</i> <span class='me_hearts'><%= n_hearts %></span></li>
-  <li style='float:left;margin:8px;'>공유중인 느낌: <span class='me_active_feelings'><%= n_active_feelings %></span></li>
-  <li style='float:left;margin:8px;'>내 느낌: <span class='me_my_feelings'><%= n_my_feelings %></span></li>
-  <li style='float:left;margin:8px;'>받은 느낌: <span class='me_rcv_feelings'><%= n_rcv_feelings %></span></li>
-  <li class='me_has_available_feeling' style='<% if(!has_available_feeling){%>display:none;<%}%>float:left;margin:8px;'><a href='#shared_feelings' style='color:#e8175d;'><i class='linecons'>&#xe000</i> 새 느낌이 왔어요</a></li>
-</ul>
+<div class='status'>
+  <div style='margin-top:4px;line-height:16px;font-size:12px;text-align:center;'>
+    <div style='float:left;'><i class='profile' style='background-image:url(<%=img %>)'></i></div>
+    <div style='float:left;margin-right:17px;'>
+      <div class='me_name' style='font-size:16px;line-height:22px;'><%= name %></div>
+      <div><i class='batch-icon'>&#xf04b;</i> <span class='me_hearts'><%= n_hearts %></span></div>
+    </div>
+    <div style='float:left;margin-right:17px;'>
+      <div class='me_active_feelings' style='font-size:16px;line-height:22px;'><%= n_active_feelings %></div>
+      <div>공유중</div>
+    </div>
+    <div style='float:left;margin-right:17px;'>
+      <div class='me_my_feelings' style='font-size:16px;line-height:22px;'><%= n_my_feelings %></div>
+      <div>내꺼</div>
+    </div>
+    <div style='float:left;margin-right:17px;'>
+      <div class='me_rcv_feelings' style='font-size:16px;line-height:22px;'><%= n_rcv_feelings %></div>
+      <div>받은거</div>
+    </div>
+    <div class='me_has_available_feeling' style='<% if(!has_available_feeling){%>display:none;<%}%>float:left'>
+      <a href='#shared_feelings' style='color:#e8175d;'>
+        <div style='font-size:16px;line-height:22px;'><i class='linecons'>&#xe000</i></div>
+        <div>새 느낌</div>
+      </a>
+    </div>
+  </div>
+</div>
 </script>
 
 <script type='text/template' id='tpl_associates'>

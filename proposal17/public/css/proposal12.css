@@ -39,17 +39,25 @@
 /* responsive */
 
 @media (max-width: 320px) {
+  .status{padding:0;}
   .what{width:260px;}
   .what_spc {margin:0 auto;}
   .fs_container {width: 300px;}
   h1 {font-size:44px;line-height:50px;margin:30px 0 20px 0;}
-  .live_feeling{padding:10px 0px;}
+  .live_feeling{padding:10px 0 4px 0;}
+  .live_feeling_user {width:20px;margin-left:2px;}
   .live_feeling_quote {width:120px;}
   .my_feelings_holder{
     /*padding:20px 0;*/
   }
 }
+@media (min-width: 321px) {
+.live_feeling{padding:10px 4px 4px 8px;}
+.live_feeling_user {width:24px;}
+.live_feeling_quote {width:140px;}
+}
 @media (min-width: 600px) {
+  .status{padding:0 0 0 30px;}
   .what{width:355px}
   .what_spc {margin:0 45px 0 15px;}
   .fs_container {width: 580px;margin:30px auto}
@@ -75,8 +83,6 @@
 @media(min-width: 641px){
 .fs_menu { display:inline-block;padding:0 6px;}
 .fs_nav_dropdown { display:none}
-.live_feeling{padding:10px 8px;}
-.live_feeling_quote {width:140px;}
 }
 
 

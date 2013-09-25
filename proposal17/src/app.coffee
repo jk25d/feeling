@@ -203,13 +203,7 @@ class UserFeelings
   mines_len: -> @_mines.length
   rcvs_len: -> @_rcvs.length
   total_len: -> @_mines.length + @_rcvs.length
-  actives_len: -> @actives().length
-  my_actives: ->
-    @actives().filter (f) -> f.has_own_perm(@_uid)
-  rcv_actives: ->
-    @actives().filter (f) -> not f.has_own_perm(@_uid)
-  actives: ->
-    @_filter_actives().map((fid) -> try gDB.feeling(fid) ).filter((f) -> f)
+  actives_len: -> @actives(0, @_actives.length).length
   _filter_actives: ->
     return @_actives if @_actives.length == 0
     _now = now()
@@ -226,12 +220,18 @@ class UserFeelings
     while reusable.length > 0
       @_actives.push reusable.pop()
     @_actives
+  actives: (s,e) ->
+    console.log "actives: #{s}, #{e}"
+    return [] if s == e || e == 0
+    l = @_filter_actives()
+    console.log "filter_actives: #{l.length}"
+    l[s..min(l.length-1,e-1)].map((id) -> try gDB.feeling(id) ).filter((f) -> f)
   mines: (s,e) -> 
     return [] if s == e || e == 0
-    @_mines[s..e-1].map((id) -> try gDB.feeling(id) catch).filter((x)->x)
+    @_mines[s..min(@_mines.length-1,e-1)].map((id) -> try gDB.feeling(id)).filter((f)->f)
   rcvs: (s,e) -> 
     return [] if s == e || e == 0
-    @_rcvs[s..e-1].map((id) -> try gDB.feeling(id) catch).filter((x)->x)
+    @_rcvs[s..min(@_rcvs.length-1,e-1)].map((id) -> try gDB.feeling(id)).filter((f)->f)
   find_active_idx: (id) ->
     for i in [0..@_actives.length-1]
       return i if @_actives[i] == id
@@ -451,7 +451,8 @@ app.get '/api/feelings', (req,res) ->
     from_idx = if from == 0 then 0 else max(0, me.feelings.find_rcv_idx(from))
     me.feelings.rcvs(max(0,from_idx+skip), min(me.feelings.rcvs_len(),from_idx+skip+n)).map (f) -> f.extend(me.id)
   else
-    me.feelings.actives().map (f) -> f.extend(me.id)
+    from_idx = if from == 0 then 0 else max(0, me.feelings.find_active_idx(from))
+    me.feelings.actives(max(0,from_idx+skip), from_idx+skip+n).map (f) -> f.extend(me.id)
 
 app.post '/api/feelings', (req,res) ->
   me = gDB.user req.session.user_id

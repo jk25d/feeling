@@ -114,15 +114,16 @@ $ ->
         type: 'DELETE'
         success: (data) -> window.location = '/'
     shared_feelings: ->
-      @scrollable_model = null
+      @scrollable_model = @models.shared
       @models.app.set {menu: '#menu_share'}
       router.layout.status.show new MyStatusView(model: @models.me)
       @models.me.fetch()
-      @models.shared.fetch()
+      @models.shared.reset()
+      @models.shared.fetch_more()
       @models.live_feelings.fetch
         success: (model, res) ->
           router.layout.header.show new LiveFeelingsView(model: router.models.live_feelings)
-      @layout.body.show new SharedFeelingsView(model: router.models.shared)
+      @layout.body.show new SharedFeelingsView(model: @models.shared)
     my_feelings: ->
       @scrollable_model = @models.my
       @models.app.set {menu: '#menu_my'}
@@ -231,11 +232,21 @@ $ ->
   class SharedFeelings extends Backbone.Collection
     model: Feeling
     url: '../api/feelings'
-    fetch: (options={}) ->
-      options.reset = true
-      options.data = {type: 'share'}
-      options.success = (model) -> router.models.shared.trigger 'refresh'
-      super options
+    fetch_more: ->
+      new SharedFeelings().fetch
+        data:
+          type: 'shared'
+          from: if @models.length == 0 then 0 else @models[0].id
+          skip: @models?.length || 0
+          n: 10
+        success: (model, res) ->
+          shared = router.models.shared
+          old_len = shared.length
+          shared.add m for m in model.models
+          if shared.length > old_len
+            shared.trigger 'concat', shared.models.slice(old_len, shared.length)
+        complete:
+          active_scroll = false
 
 
   #--- Layout ---#
@@ -539,28 +550,6 @@ $ ->
       super()
       @model.off 'concat', @_on_concat, @
       @model.reset()
-
-  class ReceivedFeelingsView extends FsView
-    tagName: 'ul'
-    id: 'received_feelings_holder'
-    className: 'fs_tiles'
-    initialize: ->
-      #@$el.addClass 'fs_container' unless @$el.hasClass 'fs_container'
-      @_wookmark = new Wookmark(@id)
-      @model.on 'concat', @_on_concat, @
-    render: ->
-      for m in @model.models
-        @$el.append @_attach(new FeelingView(model: m)).el
-    on_rendered: ->
-      @_wookmark.apply()
-    _on_concat: (list) ->
-      for m in list
-        @$el.append @_attach(new FeelingView(model: m)).el
-      @_wookmark.apply()
-    close: ->
-      super()
-      @model.off 'concat', @_on_concat, @
-      @model.reset()
     
   class NewArrivedFeelingView extends FsView
     tagName: 'li'
@@ -586,6 +575,28 @@ $ ->
     close: ->
       super()
 
+  class ReceivedFeelingsView extends FsView
+    tagName: 'ul'
+    id: 'received_feelings_holder'
+    className: 'fs_tiles'
+    initialize: ->
+      #@$el.addClass 'fs_container' unless @$el.hasClass 'fs_container'
+      @_wookmark = new Wookmark(@id)
+      @model.on 'concat', @_on_concat, @
+    render: ->
+      for m in @model.models
+        @$el.append @_attach(new FeelingView(model: m)).el
+    on_rendered: ->
+      @_wookmark.apply()
+    _on_concat: (list) ->
+      for m in list
+        @$el.append @_attach(new FeelingView(model: m)).el
+      @_wookmark.apply()
+    close: ->
+      super()
+      @model.off 'concat', @_on_concat, @
+      @model.reset()
+
   class SharedFeelingsView extends FsView
     tagName: 'ul'
     id: 'shared_feelings_holder'
@@ -596,7 +607,7 @@ $ ->
 
       # dont bind with sync
       # it makes this view refreshed when any child is fetched
-      @model.on 'refresh', @show, @
+      @model.on 'concat', @_on_concat, @
       @model.on 'prepend', @_on_prepend, @
     render: ->
       for m in @model.models
@@ -622,6 +633,10 @@ $ ->
           @arrived_view =null
       @model.unshift model
       @$el.prepend @_attach(new FeelingView(model: model)).el
+      @_wookmark.apply()
+    _on_concat: (list) ->
+      for m in list
+        @$el.append @_attach(new FeelingView(model: m)).el
       @_wookmark.apply()
     close: ->
       super()
