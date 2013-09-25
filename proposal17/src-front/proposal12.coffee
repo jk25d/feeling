@@ -136,7 +136,6 @@ $ ->
     received_feelings: ->
       @scrollable_model = @models.received
       @models.app.set {menu: '#menu_received'}
-      @models.app.set {menu: '#menu_my'}
       router.layout.status.show new MyStatusView(model: @models.me)
       @models.received.reset()
       @models.received.fetch_more()
