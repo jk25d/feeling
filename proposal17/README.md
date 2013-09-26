@@ -1006,3 +1006,25 @@ DATA
 #오래지나도 쉐어드에 나오는 카드..
 
 ec2-54-238-24-54.ap-northeast-1.compute.amazonaws.com
+
+
+======= 0927 ============
+
+Feeling
+  talks
+    listeners
+      'uid'
+        n_reads: 0
+        star: null
+      'uid2'
+        n_reads: 10
+        star: null
+    comments: [...]
+
+has_group_perm uid
+  talks.listeners[uid]
+grant_group_perm uid
+  talks.listeners[uid] = {n_reads: talks.comments.length}
+
+post ../comments
+  talks.comments.push ..
