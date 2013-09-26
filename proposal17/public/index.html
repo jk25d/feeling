@@ -30,9 +30,11 @@
 <div class='fs_navbar-inner' style='line-height:40px;overflow:visible;'>
   <div style='float:left;margin:0 20px;overflow:visible;'><a href='#'>FEELING SHARE</a></div>
   <div style='float:right;overflow:visible;'>
+    <% if(menu != '#menu_signup'){ %>
     <a href='#new_feeling' style='margin-right:10px;'>
       <i class='linecons' style='font-size:20px;line-height:34px;'>&#xe00f;</i>
     </a>
+    <% } %>
     <a class="fs_nav_dropdown fs_link" data-toggle="dropdown" style='margin-right:20px;'>
       <i class='batch-icon' style='font-size:20px;line-height:34px;'>&#xf0a9</i>
     </a>
@@ -140,7 +142,7 @@
 <script type='text/template' id='tpl_my_status'>
 <div class='status'>
   <div style='margin:5px 0 1px 0;line-height:16px;font-size:12px;text-align:center;'>
-    <div style='float:left;'><i class='profile' style='background-image:url(<%=img %>)'></i></div>
+    <div style='float:left;margin-right:4px;'><i class='profile' style='background-image:url(<%=img %>)'></i></div>
     <div style='float:left;margin-right:17px;'>
       <div class='me_name' style='font-size:15px;line-height:22px;'><%= name %></div>
       <div><i class='batch-icon'>&#xf04b;</i> <span class='me_hearts'><%= n_hearts %></span></div>
@@ -203,7 +205,7 @@
   <div style='border-bottom:1px solid rgba(0,0,0,0.1);margin:24px 0 8px 0'>
     <div class='card_header' style='padding:0 12px;margin-bottom:6px;'>
       <i class='profile' style='float:left;display:block;background-image:url(<%=users[user_id].img%>)'></i>
-      <div style='float:left;'>
+      <div style='float:left;margin-left:4px;'>
         <div style='font-size:18px;line-height:20px;font-weight:bold'><%=users[user_id].name%></div>
         <div style='width:190px;'>
           <span style='float:right;font-size:12px;line-height:14px;color:rgba(0,0,0,0.4);'><%= datefmt(time) %> ago</span>
@@ -289,16 +291,41 @@
     <% var commentor_id = null %>
     <% for(var i=0; i<comments.length; i++){ %>
       <% commentor_id = comments[i].user_id %>
-      <div style='margin-bottom:8px;'>
+      <% if(commentor_id !== my_id){ %>
+      <div style='margin:4px 0 6px; 0'>
+        <i class='profile' style='float:left;background-image:url(<%=users[commentor_id].img%>)'></i>
+        <em style='float:left'></em>
+        <div style='float:left;color:#6a6b7d;padding:4px 6px;background-color:#ffffff;' class='rd6'>
+          <div>
+            <span style='float:left;line-height:18px;font-size:13px;font-weight:bold'><%=users[commentor_id].name %></span>
+            <span style='float:right;line-height:18px;font-size:11px;color:#afafcc'><%=timestr(comments[i].time)%></span>
+          </div>
+          <div style='line-height:16px;word-wrap:break-word;max-width:175px;'><%=comments[i].blah %></div>
+        </div>
+      </div>
+      <% }else{ %>
+      <div style='margin:4px 0 6px; 0'>
+        <i class='profile' style='float:right;background-image:url(<%=users[commentor_id].img%>)'></i>
+        <em style='float:right;border-right-color:transparent;border-left-color:#ffffff;'></em>
+        <div style='float:right;color:#6a6b7d;padding:4px 6px;background-color:#ffffff;' class='rd6'>
+          <div>
+            <span style='float:right;line-height:18px;font-size:13px;font-weight:bold'><%=users[commentor_id].name %></span>
+            <span style='float:left;line-height:18px;font-size:11px;color:#afafcc'><%=timestr(comments[i].time)%></span>
+          </div>
+          <div style='line-height:16px;word-wrap:break-word;max-width:175px;'><%=comments[i].blah %></div>
+        </div>
+      </div>
+      <% } %>
+      <!--div style='margin:2px 0 8px; 0'>
         <i class='profile' style='float:left;background-image:url(<%=users[commentor_id].img%>)'></i>
         <div style='float:left;'>
-          <div style=''>
+          <div>
             <span style='float:left;line-height:18px;font-size:14px;font-weight:bold'><%=users[commentor_id].name %></span>
             <span style='float:right;line-height:18px;font-size:12px;color:rgba(255,255,255,0.3)'><%=datefmt(comments[i].time)%> ago</span>
           </div>
           <div style='line-height:16px;word-wrap:break-word;width:196px;'><%=comments[i].blah %></div>
         </div>
-      </div>
+      </div-->
     <% } %>
     <% if( (shared === true && my_id === talk_user_id && (!commentor_id || commentor_id !== my_id)) || (shared === true && my_id === feeling_user_id && my_id !== talk_user_id && (commentor_id && commentor_id !== my_id) ) ) { %>
       <textarea class='talk_blah' style='display:block;' placeholder="남기고 싶은말"></textarea>
