@@ -138,6 +138,7 @@
         '': 'index',
         'login': 'index',
         'logout': 'logout',
+        'new_feeling': 'new_feeling',
         'my_feelings': 'my_feelings',
         'shared_feelings': 'shared_feelings',
         'received_feelings': 'received_feelings'
@@ -210,6 +211,19 @@
         });
       };
 
+      Router.prototype.new_feeling = function() {
+        this.scrollable_model = null;
+        this.models.app.set({
+          menu: null
+        });
+        router.layout.status.show(new MyStatusView({
+          model: this.models.me
+        }));
+        this.models.me.fetch();
+        this.layout.header.show(new NewFeelingView());
+        return this.layout.body.show();
+      };
+
       Router.prototype.shared_feelings = function() {
         this.scrollable_model = this.models.shared;
         this.models.app.set({
@@ -244,7 +258,7 @@
         this.models.me.fetch();
         this.models.my.reset();
         this.models.my.fetch_more();
-        this.layout.header.show(new NewFeelingView());
+        this.layout.header.show();
         return this.layout.body.show(new MyFeelingsView({
           model: this.models.my
         }));
@@ -254,9 +268,6 @@
         this.scrollable_model = this.models.received;
         this.models.app.set({
           menu: '#menu_received'
-        });
-        this.models.app.set({
-          menu: '#menu_my'
         });
         router.layout.status.show(new MyStatusView({
           model: this.models.me
@@ -761,10 +772,14 @@
       };
 
       AppView.prototype.render = function() {
+        var m;
         this.$el.css('overflow', 'visible');
         this.$el.html(this.template(this.model.toJSON()));
         this.$el.find('.fs_menu').removeClass('active');
-        return $(this.model.get('menu')).addClass('active');
+        m = this.model.get('menu');
+        if (m) {
+          return $(m).addClass('active');
+        }
       };
 
       AppView.prototype._on_toggle_dropdown = function() {

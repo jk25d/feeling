@@ -64,6 +64,7 @@ $ ->
       '': 'index'
       'login': 'index'
       'logout': 'logout'
+      'new_feeling': 'new_feeling'
       'my_feelings': 'my_feelings'
       'shared_feelings': 'shared_feelings'
       'received_feelings': 'received_feelings'
@@ -113,6 +114,13 @@ $ ->
         url: '../sessions'
         type: 'DELETE'
         success: (data) -> window.location = '/'
+    new_feeling: ->
+      @scrollable_model = null
+      @models.app.set {menu: null}
+      router.layout.status.show new MyStatusView(model: @models.me)
+      @models.me.fetch()
+      @layout.header.show new NewFeelingView()
+      @layout.body.show()
     shared_feelings: ->
       @scrollable_model = @models.shared
       @models.app.set {menu: '#menu_share'}
@@ -131,7 +139,7 @@ $ ->
       @models.me.fetch()
       @models.my.reset()
       @models.my.fetch_more()
-      @layout.header.show new NewFeelingView()
+      @layout.header.show()
       @layout.body.show new MyFeelingsView(model: @models.my)
     received_feelings: ->
       @scrollable_model = @models.received
@@ -324,7 +332,8 @@ $ ->
       @$el.css 'overflow', 'visible'
       @$el.html @template(@model.toJSON())
       @$el.find('.fs_menu').removeClass 'active'
-      $(@model.get('menu')).addClass 'active'
+      m = @model.get('menu')
+      $(m).addClass 'active' if m
     _on_toggle_dropdown: ->
       @$el.find('.fs_menu').toggleClass 'fs_menu_pop'
     _on_click_menu: (e) ->
