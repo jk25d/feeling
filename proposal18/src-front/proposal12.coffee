@@ -124,9 +124,7 @@ $ ->
       @models.me.fetch()
       @models.shared.reset()
       @models.shared.fetch_more()
-      @models.live_feelings.fetch
-        success: (model, res) ->
-          router.layout.header.show new LiveFeelingsView(model: router.models.live_feelings)
+      @layout.header.show()
       @layout.body.show new SharedFeelingsView(model: @models.shared)
     my_feelings: ->
       @scrollable_model = @models.my
@@ -314,8 +312,10 @@ $ ->
     @my_feelings:   _.template $('#tpl_my_feelings').html()
     @feeling:      _.template $('#tpl_feeling').html()
     @new_arrived:  _.template $('#tpl_new_arrived').html()
-    @arrived:      _.template $('#tpl_arrived_feeling').html()
     @arrived_holder: _.template $('#tpl_arrived_holder').html()
+    @menu_card:    _.template $('#tpl_menu_card').html()
+    @live_card:    _.template $('#tpl_live_card').html()
+    @asso_card:    _.template $('#tpl_asso_card').html()
 
   class AppView extends FsView
     events:
@@ -539,6 +539,44 @@ $ ->
       super()
       @model.off 'sync', @show, @
 
+  class MenuCardView extends FsView
+    tagName: 'li'
+    template: Tpl.menu_card
+    live_template: Tpl.live_card
+    asso_template: Tpl.asso_card
+    events:
+      'click .menu_live': '_on_live_click'
+      'click .menu_asso': '_on_asso_click'
+    initialize: ->
+      @model.on 'change:menu', @show, @
+    render: ->
+      @$el.html @template()
+      holder = @$el.find('.holder')
+      switch @model.get 'menu'
+        when 'live' then holder.html @live_template()
+        when 'asso' then holder.html @asso_template()
+        else holder.empty()
+    _on_live_click: ->
+      if @model.get('menu') == 'live'
+        @model.unset 'menu'
+        return
+      $.ajax
+        url: "../api/live_feelings"
+        context: @
+        data: {n: 6}
+        success: (data) ->
+          @model.clear()
+          @model.set(data)
+          @model.set 'menu', 'live'
+    _on_asso_click: ->
+      if @model.get('menu') == 'asso'
+        @model.unset 'menu'
+        return
+      @model.set 'menu', 'asso'
+    close: ->
+      super()
+      @model.off 'change:menu', @show, @
+
   class MyFeelingsView extends FsView
     template: Tpl.my_feelings
     initialize: ->
@@ -617,6 +655,7 @@ $ ->
       @model.on 'concat', @_on_concat, @
       @model.on 'prepend', @_on_prepend, @
     render: ->
+      @$el.append @_attach(new MenuCardView(model: new MenuCard)).el
       for m in @model.models
         @$el.append @_attach(new FeelingView(model: m)).el
     on_rendered: ->
@@ -630,7 +669,8 @@ $ ->
       unless router.models.me.get('has_available_feeling')
         return
       @arrived_view = new NewArrivedFeelingView().show()
-      @$el.prepend @arrived_view.el
+      menucard = @$el.find('.menucard')
+      menucard.after @arrived_view.el
       @arrived_view.on_rendered()
       @_wookmark.apply()
     _on_prepend: (model) ->
@@ -639,7 +679,8 @@ $ ->
           @arrived_view.close()
           @arrived_view =null
       @model.unshift model
-      @$el.prepend @_attach(new FeelingView(model: model)).el
+      menucard = @$el.find('.menucard')
+      menucard.after @_attach(new FeelingView(model: model)).el
       @_wookmark.apply()
     _on_concat: (list) ->
       for m in list
