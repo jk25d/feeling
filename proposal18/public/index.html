@@ -20,8 +20,8 @@
 <div id='fs_navbar'></div>
 <div id='fs_status'></div>
 <div id='fs_header'></div>
-<div id='fs_body'>
-</div>
+<div id='fs_body'></div>
+<div id='fs_popup'></div>
 
 
 <!-- TEMPLATES -->
@@ -111,9 +111,23 @@
   <div class='_ofh' style='text-align:center'>
     <a id='new_feeling_submit' class='btn fs_submit'>작성하기</a>
     <a id='new_feeling_anony' class='btn fs_submit'>익명으로 <span style='font-size:11px;color:#afafcc'>(1일1회)</span></a>
+    <a id='new_feeling_private' class='btn fs_submit'>비공개</a>
     <a id='new_feeling_cancel' class='btn fs_cancel'>취소</a>
   </div>
 </div>
+</script>
+
+<script type='text/template' id='tpl_feeling_cate'>
+  <li class='fs_link feeling rd6' word-id="all" style='text-align:center;padding:4px;background-color:#4c4d5f;'>
+    <div style='width:60px;height:60px;'>All</div>
+  </li>
+<% for(var wid in gW){ %>
+  <li class='fs_link feeling rd6' word-id="<%= wid %>" style='text-align:center;padding:4px;background-color:#4c4d5f;'>
+    <div class='rd20' style='width:60px;height:60px;color:#4c4d5f;background-color:<%=gW[wid].c%>;'>
+      <div class='fontello' style='margin-top:7px;'><%=gW[wid].w%></div>
+    </div>
+  </li>
+<% } %>
 </script>
 
 <script type='text/template' id='tpl_live_feelings'>
@@ -200,31 +214,24 @@
 
 <script type='text/template' id='tpl_my_status'>
 <div class='status'>
-  <div style='margin:5px 0 1px 0;line-height:16px;font-size:12px;text-align:center;'>
-    <div style='float:left;margin-right:4px;'><i class='profile' style='background-image:url(<%=img %>)'></i></div>
-    <div style='float:left;margin-right:17px;'>
-      <div class='me_name' style='font-size:15px;line-height:22px;'><%= name %></div>
-      <div><i class='batch-icon'>&#xf04b;</i> <span class='me_hearts'><%= n_hearts %></span></div>
-    </div>
-    <div style='float:left;margin-right:17px;'>
-      <div class='me_active_feelings' style='font-size:16px;line-height:22px;'><%= n_active_feelings %></div>
-      <div>공유중</div>
-    </div>
-    <div style='float:left;margin-right:17px;'>
-      <div class='me_my_feelings' style='font-size:16px;line-height:22px;'><%= n_my_feelings %></div>
-      <div>내꺼</div>
-    </div>
-    <div style='float:left;margin-right:17px;'>
-      <div class='me_rcv_feelings' style='font-size:16px;line-height:22px;'><%= n_rcv_feelings %></div>
-      <div>받은거</div>
-    </div>
-    <div class='me_has_available_feeling' style='<% if(!has_available_feeling){%>display:none;<%}%>float:left'>
-      <a href='#shared_feelings' style='color:#e8175d;'>
-        <div style='font-size:16px;line-height:22px;'><i class='linecons'>&#xe000</i></div>
-        <div>새 느낌</div>
-      </a>
-    </div>
-  </div>
+  <ul style='margin:8px 0 5px 0;line-height:32px;'>
+    <li style='margin-right:8px;'>
+      <div style='width:32px;height:32px;display:inline-block'>
+        <img style='height:32px;width:auto;' src='<%=img %>'></img>
+      </div>
+    <li style='margin-right:17px;font-size:26px;'>
+      <strong><%= name %></strong>
+    </li>
+    <li style='margin-right:17px;'>
+      공유중 <%= n_active_feelings %>
+    </li>
+    <li style='margin-right:17px;'>
+      <i class='linecons'>&#xe009;</i> 00
+    </li>
+    <li style='color:#e8175d;'>
+      <i class='linecons'>&#xe014;</i> 새 댓글
+    </li>
+  </ul>
 </div>
 </script>
 
@@ -237,18 +244,22 @@
 </script>
 
 <script type='text/template' id='tpl_arrived_holder'>
-<div id='receive_arrived'>
-  <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:225px;margin:5px;text-align:center;'>
-    <div style='margin-top:80px;line-height:40px;font-size:14px;'>Waiting New Feeling ...</div>
+<div id='new_card_holder'>
+  <div class='rd10' style='border:6px solid #afafcc;color:#afafcc;height:225px;margin:5px;font-size:14px;text-align:center;'>
+    <div style='margin-top:70px;line-height:40px;'>Random 느낌</div>
+    <div><i class='linecons'>&#xe009;</i> 00</div>
   </div>
 </div>
 </script>
 
-<script type='text/template' id='tpl_menu_card'>
-<div id='flipcard' style='color:#ffffff;background-color:#afafcc;height:235px;font-size:0'>
-  <a style='display:inline-block;font-size:14px;' class='fs_link menu_live text-decoration:underline;'>실시간 느낌</a>
-  <a style='display:inline-block;font-size:14px;' class='fs_link menu_live text-decoration:underline;'>통하는 사람들</a>
-
+<script type='text/template' id='tpl_arrived_feeling'>
+<div id='flipcard' style='background-color:<%=gW[word].c%>;text-align:center;'>
+  <div class='rd6' style='display:inline-block;vertical-align:middle;padding:4px;background-color:#4c4d5f;margin-top:35px'>
+    <div class='rd20' style='width:60px;height:60px;color:#4c4d5f;background-color:<%=gW[word].c%>;'>
+      <div class='fontello' style='margin-top:7px;'><%=gW[word].w%></div>
+    </div>
+  </div>
+  <div style='margin-top:35px;color:#4c4d5f'>새 느낌이 도착했습니다.</div>
 </div>
 </script>
 
@@ -261,14 +272,14 @@
 
 <script type='text/template' id='tpl_feeling'>
 <div class='inner' style='background-color:<%= gW[word].c %>;color:#ffffff;'>
-  <div class='expand_area fs_link'>
-  <div style='border-bottom:1px solid rgba(0,0,0,0.1);margin:24px 0 8px 0'>
-    <div class='card_header' style='padding:0 12px;margin-bottom:6px;'>
+  <div style='margin:6px 8px 0 0;text-align:right;line-height:16px;'><i class='linecons'>&#xe006;</i></div>
+  <div style='border-bottom:1px solid rgba(0,0,0,0.1);margin:0 0 8px 0'>
+    <div class='card_header fs_link' style='padding:0 12px;margin-bottom:6px;'>
       <i class='profile' style='float:left;display:block;background-image:url(<%=users[user_id].img%>)'></i>
       <div style='float:left;margin-left:4px;'>
         <div>
-          <span style='font-size:18px;line-height:20px;font-weight:bold'><%=users[user_id].name%></span>
-          <% if(!own){ %><span style='float:right;'><i class='typicons' style='line-height:20px;'>&#xe07f; &#xe07f; &#xe07f; &#xe07f;</i></span><% } %>
+          <span style='font-size:14px;line-height:20px;font-weight:bold;margin-right:10px;'><%=users[user_id].name%></span>
+          <% if(!own){ %><span><i class='linecons' style=''>&#xe000;</i> 20%</span><% } %>
         </div>
         <div style='width:190px;'>
           <span style='float:right;font-size:12px;line-height:14px;color:rgba(0,0,0,0.4);'><%= datefmt(time) %> ago</span>
@@ -276,6 +287,7 @@
       </div>
     </div>
   </div>
+  <div class='expand_area fs_link'>
   <div class='card_body' style='margin:16px 18px 18px 18px;line-height:20px;'>
     <% if(expanded) { %>
     <div style='min-height:80px;'>
@@ -295,15 +307,13 @@
           <span style='color:#fff;margin-right:8px;'><i class='icon-heart icon-white'></i> 우린 통해요</span>
         <% }else if(!own && share && (typeof empathy === 'undefined' || !empathy)){ %>
           <a class='fs_link' style='color:#fff;text-decoration:underline;margin-right:8px;'><i class='icon-heart icon-white'></i> 공감해요</a>
-          <a class='fs_link' style='color:#fff;text-decoration:underline;'>(부담스러워요)</a>
         <% }else if(!own && typeof empathy !== 'undefined' && empathy){ %>
           <span>공감해요</span>
         <% } %>
         </div>
         <% if(expanded === false || n_talk_users === 0) { %>
-        <div style='float:left;margin:15px 0 15px 12px;height:20px;'>
-          <span style='margin-right:4px'><i class='icon-user icon-white'/> <%= n_talk_users%></span>
-          <span><i class='icon-comment icon-white'/> <%= n_talk_msgs%></span>
+        <div class='expand_area fs_link' style='float:left;margin:15px 0 15px 12px;height:20px;'>
+          <span><i class='linecons'>&#xe014;</i> <%= n_talk_msgs%> (<%=n_talk_users%> 명)</span>
         </div>
         <% } %>
       </div>
@@ -316,8 +326,19 @@
 
 <script type='text/template' id='tpl_my_feelings'>
 <div style='background-color:#6a6b7d;'>
-  <div><i class='linecons' style='font-size:24px;float:left;line-height:30px;margin:10px 0 0 40px;'>&#xe00c; &#xe02c; &#xe02c; &#xe00c; </i></div>
+  <ul style='margin:10px 0 0 40px;'>
+    <li style='font-size:24px;line-height:30px;'>
+      <a href='#new_feeling'>
+        <i class='linecons'>&#xe00f;</i> <span style='font-size:13px;vertical-align:text-top;'>HOW ARE YOU FEELING NOW?</span>
+      </a>
+    </li>
+  </ul>
   <ul class='my_feelings_holder' style='margin:0 auto'>
+    <li style='font-size:24px;line-height:30px;'>
+      <a href='#new_feeling'>
+        <i class='linecons'>&#xe00f;</i> <span style='font-size:13px;vertical-align:text-top;'>지금 당신의 기분은 어떤가요?</span>
+      </a>
+    </li>
   </ul>
   <div><i class='linecons' style='font-size:24px;float:right;line-height:30px;margin:0 40px 10px 0;'>&#xe026; &#xe02c; &#xe000; &#xe017;</i></div>
 </div>
@@ -402,6 +423,92 @@
       <div style='color:rgba(255,255,255,0.3)'>This feeling is no longer sharable</div>
     <% } %>
   </div>
+</div>
+</script>
+
+<script type='text/template' id='tpl_menucard'>
+<div style='background-color:#4c4d5f;height:235px;'>
+  <a class='fs_link timeline menu'>Timeline</a>
+  <a class='fs_link buddies menu'>Buddies</a>
+  <a class='fs_link favorites menu'>Favorites</a>
+  <div class='holder'></div>
+</div>
+</script>
+
+<script type='text/template' id='tpl_timeline'>
+<div>xxx님과 buddy가 되었습니다.</div>
+<div>xxx님이 <i class='linecons'>&#xe00f;</i>을 보냈습니다.</div>
+<div>yyy님과 호감도가 상승하였습니다.</div>
+<div>zzz님과 더이상 buddy가 아닙니다.</div>
+</script>
+
+<script type='text/template' id='tpl_favorites'>
+<div>
+  <a><i class='linecons'>&#xe007;</i> sun</a>
+  <a><i class='linecons'>&#xe01e;</i></a>
+  <a><i class='typicons' style='font-size:20px'>&#xe02a;</i></a>
+  <span>1d ago</span>
+</div>
+<div>
+  <a><i class='linecons'>&#xe007;</i> moon</a>
+  <a><i class='linecons'>&#xe01e;</i></a>
+  <a><i class='typicons' style='font-size:20px'>&#xe029;</i></a>
+  <span>15d ago</span>
+</div>
+</script>
+
+<script type='text/template' id='tpl_buddies'>
+<div>
+  <a><i class='linecons'>&#xe007;</i> sun</a>
+  <a><i class='linecons'>&#xe01e;</i></a>
+  <a><i class='linecons'>&#xe00f;</i></a>
+  <span><i class='linecons'>&#xe000;</i> 20%</span>
+</div>
+</script>
+
+<script type='text/template' id='tpl_profile'>
+<% if(typeof id !== 'undefined' && id !== null){ %>
+<div class='card _sd0' style='z-index:900;position:fixed;top:20%;left:50%;margin-left:-140px;background-color:#afafcc;color:#4c4d5f;'>
+  <div class='close_btn' style='text-align:right;'><i class='typicons'>&#xe108;</i></div>
+  <div>
+    <div style='width:200px;height:200px;display:inline-block'>
+      <img style='height:200px;width:auto;' src='../img/profile3.jpg'></img>
+    </div>
+  </div>
+  <div>sun</div>
+  <div>총 느낌수: 111</div>
+  <div>
+    <div>최근 7일간 느낌</div>
+    <div></div>
+  </div>
+  <div>Favorites 수: 11</div>
+  <div>Buddy 수: 2</div>
+  <div>block</div>
+  <div>호감도(favorites만)</div>
+  <div>관계게이지(buddy만)</div>
+  <div><a href='#users/u1' style='text-decoration:underline'>프로필 상세</a></div>
+</div>
+<% } %>
+</script>
+
+<script type='text/template' id='tpl_profile_card'>
+<div style='background-color:#afafcc;color:#4c4d5f;'>
+  <div>
+    <div style='width:200px;height:200px;display:inline-block'>
+      <img style='height:200px;width:auto;' src='../img/profile3.jpg'></img>
+    </div>
+  </div>
+  <div>sun</div>
+  <div>총 느낌수: 111</div>
+  <div>
+    <div>최근 7일간 느낌</div>
+    <div></div>
+  </div>
+  <div>Favorites 수: 11</div>
+  <div>Buddy 수: 2</div>
+  <div>block</div>
+  <div>호감도(favorites만)</div>
+  <div>관계게이지(buddy만)</div>
 </div>
 </script>
 
