@@ -1,3 +1,13 @@
+#### CODING RULES ####
+# private variable, methods
+#   start with _
+#   don't use = when define it
+#     it makes side effects: can't use class's this memeber
+#
+#  Router -->* Layout
+#         -->* Model
+#  Layout --> View  --> Model
+
 $ ->
   gW = [
     { w: '두렵다', c: '#556270' },
@@ -72,6 +82,11 @@ $ ->
       @layout.nav.show new AppView(model: @models.app)
 
       _.bindAll @, 'index', 'logout', 'my_feelings', 'received_feelings'
+    _login_view: ->
+      @models.app.set {menu: '#menu_signup'}
+      @layout.header.show new LoginView
+      @layout.status.show()
+      @layout.body.show()
     index: ->
       $.ajax
         url: '../sessions'
@@ -80,12 +95,7 @@ $ ->
           403: ->
         context: @
         success: -> @navigate 'shared_feelings', {trigger: true}
-        error: -> @login_view()
-    login_view: ->
-      @models.app.set {menu: '#menu_signup'}
-      @layout.header.show new LoginView
-      @layout.status.show()
-      @layout.body.show()
+        error: -> @_login_view()
     logout: ->
       $.ajax
         url: '../sessions'
@@ -95,29 +105,25 @@ $ ->
     shared_feelings: ->
       @models.app.set {menu: '#menu_share'}
       @models.me.fetch
-        context: @
         success: (model)->
-          @layout.status.show new MyStatusView(model: model)
+          router.layout.status.show new MyStatusView(model: model)
       @models.shared.fetch
-        context: @
         success: (model)->
-          @layout.body.show new SharedFeelingsView(model: model)
+          router.layout.body.show new SharedFeelingsView(model: model)
       @layout.header.show new NewFeelingView
     my_feelings: ->
       @models.app.set {menu: '#menu_my'}
       @models.me.fetch
-        context: @
         success: (model)->
-          @layout.status.show new MyStatusView(model: model)
+          router.layout.status.show new MyStatusView(model: model)
       @models.my.fetch_more()
       @layout.header.show new NewFeelingView
       @layout.body.show new MyFeelingsView(model: @models.my)
     received_feelings: ->
       @models.app.set {menu: '#menu_received'}
       @models.me.fetch
-        context: @
         success: (model)->
-          @layout.status.show new MyStatusView(model: model)
+          router.layout.status.show new MyStatusView(model: model)
       @models.live_feelings.fetch()
       @models.received.fetch_more()
       @layout.header.show new LiveFeelingsView
@@ -213,7 +219,7 @@ $ ->
       @current_view.close() if @current_view
       return $("##{@id}").empty() unless view
       @current_view = view
-      @current_view.render()
+      @current_view.show()
       $("##{@id}").html @current_view.el
       @current_view.on_rendered()
 
@@ -231,23 +237,36 @@ $ ->
 
   #--- VIEWS ---#
 
-  # rerender 시 render했던 모든 view를 destroy하는 컨셉
+  # parent에서 child의 render대신 show 호출할것
+  # event callback도 동일
+  # show: ->
+  #   destroy children and self.el.empty
+  #   self.render
+  #   children.on_rendered
+  # render: ->
+  #   models.fetch_aync
+  #   @_attach views
+  #   @$el.append views.el
   class FsView extends Backbone.View
-    attach: (view) ->
+    _attach: (view) ->
       @views.push view
-      view.render()
+      view.show()
       view
-    detach_all: ->
+    _detach_all: ->
       @views ||= []
       while @views.length > 0
         @views.pop().close()
-    render: ->
-      console.log "#{@constructor.name}.render"
-      @detach_all()
+    show: ->
+      console.log "#{@constructor.name}.show"
+      @_detach_all()
       @$el.empty()
+      @render()
+      for v in @views
+        v.on_rendered()
+      @
     on_rendered: ->
     close: ->
-      @detach_all()
+      @_detach_all()
       @remove()
       @off()
 
@@ -269,24 +288,22 @@ $ ->
   class AppView extends FsView
     template: Tpl.navbar
     initialize: ->
-      @model.on 'change:menu', @render, @
+      @model.on 'change:menu', @show, @
     render: ->
-      super()
       @$el.html @template(@model.toJSON())
       @$el.find('.fs_menu').removeClass 'active'
       $(@model.get('menu')).addClass 'active'
     close: ->
       super()
-      @model.off 'change:menu', @render
+      @model.off 'change:menu', @show
 
   class LoginView extends FsView
     events:
-      'click .fs_submit': 'on_submit'
+      'click .fs_submit': '_on_submit'
     template: Tpl.login
     render: ->
-      super()
       @$el.html @template()
-    on_submit: ->
+    _on_submit: ->
       $.ajax
         url: '../sessions'
         type: 'POST'
@@ -303,63 +320,58 @@ $ ->
 
   class SignupView extends FsView
     events:
-      'click .fs_submit': 'on_submit'
+      'click .fs_submit': '_on_submit'
     template: Tpl.signup
     render: ->
-      super()
       @$el.html @template()
-    on_submit: ->
+    _on_submit: ->
       console.log 'signup submit'
 
   class MyStatusView extends FsView
     template: Tpl.my_status
     initialize: ->
-      @model.on 'sync', @render, @
+      @model.on 'sync', @show, @
     render: ->
-      super()
       @$el.html @template(@model.toJSON())    
     close: ->
       super()
-      @model.off 'sync', @render
+      @model.off 'sync', @show
 
   class LiveFeelingView extends FsView
     tagName: 'li'
     template: Tpl.live_feeling
     render: ->
-      super()
       @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
 
   class LiveFeelingsView extends FsView
     tagName: 'div'
     template: Tpl.live_status
     initialize: ->
-      @model.on 'sync', @render, @
+      @model.on 'sync', @show, @
     render: ->
-      super()
       @$el.html @template()
       holder = @$el.find('#live_holder')
       for m in @model.models
-        holder.append @attach(new LiveFeelingView(model: m)).el
+        holder.append @_attach(new LiveFeelingView(model: m)).el
     close: ->
       super()
-      @model.off 'sync', @render
+      @model.off 'sync', @show
 
   class NewFeelingView extends FsView
     events:
-      'click .fs_submit': 'on_submit'
-      'click #wordselect .ww': 'on_select_word'
+      'click .fs_submit': '_on_submit'
+      'click #wordselect .ww': '_on_select_word'
     template: Tpl.new_feeling
     render: ->
-      super()
       @$el.html @template({gW: gW})
-    on_select_word: (e) ->
+    _on_select_word: (e) ->
       @$el.find('#wordselect').find('.active').removeClass 'active'
       $(e.currentTarget).addClass 'active'
       unless @expanded
         @$el.find('.content0-input').css('display', 'block')
         @expanded = true
-        router.layout.body.current_view.wookmark.apply()
-    on_submit: ->
+        router.layout.body.current_view.on_rendered()
+    _on_submit: ->
       $.ajax
         url: '../api/feelings'
         type: 'POST'
@@ -376,28 +388,27 @@ $ ->
   class TalkView extends FsView
     template: Tpl.talk
     initialize: ->
-      @model.on 'change', @render, @
+      @model.on 'change', @show, @
     render: ->
-      super()
       @$el.html @template(@model.toJSON())
     close: ->
       super()
-      @model.off 'change', @render
+      @model.off 'change', @show
 
   class MyFeelingView extends FsView
     tagName: 'li'
     events:
-      'click .inner': 'on_expand'
+      'click .inner': '_on_expand'
     template: Tpl.my_feeling
+    _expand: false
+    _on_expand_triggered: false
     initialize: ->
-      @model.on 'change', @render, @
-      @expand = false
+      @model.on 'change', @show, @
     render: ->
-      super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
       @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
-      if @expand
+      if @_expand
         holder = @$el.find('.talks')
         holder.empty()
         for u,talk of @model.get('talks')
@@ -405,72 +416,69 @@ $ ->
             shared: @model.get('share')
             user_id: u
             comments: talk
-          holder.append @attach(new TalkView(model: new Talk(m))).el
+          holder.append @_attach(new TalkView(model: new Talk(m))).el
 
-      if @on_expand_triggered
+      if @_on_expand_triggered
         @$el.trigger 'refreshWookmark'
-      @on_expand_triggered = false
-    on_expand: (event) ->
-      @on_expand_triggered = true
-      @expand = not @expand
-      @render()
+      @_on_expand_triggered = false
+    _on_expand: (event) ->
+      @_on_expand_triggered = true
+      @_expand = not @_expand
+      @show()
     close: ->
       super()
-      @model.off 'change', @render(), @
+      @model.off 'change', @show, @
 
   class MyFeelingsView extends FsView
     tagName: 'ul'
     id: 'my_feelings_holder'
     className: 'fs_tiles'
     initialize: ->
-      @wookmark = new Wookmark(@id)
-      @model.on 'concat', @on_concat, @
-      $(window).on 'scroll', @on_scroll
+      @_wookmark = new Wookmark(@id)
+      @model.on 'concat', @_on_concat, @
+      $(window).on 'scroll', @_on_scroll
     render: ->
-      super()
       for m in @model.models
-        @$el.append @attach(new MyFeelingView(model: m)).el
+        @$el.append @_attach(new MyFeelingView(model: m)).el
     on_rendered: ->
-      console.log 'wook.my'
-      @wookmark.apply()
-    on_scroll: (e) ->
+      @_wookmark.apply()
+    _on_scroll: (e) ->
       router.models.my.fetch_more() if $(window).scrollTop() + $(window).height() >  $(document).height() - 100
-    on_concat: (list) ->
+    _on_concat: (list) ->
       for m in list
-        @$el.append @attach(new MyFeelingView(model: m)).el
-      @wookmark.apply()
+        @$el.append @_attach(new MyFeelingView(model: m)).el
+      @_wookmark.apply()
     close: ->
       super()
-      @model.off 'concat', @on_concat
-      $(window).off 'scroll', @on_scroll
+      @model.off 'concat', @_on_concat
+      $(window).off 'scroll', @_on_scroll
 
   class NewCommentView extends FsView
     className: 'new_comment'
     events:
-      'click .fs_link': 'on_submit'
+      'click .fs_link': '_on_submit'
     template: Tpl.new_comment
     render: ->
-      super()
       @$el.html @template()
       @
-    on_submit: (event) -> 
+    _on_submit: (event) -> 
       alert 'not implemented'
 
   class FeelingView extends FsView
     tagName: 'li'
     events:
-      'click .inner': 'on_expand'
+      'click .inner': '_on_expand'
     template: Tpl.feeling
+    _expand: false
+    _on_expand_triggered: false
     initialize: ->
-      @model.on 'sync', @render, @
-      @expand = false
+      @model.on 'sync', @show, @
     render: ->
-      super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       @$el.addClass('rd6').addClass('_sd0').addClass('card')
       @$el.html @template(_.extend(@model.toJSON(), {gW: gW}))
 
-      if @expand
+      if @_expand
         holder = @$el.find('.talks')
         holder.empty()
         for u,talk of @model.get('talks')
@@ -480,66 +488,64 @@ $ ->
             talk_user_id: u
             comments: talk
             user: @model.get('talk_user')
-          holder.append @attach(new TalkView(model: new Talk(m))).el
+          holder.append @_attach(new TalkView(model: new Talk(m))).el
 
-      if @on_expand_triggered
+      if @_on_expand_triggered
         @$el.trigger 'refreshWookmark'
-      @on_expand_triggered = false
-    on_expand: (event) ->
-      @on_expand_triggered = true
-      @expand = not @expand
+      @_on_expand_triggered = false
+    _on_expand: (event) ->
+      @_on_expand_triggered = true
+      @_expand = not @_expand
       @model.fetch()
     close: ->
       super()
-      @model.off 'change', @render
+      @model.off 'change', @show
 
   class ReceivedFeelingsView extends FsView
     tagName: 'ul'
     id: 'received_feelings_holder'
     className: 'fs_tiles'
     initialize: ->
-      @wookmark = new Wookmark(@id)
-      @model.on 'prepend', @on_prepend, @
-      @model.on 'concat', @on_concat, @
-      $(window).on 'scroll', @on_scroll
+      @_wookmark = new Wookmark(@id)
+      @model.on 'prepend', @_on_prepend, @
+      @model.on 'concat', @_on_concat, @
+      $(window).on 'scroll', @_on_scroll
     render: ->
-      super()
-      @$el.append @attach(new ArrivedFeelingView).el
+      @$el.append @_attach(new ArrivedFeelingView).el
       for m in @model.models
-        @$el.append @attach(new FeelingView(model: m)).el
+        @$el.append @_attach(new FeelingView(model: m)).el
     on_rendered: ->
-      @wookmark.apply()
-    on_scroll: ->
+      @_wookmark.apply()
+    _on_scroll: ->
       router.models.received.fetch_more() if $(window).scrollTop() + $(window).height() >  $(document).height() - 100
-    on_concat: (list) ->
+    _on_concat: (list) ->
       console.log 'concat'
       for m in list
-        @$el.append @attach(new FeelingView(model: m)).el
-      @wookmark.apply()
-    on_prepend: (model) ->
+        @$el.append @_attach(new FeelingView(model: m)).el
+      @_wookmark.apply()
+    _on_prepend: (model) ->
       @model.models.unshift model
-      @$el.find('.arrived_feeling').after @attach(new FeelingView(model: model)).el
-      @wookmark.apply()
+      @$el.find('.arrived_feeling').after @_attach(new FeelingView(model: model)).el
+      @_wookmark.apply()
     close: ->
       super()
-      @model.off 'concat', @on_concat
-      @model.off 'prepend', @on_prepend
-      $(window).off 'scroll', @on_scroll
+      @model.off 'concat', @_on_concat
+      @model.off 'prepend', @_on_prepend
+      $(window).off 'scroll', @_on_scroll
 
   class ArrivedFeelingView extends FsView
     tagName: 'li'
     className: 'arrived_feeling'
     events:
-      'click #receive_arrived': 'on_receive'
-      'click #flipcard': 'on_flip'
+      'click #receive_arrived': '_on_receive'
+      'click #flipcard': '_on_flip'
     template: Tpl.arrived
     holder_template: Tpl.arrived_holder
     initialize: ->
       @model = new ArrivedFeelings
-      @model.on 'sync', @render, @
-      router.models.me.on 'sync', @render, @
+      @model.on 'sync', @show, @
+      router.models.me.on 'sync', @show, @
     render: ->
-      super()
       @$el.removeClass('rd6').removeClass('_sd0').removeClass('card')
       if @model.length > 0
         @$el.addClass('rd6').addClass('_sd0').addClass('card')
@@ -548,11 +554,9 @@ $ ->
         @$el.addClass('rd6').addClass('card')
         @$el.html @holder_template(router.models.me.toJSON())
       @
-    on_receive: (event) ->
-      console.log 'on_receive'
+    _on_receive: (event) ->
       @model.fetch()
-    on_flip: (event) ->
-      console.log 'on_flip'
+    _on_flip: (event) ->
       model = @model.at 0
       $.ajax
         url: "../api/arrived_feelings/#{model.get('id')}"
@@ -565,30 +569,29 @@ $ ->
           router.models.shared.trigger 'prepend', new Feeling(data)
     close: ->
       super()
-      @model.off 'sync', @render
-      router.models.me.off 'sync', @render
+      @model.off 'sync', @show
+      router.models.me.off 'sync', @show
     
   class SharedFeelingsView extends FsView
     tagName: 'ul'
     id: 'shared_feelings_holder'
     className: 'fs_tiles'
     initialize: ->
-      @wookmark = new Wookmark(@id)
-      @model.on 'prepend', @on_prepend, @
+      @_wookmark = new Wookmark(@id)
+      @model.on 'prepend', @_on_prepend, @
     render: ->
-      super()
-      @$el.append @attach(new ArrivedFeelingView).el
+      @$el.append @_attach(new ArrivedFeelingView).el
       for m in @model.models
-        @$el.append @attach(new FeelingView(model: m)).el
+        @$el.append @_attach(new FeelingView(model: m)).el
     on_rendered: ->
-      @wookmark.apply()
-    on_prepend: (model) ->
+      @_wookmark.apply()
+    _on_prepend: (model) ->
       @model.models.unshift model
-      @$el.find('.arrived_feeling').after @attach(new FeelingView(model: model)).el
-      @wookmark.apply()
+      @$el.find('.arrived_feeling').after @_attach(new FeelingView(model: model)).el
+      @_wookmark.apply()
     close: ->
       super()
-      @model.off 'prepend', @on_prepend
+      @model.off 'prepend', @_on_prepend
 
 
   router = new Router

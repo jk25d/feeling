@@ -831,13 +831,15 @@ GET /feelings?type=[my,rcv,share]
 
 
 my feeling
-  talk_last_uid != me
+  talks
+    'uid'
+      last comment.uid == talks.uid  --> input
 
 rcv fee
-  talk_last_uid == null || != me
-
-my_id == talk_user_id && commentor_id && commentor_id != my_id
-my_id != talk_user_id && !commentor_id || commentor_id != my_id
+  talks
+    'uid'
+      no comment --> input
+      last comment.uid != talks.uid --> input
 
 
 card-rcv
@@ -968,336 +970,57 @@ DATA
           {user_id: '', blah: '', time: ''}  # ordered. latest last
         ]
 
+        
+        
+==================== 0917
 
-============ 0918 ============
-디자인
-  # 네비바.. 모바일 화면
-  * 회색 글씨.. 잘 안보임
-  * 코멘트 화면
-  * 글쓰기 텍스트에어리어
-  * 카드 디자인.. 내가 쓴거.. 받은거 구별가게
-  * 글쓰기.. 사이즈 줄이기.. 처음엔 텍스트에어리어만.. 클릭하면 커지게..
-  * 스테이터스바 내의 컨텐츠 배치
-
-기능
-  # 스테이터스바 지금 제대로 동작안함
-  # 하트 보내기
-  # 내가 쓴 느낌 리스트 화면
-  # 코멘트 테스트
-  * 받은 느낌 삭제..
-  # 내가 받은 느낌 리스트 화면
-  * 어라이브드 필링형태로 공지사항 보내려면??
-
-기타
-  * 아마존 올리기
-  * css 정리
+Dispatcher
+  run: ->
+    while @UQ.not_empty
+      uid = @UQ.pop
+      u = @DB.user uid
+      break unless @enough_wait u
+      fid = @select_appropriate_item_for u
+      send u, fid
 
 
-======== 0921 =============
-
-*사인업 페이지..
-#하트..
-#카드 디자인..
-설정파일 통한 오토 느낌 업로드..
-컬러..
-전체 엘리먼트 마진.. 패딩..
-아마존 올리기..
-#카드 변경된거(라이크나.. 답변) 쉐어드의 맨 앞쪽으로 왔으면..
-#오래지나도 쉐어드에 나오는 카드..
-
-ec2-54-238-24-54.ap-northeast-1.compute.amazonaws.com
-
-
-======= 0927 ============
+User
+  on_arrived: (fid) ->
+    @arrived_feelings.push fid
+  arrived_to_rcv: (fid) ->
+    @rcv_feelings.unshift fid
+    f = DB.feeling fid
+    f.grant_group_perm @id
+  my_active_feelings: ->
+  rcv_active_feelings: ->
+  all_active_feelings: ->
+    
 
 Feeling
-  talks
-    listeners
-      'uid'
-        n_reads: 0
-        star: null
-      'uid2'
-        n_reads: 10
-        star: null
-    comments: [...]
+  sharable_time: ->
+  sharable: ->
+  has_own_perm: (uid)->
+  has_group_perm: (uid)->
+  grant_group_perm: (uid) ->
+  weight: ->
+  change_open_status: ->
+  remove: ->
 
-has_group_perm uid
-  talks.listeners[uid]
-grant_group_perm uid
-  talks.listeners[uid] = {n_reads: talks.comments.length}
+/api/feelings?type=my
+  for fid in me.rcved
+    f = DB.feeling fid
+    continue unlee f.owner != me.id
+    r.push f
 
-post ../comments
-  talks.comments.push ..
+/api/feelings?type=share
+  for fid in me.rcved
+    f = DB.feeling fid
+    if f.owner == me.id
+      break unless f.share_time()
+    else
+      break unless now() - f.time < Feeling.SHARABLE_TIME + Feeling.DISPATCHABLE_TIME
 
-
-========= 1004 ===========
-
-# 400 Bad Request
-# 500 Internal Server Error
-
-# 필링뷰
-내꺼 공유중
-내꺼 공유종료
-남의꺼 공유중
-남의꺼 공유종료
-
-# 필링리스트뷰
-내꺼
-내꺼 특정느낌만
-공유중(내꺼+남꺼)
-받은거
-특정유저한테 받은거
-
-#프로필뷰
-내꺼
-페보릿
-버디
-남
-
-# ::: 내정보 :::
-# 빈도 상
-app.get '/api/me', (req,res) ->
-  #{id:'', name: '', n_shares:'', n_glasses:'', #n_new_comments:'', avail_anony_writes:''}
-  users.findById(id).exec()
-    .next (u) ->
-      res.json
-        id: u.id
-        name: u.name
-        n_actives: u.activefs.length
-        n_glasses: u.n_glasses()
-        has_comment: u.has_new_comment()
-        avail_anony_writes: u.avail_anony_writes()
-        
-  
-# ::: (클릭시?)새거 달라고 요구 (빈도 상) :::
-app.get '/api/feelings/new', (req,res) ->
-  # not enough glasses? 500 error
-  # glasses체크.. dec glasses
-  # 캐시무시.. 필링엔진에 적당한거 달라고 요청
-  # 결과는 필링요약목록에 엔티티1개 있는것과 같음..
-  me = db.get uid
-  me.n_glasses...
-  fid = engine.new_feeling(...)
-  f = db.get fid
-  dbutil.appendMulti ["#{me.id}:activefs", ...], f
-
-# ::: 필링상세 :::
-# 내꺼 공유중, 내꺼 공유종료, 남의꺼 공유중, 남의꺼 공유종료
-app.get '/api/feelings/:id', (req,res) ->
-  # 내꺼? get_feeling_mine_detail(id)
-  # 내가 받은거? get_feeling_other_detail(id)
-  # 둘다아님? 500 error
-  users.findById('').exec().then (doc) ->
-    doc.
-
-# ::: 필링요약목록 :::
-# 내꺼, 내꺼 특정느낌만, 공유중(내꺼+남꺼), 받은거, 특정유저한테 받은거
-app.get '/api/feelings', (req,res) ->
-  # type == 'my' ? db.me.mines(limit,..)
-  # type == 'rcv' ? db.me.rcvs
-  # has uid ? db.me.rcvs.uid ...
-  # type == 'active' ? db.me.shared
-
-# ::: 새 필링 :::
-app.post '/api/feelings', (req,res) ->
-
-# ::: 필링에 공감해요 :::
-app.put '/api/feelings/:id', (req,res) ->
-
-# ::: 댓글 :::
-app.post '/api/feelings/:id/comments', (req,res) ->
-
-# ::: 댓글에 하트 :::
-app.put '/api/feelings/:id/comments/:cid', (req,res) ->
-
-# ::: 유저 정보 :::
-# 내꺼, 페보릿, 버디, 남
-app.get '/api/users/:id', (req,res) ->
-
-# ::: 자기 필링 삭제 or 받은필링 제거 :::
-app.del '/api/feelings/:id', (req,res) ->
-
-# ::: 타임라인 :::
-app.get '/api/timeline', (req,res) ->
-
-# ::: 페버릿리스트 :::
-app.get '/api/favorites', (req,res) ->
-
-# ::: 버디리스트 :::
-app.get '/api/buddies', (req,res) ->
-
-# ::: block :::
-app.put '/api/blocklist/append', (req, res) ->
-app.put '/api/blocklist/remove', (req, res) ->
-app.get '/api/blocklist', (req, res) ->
-
-========
-
-# what is design doc.. and view.. how to create via sdk??
-
-class FeelingPrinter
-  constructor: (@req_user, @feeling) ->
-  detail: ->
-    owner? ...
-    group_member? ...
-    else? throw..
-  summary: ->
-
-
-app.get '/api/feelings/:id', (req,res) ->
-  db.get "feeling::#{id}", (err, rs) ->
-    f = new Feeling(rs)
-    fp = new FeelingPrinter(me, f)
-    try
-      res.json fp.detail()
-    catch
-      ...
-      
-      
-===================
-
-var Fiber = require('fibers');
-
-function sleep(ms) {
-    var fiber = Fiber.current;
-    setTimeout(function() {
-        fiber.run();
-    }, ms);
-    Fiber.yield();
-}
-
-Fiber(function() {
-    console.log('wait... ' + new Date);
-    sleep(1000);
-    console.log('ok... ' + new Date);
-}).run();
-console.log('back in main');
-
-
-======== mongoose plugins ==========
-
-text-search
-https://github.com/aheckmann/mongoose-text-search
-
-redis-cache
-https://github.com/conancat/mongoose-redis-cache
-
-paginate
-https://github.com/edwardhotchkiss/mongoose-paginate
-
-*async promise
-https://github.com/LearnBoost/express-mongoose
-
-
-=========== express.js security =============
-
-https://github.com/evilpacket/express-secure-skeleton/blob/master/app.js
-
-https://npmjs.org/package/helmet
-
-
-=============
-
-# what is design doc.. and view.. how to create via sdk??
-
-class FeelingPrinter
-  constructor: (@req_user, @feeling) ->
-  detail: ->
-    owner? ...
-    group_member? ...
-    else? throw..
-  summary: ->
-
-      
-
-USER
-  id: u00
-  email
-  name
-  img
-  n_glasses
-  last_written_t:
-  anony_ts: [t, ...]
-  favorites: {fv_id, ...}
-  buddies: {bd_id, ...}
-  blocks: {uid, ...}
-  activefs: [afid, ...]
-  u00:minefs: [fid, ...]
-  u00:rcvfs: [fid, ...]
-  
-FAVORITE
-  id: fv00
-  last_conn: <time>
-  conns: [fid, fid]
-  score:
-
-BUDDY
-  id: bd00
-  last_conn: <time>
-  conns: [fid, fid]
-
-ACTIVE_FEELING
-  id: af00
-  fid:
-  fowner:  # redundant but to reduce overhead on /api/me
-  n_reads:
-  
-FEELING
-  id: f00
-  owner
-  status: pub/prv
-  time:
-  face:
-  blah
-  listeners: {uid, ...}
-  comments: [cid, ...]
-  hearts: {uid, ...}
-
-COMMENT
-  id: f00:c00
-  owner
-  time
-  blah
-  n_hearts
-
-  ============
-  
-  mgs = require 'mongoose'
-mgs.connect 'mongodb://localhost/nanav'
-
-seq_schema = new mgs.Schema
-  _id: String
-  seq: Number
-  
-next_seq = (prefix) ->
-  m = mgs.model 'seq'
-  m.findByIdAndUpdate(prefix, {$inc: {seq:1}}).exec()
-Seq = mgs.model 'seq', seq_schema
-
-user_schema = new mgs.Schema
-  _id: String
-  name: String
-Users = mgs.model 'users', user_schema  
-
-
-user_seq = new Seq {_id: 'u', seq: 0}
-user_seq.save()
-
-next_seq('u')
-  .then (doc) ->
-    u = new Users {_id: doc.seq, name:'asdf'}
-    u.save()
-    console.log u._id
-    
-===========
-
-mgs = require 'mongoose'
-mgs.connect 'mongodb://localhost/nanav'
-
-user_schema = new mgs.Schema
-  name: String
-Users = mgs.model 'users', user_schema
-Users.create {name:'blah1'},{name:'blah2'}, (err, asdf, qwer) ->
-  Users.where('name').in(['asdf','blah1']).exec (err, doc) ->
-    console.log doc
-    
+POST /api/feelings
+  f = new Feeling()
+  DB.insert_feeling(f)
+  dispatcher.register_item f.id
