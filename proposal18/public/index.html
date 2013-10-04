@@ -214,11 +214,9 @@
 
 <script type='text/template' id='tpl_my_status'>
 <div class='status'>
-  <ul style='margin:8px 0 5px 0;line-height:32px;'>
-    <li style='margin-right:8px;'>
-      <div style='width:32px;height:32px;display:inline-block'>
-        <img style='height:32px;width:auto;' src='<%=img %>'></img>
-      </div>
+  <ul style='margin:8px 0 8px 0;line-height:32px;'>
+    <li style='width:32px;height:32px;display:inline-block;margin-right:8px;'>
+      <img style='height:32px;width:auto;' src='<%=img %>'></img>
     <li style='margin-right:17px;font-size:26px;'>
       <strong><%= name %></strong>
     </li>
@@ -288,7 +286,7 @@
     </div>
   </div>
   <div class='expand_area fs_link'>
-  <div class='card_body' style='margin:16px 18px 18px 18px;line-height:20px;'>
+  <div class='card_body' style='margin:14px 26px 20px 26px;line-height:20px;'>
     <% if(expanded) { %>
     <div style='min-height:80px;'>
     <% }else{ %>
@@ -306,14 +304,15 @@
         <% if(!own && like_me){ %>
           <span style='color:#fff;margin-right:8px;'><i class='icon-heart icon-white'></i> 우린 통해요</span>
         <% }else if(!own && share && (typeof empathy === 'undefined' || !empathy)){ %>
-          <a class='fs_link' style='color:#fff;text-decoration:underline;margin-right:8px;'><i class='icon-heart icon-white'></i> 공감해요</a>
+          <a class='fs_link' style='color:#fff;text-decoration:underline;margin-right:8px;'><i class='linecons' style=''>&#xe000;</i> 공감해요</a>
         <% }else if(!own && typeof empathy !== 'undefined' && empathy){ %>
           <span>공감해요</span>
         <% } %>
         </div>
         <% if(expanded === false || n_talk_users === 0) { %>
         <div class='expand_area fs_link' style='float:left;margin:15px 0 15px 12px;height:20px;'>
-          <span><i class='linecons'>&#xe014;</i> <%= n_talk_msgs%> (<%=n_talk_users%> 명)</span>
+          <span style='margin-right:8px'><i class='linecons'>&#xe014;</i> <%= n_talk_msgs%> (<%=n_talk_users%> 명)</span>
+          <span><i class='linecons' style=''>&#xe000;</i> 0</span>
         </div>
         <% } %>
       </div>

@@ -1028,3 +1028,29 @@ grant_group_perm uid
 
 post ../comments
   talks.comments.push ..
+
+
+========= 1004 ===========
+
+# 필링뷰
+내꺼 공유중
+내꺼 공유종료
+남의꺼 공유중
+남의꺼 공유종료
+
+# 필링리스트뷰
+내꺼
+내꺼 특정느낌만
+공유중(내꺼+남꺼)
+받은거
+특정유저한테 받은거
+
+#프로필뷰
+내꺼
+페보릿
+버디
+남
+
+# 빈도 상
+app.get '/api/me', (req,res) ->
+  {id:'', name: '', n_shares:'', n_glasses:'', n_new_comments:'', n_anony_writes:''}
