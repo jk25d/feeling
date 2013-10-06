@@ -1058,15 +1058,15 @@ post ../comments
 # 빈도 상
 app.get '/api/me', (req,res) ->
   #{id:'', name: '', n_shares:'', n_glasses:'', #n_new_comments:'', avail_anony_writes:''}
-  users.findById(id).exec()
+  Users.findById(uid).select("-rcvfs").exec()
     .next (u) ->
       res.json
         id: u.id
         name: u.name
-        n_actives: u.activefs.length
-        n_glasses: u.n_glasses()
+        n_activefs: u.activefs.length
+        n_glasses: u.n_read_perms()
         has_comment: u.has_new_comment()
-        avail_anony_writes: u.avail_anony_writes()
+        avail_anony_writes: u.n_anony_write_perms()
         
   
 # ::: (클릭시?)새거 달라고 요구 (빈도 상) :::
@@ -1087,16 +1087,42 @@ app.get '/api/feelings/:id', (req,res) ->
   # 내꺼? get_feeling_mine_detail(id)
   # 내가 받은거? get_feeling_other_detail(id)
   # 둘다아님? 500 error
-  users.findById('').exec().then (doc) ->
-    doc.
+  Feelings.findById id, (err, f) ->
+    return res.json f.print4me() if f.owner == uid
+    return res.json f.print() if f.member uid
+    res.send 500
 
 # ::: 필링요약목록 :::
 # 내꺼, 내꺼 특정느낌만, 공유중(내꺼+남꺼), 받은거, 특정유저한테 받은거
 app.get '/api/feelings', (req,res) ->
-  # type == 'my' ? db.me.mines(limit,..)
-  # type == 'rcv' ? db.me.rcvs
+  # type == 'my' ? db.me.minefs(limit,..)
+  # type == 'rcv' ? db.me.rcvfs
   # has uid ? db.me.rcvs.uid ...
   # type == 'active' ? db.me.shared
+  if type == 'my'
+    q = if face then {face:face} else {}
+    mgs.model("#{uid}:feelings").find(q).skip(skip).limit(n).exec (err, fs) ->
+      res.json fs.map (f) -> new FeelingPrinter(f).short_mine()
+  elseif type =='rcv'
+    unless user_id
+      Users.findById uid, 'rcvfs', (err,u) ->
+        for fid in u.rcvfs[skip..skip+n]
+          mgs.model("#{}:feelings").findById(fid).exec (err, f) ->
+            i++
+            return if err
+            ret.push f
+            res.json ret if i == u.rcvfs.length
+    else
+      Users.find({rcvfs: {$elemMatch: {$regex: "^#{uid}:.+"}}}).skip(skip).limit(n).exec (err, fs) ->
+        for f in fs
+          mgs.model("#{f.uid}:feelings").find(
+        
+      mgs.model("
+    mgs.model("#{uid}:rcvfs").find().skip(skip).limit(n).populate('fid').exec (err, fs) ->
+      res.json fs.map (f) -> new FeelingPrinter(f).short()
+  elseif type =='active'
+    mgs.model("#{uid}:activefs").find().skip(skip).limit(n).populate('fid').exec (err, fs) ->
+      res.json fs.map (f) -> new FeelingPrinter(f).short()
 
 # ::: 새 필링 :::
 app.post '/api/feelings', (req,res) ->
@@ -1189,6 +1215,15 @@ https://github.com/edwardhotchkiss/mongoose-paginate
 https://github.com/LearnBoost/express-mongoose
 
 
+======== mongodb docs ================
+
+query sub documents
+http://docs.mongodb.org/manual/reference/method/db.collection.find/#query-subdocuments
+http://docs.mongodb.org/manual/core/index-single/
+
+index strategy
+http://emptysqua.re/blog/optimizing-mongodb-compound-indexes/
+
 =========== express.js security =============
 
 https://github.com/evilpacket/express-secure-skeleton/blob/master/app.js
@@ -1215,9 +1250,9 @@ USER
   email
   name
   img
-  n_glasses
-  last_written_t:
-  anony_ts: [t, ...]
+  n_read_perms
+  last_written:
+  anony_writes: [t, ...]
   favorites: {fv_id, ...}
   buddies: {bd_id, ...}
   blocks: {uid, ...}
@@ -1301,3 +1336,11 @@ Users.create {name:'blah1'},{name:'blah2'}, (err, asdf, qwer) ->
   Users.where('name').in(['asdf','blah1']).exec (err, doc) ->
     console.log doc
     
+
+
+=========== mongodb tips
+
+in here, array means sub docuemtn array
+
+don't use array if u need its size frequentiy
+don't use array if it gets too big
