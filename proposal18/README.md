@@ -1245,55 +1245,48 @@ class FeelingPrinter
 
       
 
-USER
-  id: u00
-  email
-  name
-  img
-  n_read_perms
-  last_written:
-  anony_writes: [t, ...]
-  favorites: {fv_id, ...}
-  buddies: {bd_id, ...}
-  blocks: {uid, ...}
-  activefs: [afid, ...]
-  u00:minefs: [fid, ...]
-  u00:rcvfs: [fid, ...]
-  
-FAVORITE
-  id: fv00
-  last_conn: <time>
-  conns: [fid, fid]
-  score:
+userSchema = new mgs.Schema
+  _id: {type: String, unique: true}
+  email: {type: String, index: true, unique: true, required: true}
+  password: String
+  name: String
+  img: String
+  status_msg: String    # like kakao talk status message
+  nread_perms: {type: Number, default: 0}
+  last_written: {type: Number, default: 0}
+  anony_writes: [Number]
+  blocks: [String]
 
-BUDDY
-  id: bd00
-  last_conn: <time>
-  conns: [fid, fid]
+buddySchema = new mgs.Schema
+  uids: [String]
+  update_at: Number
+  score: {type: Number, default: 0}
 
-ACTIVE_FEELING
-  id: af00
-  fid:
-  fowner:  # redundant but to reduce overhead on /api/me
-  n_reads:
-  
-FEELING
-  id: f00
-  owner
-  status: pub/prv
-  time:
-  face:
-  blah
-  listeners: {uid, ...}
-  comments: [cid, ...]
-  hearts: {uid, ...}
+feelingSchema = new mgs.Schema
+  _id: {type: String, unique: true}    # no uid:fid pair for privacy
+  owner: {type: String, index: true}
+  status: String
+  time: {type: Number, default: 0}
+  face: String
+  blah: String
+  listeners: {type: [String], index: true, unique: true}
+  like_users: [String]
+  ncomments: {type: Number, default: 0}
+  comments: [commentSchema]
 
-COMMENT
-  id: f00:c00
-  owner
-  time
-  blah
-  n_hearts
+commentSchema = new mgs.Schema
+  _id: {type: Number, unique: true}  # index number
+  owner: String
+  time: {type: Number, default: 0}
+  blah: String
+  nhearts: {type: Number, default: 0}
+
+activeFeelingSchema = new mgs.Schema
+  fid: String
+  owner: {type: String, index: true}
+  nreads: {type: Number, default: 0}
+
+
 
   ============
   

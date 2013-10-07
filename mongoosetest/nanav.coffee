@@ -17,6 +17,7 @@ Users = mgs.model 'users', new userSchema
 
 buddySchema = new mgs.Schema
   uids: [String]
+  update_at: Number
   score: {type: Number, default: 0}
 buddySchema.index {uids: 1, score: 1}
 Buddies = mgs.model 'buddies', new buddySchema
@@ -34,6 +35,9 @@ feelingSchema = new mgs.Schema
   blah: String
   listeners: {type: [String], index: true, unique: true}
   like_users: [String]
+  # don't use ncomments as seq. 
+  # inc ncomments and pusing comments are atomic operation
+  comment_seq: {type: Number, default: 0}
   ncomments: {type: Number, default: 0}
   comments: [commentSchema]
 # for my feeling by face or feeling logs with buddy
@@ -75,11 +79,15 @@ sync Actives, 'create', 'find', 'findOne', 'findById', 'findByIdAndUpdate', 'cou
 
 
 next_seq = (prefix) ->
-  Seq.findByIdAndUpdate(prefix, {$inc: {seq: 1}}).seq
+  Seq.update({_id: prefix, {$inc: {seq: 1}} }).seq
 user_seq = -> "u#{next_seq 'u'}"
 feeling_seq = -> "f#{next_seq 'f'}"
+comment_seq = (fid) ->
+  f = Feelings.findByIdAndUpdate fid, {$inc: {comment_seq: 1}}, {select: 'comment_seq'}
+  "c#{f.comment_seq}"
 
 rand = (s,e) -> Math.round(Math.random()*e)+s
+now = -> new Date().getTime()
 
 activeFeelingSchema.statics.has_new_comments = (uid) ->
   # $regex can only use an index efficiently 
@@ -89,77 +97,77 @@ activeFeelingSchema.statics.has_new_comments = (uid) ->
   conds = afs.map (af) -> {fid: af.fid, ncomments: {$gt: af.nreads}}
   Feelings.count {$or: conds} > 0
 
-feelingSchema.statics.actives = (uid, options={}) ->
-  afs = Actives.find {owner: uid}, "fid nreads", options
+feelingSchema.statics.actives = (uid, skip, limit) ->
+  afs = Actives.find {owner: uid}, "fid nreads", {skip:skip, limit:limit}
 
   conds = afs.map (af) -> {fid: af.fid, ncomments: {$gt: af.nreads}}
   fs = @find {fid: afs.map(af) -> fid}, '-comments'
 
-  umap = {}
-  uids = fs.map (f) -> f.owner
-  us = Users.find {_id: {$in: uids}}, '_id name img'
-  for u in us do (u) -> umap[u._id] = u
-
   afmap = {}
   for af in afs do (af) -> afmap[af.fid] = af
-
-  scores = {}
-  candidates = uids.filter (u) -> u != uid
-  bs = Buddies.find {uids: uid, uids: {$in: candidates}}
-  for b in bs
-    continue if b.uids.length != 2
-    buddy = if b.uids[0] != uid then b.uids[0] else b.uids[1]
-    scores[buddy] = b.score
-
   for f in fs
     f.new_comments = f.ncomments - afmap[f.fid].nreads
-    f.users = {}
-    f.users[f.owner] = umap[f.owner]
-    f.users[f.owner].score = scores[f.owner] if scores[f.owner]
+  
+  Feelings.with_users uid, fs
   fs
 
-feelingSchema.statics.rcvs = (uid, options=[]) ->
-  fs = @find {listeners: uid}, '-comments', options
+feelingSchema.statics.rcvs = (uid, skip, limit) ->
+  fs = @find {listeners: uid}, '-comments', {skip:skip, limit:limit}
+  Feelings.with_users uid, fs
+  fs
 
+feelingSchema.statics.mines = (uid, face, skip, limit) ->
+  cond = {owner: uid}
+  cond.face = face if face
+  fs = @find cond, '-comments', {skip:skip, limit:limit}
+  Feelings.with_users uid, fs
+  fs
+  
+feelingSchema.statics.with_users = (uid, feelings, include_listeners=false) ->
   umap = {}
-  uids = fs.map (f) -> f.owner
+  uids = []
+  for f in feelings
+    uids.push f.owner
+    uids.concat f.listeners if include_listeners
   us = Users.find {_id: {$in: uids}}, '_id name img'
   for u in us do (u) -> umap[u._id] = u
 
   scores = {}
-  candidates = uids.filter (u) -> u != uid
+  candidates = uids.filter (u) -> u != feelings
   bs = Buddies.find {uids: uid, uids: {$in: candidates}}
   for b in bs
     continue if b.uids.length != 2
     buddy = if b.uids[0] != uid then b.uids[0] else b.uids[1]
     scores[buddy] = b.score
 
-  for f in fs
+  for f in feelings
     f.users = {}
     f.users[f.owner] = umap[f.owner]
     f.users[f.owner].score = scores[f.owner] if scores[f.owner]
-  fs
+  
+feelingSchema.methods.with_users = (uid) ->
+  Feelings.with_users uid, [@], true
 
-feelingSchema.statics.mines = (uid, face, options=[]) ->
-  cond = {owner: uid}
-  cond.face = face if face
-  fs = @find cond, '-comments', options
+feelingSchema.statics.like (fid, uid) ->
+  Feelings.update {_id: fid, {$addToSet: {like_users: uid}} }
 
+feelingSchema.statics.like_comment (fid, cid, uid) ->
+  # comment의 nhearts 증가
+  # f owner이면 like_users에 해당 유저가 있으면.. buddy를 찾아 score업뎃
+  f = Feelings.findByIdAndUpdate fid, {$inc: {"comments.#{cid}.nhearts": 1}}, {select: 'owner'}
+  if uid == f.owner
+    Buddies.update {uids: uid, uids: f.owner},
+      {uids: [uid, f.owner], update_at: now(), score: {$inc: 1}},
+      {upsert: true}
 
-feelingSchema.methods.with_users = (myid, include_listeners=false) ->
-  uids = [@owner]
-  if include_listeners
-    uids.concat @listeners
-  users = @model('users').find {_id: {$in: uids}}, '_id name img'
-  ret = {}
-  for u in users
-    ret.u._id = {name: u.name, img: u.img}
-  if myid != @owner
-    buddy = @model('buddies').findOne {uids: myid, uids: @owner}
-    ret[@owner].buddy_score = buddy.score if buddy
-  ret
+feelingSchema.statics.post_comment (fid, uid, blah) ->
+  seq = comment_seq(fid)
+  f = Feelings.findById fid
+  Feelings.update {_id: fid}, {
+    $inc: {ncomments: 1},
+    $push: {_id: seq, owner: uid, time: now(), blah: blah}}
 
-feelingSchema.statics.connection_logs = (uid0, uid1) ->
+feelingSchema.statics.buddy_logs = (uid0, uid1) ->
   uids = [uid0, uid1]
   @find {owner: {$in: uids}, listeners: {$in: uids}}
 
@@ -169,8 +177,11 @@ buddySchema.statics.favorites = (uid) ->
 buddySchema.statics.buddies = (uid) ->
   @find {uids: uid, score: 10 }
 
+# profile...
 
-
+feelingSchema.statics.delete (fid) ->
+  Feelings.remove {_id: fid}
+  Actives.remove {fid: fid}
 
 
 sync.fiber ->
