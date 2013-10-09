@@ -1,0 +1,130 @@
+내가 쓴거
+내가 과거에 받았던거..목록..
+내가 쓴거중 특정 느낌만
+특정인과 소통했던 목록..
+
+
+users
+  id
+  email
+  pwd
+  name
+  img
+  msg
+  n_listen_coins: num
+  last_written_at: time
+  anon_wrtten_ats: [time] # ordered
+  blocks: [uid]
+pk: id
+
+emails
+  email: 
+  uid
+pk: email
+
+buddies
+  id: # uid:uid
+  score:
+  updated_at:
+  logs: [fid]
+pk: id
+
+active_feelings  # for list
+  owner
+  n_reads
+  n_comments:
+  fid
+pk: owner, fid
+# for alert, fid
+
+user_feelings  # for list
+  owner
+  time
+  fid
+  face
+  type: (ttl)
+  time: (ttl)
+  blah: (ttl)
+  n_comments: (ttl)
+pk: owner, time
+idx: face
+
+rcv_feelings  # for list
+  receiver
+  received_at
+  fid
+  face:       # for buddy logs
+  type: (ttl)
+  time: (ttl)
+  blah: (ttl)
+  n_comments: (ttl)
+pk: receiver, received_at
+
+feelings
+  id
+  owner
+  face
+  type: 0 - pub /1 -prv/ 2 - anon
+  time
+  blah
+  n_comments: counter
+pk: id   # to use owner as partition key
+
+listeners
+  fid
+  uid
+  sent_like: bool
+  rcvd_like: bool
+pk: fid, uid
+# fid의 listener 찾을때
+
+comments
+  fid
+  uid
+  speaker
+  blah
+  time
+pk: (fid,uid), time
+
+
+================
+
+http://www.datastax.com/dev/blog/the-data-dictionary-in-
+cassandra-1-2
+
+select * from system.schema_keyspaces;
+select * from system.schema_columnfamilies where 
+keyspace_name='nanav';
+select * from system.schema_columns where keyspace_name='nanav' 
+and columnfamily_name='feelings';
+
+create table comments (fid text, uid text, time int, primary key
+((fid,uid),time) );
+insert into comments (fid,uid,time) values ('0','0',1);
+insert into comments (fid,uid,time) values ('0','0',0);
+select * from comments where fid='0' and uid='0';
+
+
+create table feelings (id text, owner text, face text, time int, 
+primary key((id), owner, time) );
+create index on feelings (face);
+insert into feelings (id, owner, face, time) values 
+('f0','u0','fc0',1);
+insert into feelings (id, owner, face, time) values 
+('f1','u1','fc2',0);
+insert into feelings (id, owner, face, time) values 
+('f4','u1','fc1',2);
+insert into feelings (id, owner, face, time) values 
+('f2','u0','fc1',0);
+insert into feelings (id, owner, face, time) values 
+('f3','u1','fc1',1);
+select * from feelings where id='f0';
+select * from feelings where owner ='u0';
+select * from feelings where owner ='u1' and face='fc1';
+
+create table actives (owner text, nreads int, ncomments int, primary key (owner,ncomments,nreads) );
+insert into actives (owner, nreads, ncomments) values ('0', 10, 20);
+insert into actives (owner, nreads, ncomments) values ('1', 20, 20);
+insert into actives (owner, nreads, ncomments) values ('2', 9, 10);
+insert into actives (owner, nreads, ncomments) values ('0', 3, 4);
+select * from actives where owner='0' and ncomments > nreads;
