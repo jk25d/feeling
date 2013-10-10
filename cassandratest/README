@@ -1,8 +1,4 @@
-내가 쓴거
-내가 과거에 받았던거..목록..
-내가 쓴거중 특정 느낌만
-특정인과 소통했던 목록..
-
+# 일단 캐시 무시..
 
 users
   id
@@ -11,6 +7,7 @@ users
   name
   img
   msg
+  init_listen_coin_capa: 
   n_listen_coins: num
   last_written_at: time
   anon_wrtten_ats: [time] # ordered
@@ -29,23 +26,11 @@ buddies
   logs: [fid]
 pk: id
 
-active_feelings  # for list
-  owner
-  n_reads
-  n_comments:
-  fid
-pk: owner, fid
-# for alert, fid
-
 user_feelings  # for list
   owner
   time
   fid
   face
-  type: (ttl)
-  time: (ttl)
-  blah: (ttl)
-  n_comments: (ttl)
 pk: owner, time
 idx: face
 
@@ -54,10 +39,6 @@ rcv_feelings  # for list
   received_at
   fid
   face:       # for buddy logs
-  type: (ttl)
-  time: (ttl)
-  blah: (ttl)
-  n_comments: (ttl)
 pk: receiver, received_at
 
 feelings
@@ -67,7 +48,6 @@ feelings
   type: 0 - pub /1 -prv/ 2 - anon
   time
   blah
-  n_comments: counter
 pk: id   # to use owner as partition key
 
 listeners
@@ -86,8 +66,18 @@ comments
   time
 pk: (fid,uid), time
 
+couchbase
+---------
 
-waiting_feelings  # temporary
+cb_active_feelings  # for list
+  owner
+  n_reads
+  n_comments:
+  fid
+pk: owner, fid
+# for alert, fid
+
+cb_waiting_feelings  # temporary
   fid
   face
   owner
