@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NANAV</title>
+  <script src="js/jquery-1.10.2.min.js"></script>
+  <script src="js/bootstrap-2.3.2.js"></script>
+  <script src="js/json2.js"></script>
+  <script src="js/underscore-1.5.1.js"></script>
+  <script src="js/backbone-1.0.0.min.js"></script>
+  <script src="js/coffee-script.js"></script>
+  <style>
+    li {list-style:none;}
+    .blah {max-height:200px;padding-bottom:10px;}
+  </style>
+  <script type='text/coffeescript'>
+    $ ->
+      rand = (s,e) ->
+        Math.round(Math.random()*e)+s
+      blah = ->
+        a = []
+        for i in [0..rand(2,10)]
+          a.push "blah#{i}"
+        a.join(" ")
+      clone = (obj) ->
+        return JSON.parse(JSON.stringify(obj))  
+      
+      pagemap = (comments, tpl, ul_height) ->
+        pages = []
+        page = []
+        page_height = 0
+        testarea = $('#testarea')
+        while comments.length > 0
+          x = tpl {blah: comments.pop()}
+          testarea.html x
+          page_height += testarea.height()
+          if page_height > ul_height
+            pages.push clone page 
+            page = [x]
+            page_height = testarea.height()
+          else
+            page.push x
+        pages.push clone page if page.length > 0
+        console.log pages
+        pages
+      page_comments = (page_n, comments, tpl, ul_height) ->
+        pages = pagemap(comments, tpl, ul_height)
+        pages[page_n].join('')
+        
+      tpl = _.template $("#tpl_comment").html()
+      comments = []
+      for i in [0..rand(20,50)]
+        comments.push blah()
+
+      $('#content').html page_comments(2, comments, tpl, 300) 
+  </script>
+</head>
+
+<body>
+<div id='testarea' style='width:100px;position:absolute;top:-1000px;left:-1000px;visibility:hidden;'></div>
+
+<ul id='content' style='height:300px;width:100px;overflow:hidden;border:1px solid red'>
+</ul>
+
+<script type='text/template' id='tpl_comment'>
+<li><div class='blah'><%=blah%></div></li>
+</script>
+
+</body>
+</html>
+

@@ -87,6 +87,15 @@ comments
 pk: (fid,uid), time
 
 
+waiting_feelings  # temporary
+  fid
+  face
+  owner
+  blocks
+  time
+pk: time
+  
+
 ================
 
 http://www.datastax.com/dev/blog/the-data-dictionary-in-

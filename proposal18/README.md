@@ -1054,108 +1054,126 @@ post ../comments
 버디
 남
 
+# 가입
+app.post '/users', (req,res) ->
+
+# 로그인
+
+# 로그아웃
+
 # ::: 내정보 :::
-# 빈도 상
+# return: id, name, img, msg, n_listen_coins, last_written_ats, anon_written_ats
 app.get '/api/me', (req,res) ->
-  #{id:'', name: '', n_shares:'', n_glasses:'', #n_new_comments:'', avail_anony_writes:''}
-  Users.findById(uid).select("-rcvfs").exec()
-    .next (u) ->
-      res.json
-        id: u.id
-        name: u.name
-        n_activefs: u.activefs.length
-        n_glasses: u.n_read_perms()
-        has_comment: u.has_new_comment()
-        avail_anony_writes: u.n_anony_write_perms()
-        
+
+# 새 메시지 알럿
+# return: [{fid: bool}]
+Users.updated_feelings
+  select * from active_feelings
+  ...
+
+# ::: 새 필링 :::
+# params: type(pub/prv/anon), uid, face, blah
+app.post '/api/feelings', (req,res) ->
+  # pub
+  f = Feelings.create
+    insert into active_feelings ...
+    insert into user_feelings ...
+    insert into feelings ...
+  Engine.post f
+  # prv
+  ... same as above
+  ... but no push to Engine
+  # anon
+  Users.has_anon_write_perm
+  ... same as pub
+  # pub & uid
+  Users.buddy uid
+  ... same as pub
+  Users.grab f
+  
+# ::: 필링요약목록 :::
+# 내꺼, 내꺼 특정느낌만, 공유중(내꺼+남꺼), 받은거, 특정유저한테 받은거
+# params: type(my, rcv), face, start, limit
+app.get '/api/feelings', (req,res) ->
+  # my
+  uf = Users.updated_feelings
+  fs = Feelings.user_feelings myid
+    select * from user_feelings where owner == myid and time > start limit limit
+  FeelingPrinter.short fs, uf
+  # rcv
+  uf = Users.updated_feelings
+  fs = Feelings.rcv_feelings myid
+    select * from rcv_feelings where receiver == myid and received_at > start limit limit
+  FeelingPrinter.short fs, uf
   
 # ::: (클릭시?)새거 달라고 요구 (빈도 상) :::
 app.get '/api/feelings/new', (req,res) ->
-  # not enough glasses? 500 error
-  # glasses체크.. dec glasses
-  # 캐시무시.. 필링엔진에 적당한거 달라고 요청
   # 결과는 필링요약목록에 엔티티1개 있는것과 같음..
-  me = db.get uid
-  me.n_glasses...
-  fid = engine.new_feeling(...)
-  f = db.get fid
-  dbutil.appendMulti ["#{me.id}:activefs", ...], f
-
+  Users.has_listen_perm
+  f = Engine.select
+  Users.grab f
+      
 # ::: 필링상세 :::
 # 내꺼 공유중, 내꺼 공유종료, 남의꺼 공유중, 남의꺼 공유종료
 app.get '/api/feelings/:id', (req,res) ->
-  # 내꺼? get_feeling_mine_detail(id)
-  # 내가 받은거? get_feeling_other_detail(id)
+  # 내꺼? 
+  # 내가 받은거? 
   # 둘다아님? 500 error
-  Feelings.findById id, (err, f) ->
-    return res.json f.print4me() if f.owner == uid
-    return res.json f.print() if f.member uid
-    res.send 500
-
-# ::: 필링요약목록 :::
-# 내꺼, 내꺼 특정느낌만, 공유중(내꺼+남꺼), 받은거, 특정유저한테 받은거
-app.get '/api/feelings', (req,res) ->
-  # type == 'my' ? db.me.minefs(limit,..)
-  # type == 'rcv' ? db.me.rcvfs
-  # has uid ? db.me.rcvs.uid ...
-  # type == 'active' ? db.me.shared
-  if type == 'my'
-    q = if face then {face:face} else {}
-    mgs.model("#{uid}:feelings").find(q).skip(skip).limit(n).exec (err, fs) ->
-      res.json fs.map (f) -> new FeelingPrinter(f).short_mine()
-  elseif type =='rcv'
-    unless user_id
-      Users.findById uid, 'rcvfs', (err,u) ->
-        for fid in u.rcvfs[skip..skip+n]
-          mgs.model("#{}:feelings").findById(fid).exec (err, f) ->
-            i++
-            return if err
-            ret.push f
-            res.json ret if i == u.rcvfs.length
-    else
-      Users.find({rcvfs: {$elemMatch: {$regex: "^#{uid}:.+"}}}).skip(skip).limit(n).exec (err, fs) ->
-        for f in fs
-          mgs.model("#{f.uid}:feelings").find(
-        
-      mgs.model("
-    mgs.model("#{uid}:rcvfs").find().skip(skip).limit(n).populate('fid').exec (err, fs) ->
-      res.json fs.map (f) -> new FeelingPrinter(f).short()
-  elseif type =='active'
-    mgs.model("#{uid}:activefs").find().skip(skip).limit(n).populate('fid').exec (err, fs) ->
-      res.json fs.map (f) -> new FeelingPrinter(f).short()
-
-# ::: 새 필링 :::
-app.post '/api/feelings', (req,res) ->
-
+  f = Feelings.get
+  f.mine?
+    FeelingPrinter.print4me f
+  f.rcv?
+    FeelingPrinter.print f
+    
 # ::: 필링에 공감해요 :::
 app.put '/api/feelings/:id', (req,res) ->
+  me.has_listen_perm
+  Feeling.like me.id
 
+# 리스너 목록 및 최근 코멘트(쥔장용)
+app.get '/api/feelings/:id/listeners', (req,res) ->
+  me.has_own_perm 
+
+# 댓글 목록
+app.get '/api/feelings/:id/listeners/:uid/comments', (req,res) ->
+  me.has_listen_perm
+  Feeling.comments
+  
 # ::: 댓글 :::
-app.post '/api/feelings/:id/comments', (req,res) ->
+app.post '/api/feelings/:id/listeners/:uid/comments', (req,res) ->
+  me.has_listen_perm
+  Feeling.comment ...
 
-# ::: 댓글에 하트 :::
-app.put '/api/feelings/:id/comments/:cid', (req,res) ->
-
-# ::: 유저 정보 :::
-# 내꺼, 페보릿, 버디, 남
-app.get '/api/users/:id', (req,res) ->
+# ::: 리스너에 하트 :::
+app.put '/api/feelings/:id/listeners/:uid', (req,res) ->
+  me.has_own_perm
+  Feeling.like_listener
 
 # ::: 자기 필링 삭제 or 받은필링 제거 :::
 app.del '/api/feelings/:id', (req,res) ->
+  Feeling.own_perm
+  Feeling.listen_perm  
 
 # ::: 타임라인 :::
 app.get '/api/timeline', (req,res) ->
 
-# ::: 페버릿리스트 :::
-app.get '/api/favorites', (req,res) ->
-
 # ::: 버디리스트 :::
 app.get '/api/buddies', (req,res) ->
+  select * from buddies where id in ("myid:uid", "uid:myid")
+
+# 버디와 로그..
+  select logs from buddies ...
+
+# ::: 유저 정보 :::
+# 내꺼, 버디, 남
+app.get '/api/users/:id', (req,res) ->
 
 # ::: block :::
-app.put '/api/blocklist/append', (req, res) ->
-app.put '/api/blocklist/remove', (req, res) ->
-app.get '/api/blocklist', (req, res) ->
+app.post '/api/blocks', (req, res) ->
+app.del '/api/blocks/:id', (req, res) ->
+app.get '/api/blocks', (req, res) ->
+
+# top listeners
 
 ========
 
